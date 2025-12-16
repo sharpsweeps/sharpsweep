@@ -1,0 +1,3995 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>SharpSweep – Demo MVP</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #020617;
+        --card: #020617;
+        --border: #1e293b;
+        --text: #e2e8f0;
+        --muted: #64748b;
+        --accent: #22c55e;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont,
+          "SF Pro Text", "Segoe UI", sans-serif;
+        background: radial-gradient(circle at top, #0f172a 0, #020617 55%);
+        color: var(--text);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .app-shell {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      header,
+      footer {
+        height: 56px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 16px;
+        border-bottom: 1px solid var(--border);
+        backdrop-filter: blur(10px);
+        background: linear-gradient(
+          to bottom,
+          rgba(15, 23, 42, 0.9),
+          rgba(15, 23, 42, 0.4)
+        );
+        z-index: 10;
+      }
+
+      footer {
+        border-top: 1px solid var(--border);
+        border-bottom: none;
+        background: linear-gradient(
+          to top,
+          rgba(15, 23, 42, 0.9),
+          rgba(15, 23, 42, 0.4)
+        );
+        justify-content: center;
+        font-size: 11px;
+        color: var(--muted);
+      }
+
+      .header-left {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .logo-group {
+        position: relative;
+        display: flex;
+        align-items: center;
+      }
+
+      .logo-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        border: 1px solid transparent;
+        background: transparent;
+        cursor: pointer;
+      }
+
+      .logo-button:hover {
+        border-color: #1f2937;
+        background: rgba(15, 23, 42, 0.85);
+      }
+
+      .logo {
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .logo-caret {
+        font-size: 10px;
+        color: var(--muted);
+      }
+
+      .sports-menu {
+        position: absolute;
+        top: 110%;
+        left: 0;
+        background: #020617;
+        border-radius: 16px;
+        border: 1px solid var(--border);
+        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.8);
+        padding: 8px 0;
+        min-width: 220px;
+        display: none;
+        z-index: 60;
+      }
+
+      .sports-menu.open {
+        display: block;
+      }
+
+      .sports-menu-item {
+        padding: 6px 12px;
+        font-size: 12px;
+        color: #e5e7eb;
+        cursor: default;
+        position: relative;
+      }
+
+      .sports-menu-item:hover {
+        background: #0f172a;
+      }
+
+      .sports-menu-item-title {
+        font-weight: 500;
+      }
+
+      .sports-games-submenu {
+        margin-top: 4px;
+        margin-left: 4px;
+        padding-left: 8px;
+        border-left: 1px solid #1f2937;
+      }
+
+      .game-item {
+        font-size: 11px;
+        color: var(--muted);
+        padding: 3px 0;
+        cursor: pointer;
+      }
+
+      .game-item:hover {
+        color: #e5e7eb;
+      }
+
+      #back-to-sports {
+        display: none;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        background: rgba(15, 23, 42, 0.95);
+        color: var(--muted);
+        font-size: 11px;
+        padding: 4px 10px;
+        cursor: pointer;
+      }
+
+      #back-to-sports:hover {
+        border-color: #334155;
+        color: #e5e7eb;
+      }
+
+      .user-menu-wrapper {
+        position: relative;
+      }
+
+      .menu-placeholder {
+        font-size: 11px;
+        color: var(--muted);
+        cursor: pointer;
+        padding: 4px 10px;
+        border-radius: 999px;
+        border: 1px solid transparent;
+        background: transparent;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .menu-placeholder:hover {
+        border-color: #1f2937;
+        color: #e5e7eb;
+        background: rgba(15, 23, 42, 0.8);
+      }
+
+      .user-dropdown {
+        position: absolute;
+        right: 0;
+        top: 110%;
+        background: #020617;
+        border-radius: 16px;
+        border: 1px solid var(--border);
+        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.8);
+        min-width: 180px;
+        padding: 6px 0;
+        display: none;
+        z-index: 60;
+      }
+
+      .user-dropdown.open {
+        display: block;
+      }
+
+      .user-dropdown-item {
+        padding: 6px 12px;
+        font-size: 12px;
+        cursor: pointer;
+        color: #e5e7eb;
+      }
+
+      .user-dropdown-item:hover {
+        background: #0f172a;
+      }
+
+      .user-dropdown-separator {
+        border-top: 1px solid #1f2937;
+        margin: 4px 0;
+      }
+
+      main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: center;
+        padding: 24px 16px;
+      }
+
+      .content {
+        max-width: 960px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        align-items: stretch;
+      }
+
+      .title-block {
+        text-align: center;
+      }
+
+      .title-block h1 {
+        font-size: 28px;
+        margin: 0 0 8px;
+      }
+
+      .title-block p {
+        margin: 0;
+        font-size: 14px;
+        color: var(--muted);
+      }
+
+      .title-block .directions {
+        margin-top: 6px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      @media (min-width: 768px) {
+        .title-block h1 {
+          font-size: 32px;
+        }
+        .title-block .directions {
+          font-size: 13px;
+        }
+      }
+
+      /* card stack */
+      .card-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .card-click-area {
+        position: relative;
+        width: 100%;
+        max-width: 380px;
+        aspect-ratio: 2.5 / 3.5;
+        perspective: 1200px;
+        cursor: pointer;
+      }
+
+      @media (min-width: 1024px) {
+        .card-click-area {
+          max-width: 420px;
+        }
+      }
+
+      .card,
+      .stack-card {
+        position: absolute;
+        inset: 0;
+        border-radius: 24px;
+        border: 1px solid var(--border);
+        background: radial-gradient(circle at top, #020617, #020617);
+        box-shadow: 0 22px 40px rgba(0, 0, 0, 0.6);
+        overflow: hidden;
+      }
+
+      .card-main {
+        transform-style: preserve-3d;
+        transition: transform 0.5s ease;
+        z-index: 3;
+      }
+
+      .stack-card {
+        pointer-events: none;
+        opacity: 0.55;
+        z-index: 0;
+      }
+
+      .stack-card.stack-1 {
+        transform: translateY(10px) translateX(6px) scale(0.97);
+      }
+
+      .stack-card.stack-2 {
+        transform: translateY(18px) translateX(10px) scale(0.94);
+        opacity: 0.4;
+      }
+
+      .stack-card.stack-3 {
+        transform: translateY(26px) translateX(14px) scale(0.9);
+        opacity: 0.25;
+      }
+
+      .card-face {
+        position: absolute;
+        inset: 0;
+        padding: 18px 16px 14px;
+        display: flex;
+        flex-direction: column;
+        backface-visibility: hidden;
+      }
+
+      .card-front {
+        align-items: center;
+        text-align: center;
+        justify-content: center;
+        gap: 12px;
+        transform: rotateY(0deg);
+        transition: transform 0.5s ease;
+      }
+
+      .card-back {
+        transform: rotateY(180deg);
+        justify-content: flex-start;
+        transition: transform 0.5s ease;
+      }
+
+      .card-main.flipped .card-front {
+        transform: rotateY(-180deg);
+      }
+
+      .card-main.flipped .card-back {
+        transform: rotateY(0deg);
+      }
+
+      /* logo + labels */
+      .sport-logo-circle {
+        width: 120px;
+        height: 120px;
+        border-radius: 999px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 42px;
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.6);
+      }
+
+      .sport-logo-mlb {
+        background: radial-gradient(circle at top left, #f97316, #ea580c);
+      }
+      .sport-logo-nba {
+        background: radial-gradient(circle at top left, #38bdf8, #0ea5e9);
+      }
+      .sport-logo-ncaamb {
+        background: radial-gradient(circle at top left, #a855f7, #7c3aed);
+      }
+      .sport-logo-boxing {
+        background: radial-gradient(circle at top left, #fb7185, #ef4444);
+      }
+      .sport-logo-nfl {
+        background: radial-gradient(circle at top left, #4ade80, #22c55e);
+      }
+      .sport-logo-ncaaf {
+        background: radial-gradient(circle at top left, #fb923c, #ea580c);
+      }
+      .sport-logo-golf {
+        background: radial-gradient(circle at top left, #facc15, #eab308);
+      }
+      .sport-logo-nhl {
+        background: radial-gradient(circle at top left, #67e8f9, #22d3ee);
+      }
+      .sport-logo-cfl {
+        background: radial-gradient(circle at top left, #a3e635, #84cc16);
+      }
+      .sport-logo-ufc {
+        background: radial-gradient(circle at top left, #fb7185, #ef4444);
+      }
+      .sport-logo-mls {
+        background: radial-gradient(circle at top left, #22c55e, #15803d);
+      }
+      .sport-logo-premier {
+        background: radial-gradient(circle at top left, #6366f1, #4f46e5);
+      }
+      .sport-logo-tennis {
+        background: radial-gradient(circle at top left, #facc15, #22c55e);
+      }
+
+      .sport-front-name {
+        font-size: 18px;
+        font-weight: 500;
+        margin-top: 10px;
+      }
+
+      .sport-front-code {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        color: var(--muted);
+        margin-top: 4px;
+      }
+
+      .tap-hint {
+        position: absolute;
+        bottom: 10px;
+        right: 14px;
+        font-size: 10px;
+        color: #6b7280;
+        pointer-events: none;
+      }
+
+      .index-indicator {
+        position: absolute;
+        bottom: 10px;
+        left: 14px;
+        font-size: 10px;
+        color: #6b7280;
+      }
+
+      /* back content */
+      .back-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+
+      .back-title {
+        font-size: 16px;
+        font-weight: 600;
+      }
+
+      .back-sub {
+        font-size: 11px;
+        color: var(--muted);
+        text-align: right;
+      }
+
+      .matchups-list {
+        margin-top: 6px;
+        flex: 1;
+        overflow-y: auto;
+        padding-right: 4px;
+      }
+
+      .matchup-card {
+        border-radius: 18px;
+        border: 1px solid var(--border);
+        background: rgba(15, 23, 42, 0.98);
+        padding: 10px 10px 8px;
+        margin-bottom: 8px;
+        position: relative;
+        transition: transform 0.2s ease, opacity 0.2s ease;
+      }
+
+      .matchup-card.swipe-right {
+        transform: translateX(40px);
+        opacity: 0;
+      }
+
+      .matchup-card.swipe-left {
+        transform: translateX(-40px);
+        opacity: 0;
+      }
+
+      .matchup-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 6px;
+        margin-bottom: 6px;
+      }
+
+      .matchup-label {
+        font-size: 13px;
+        font-weight: 500;
+        color: #e5e7eb;
+      }
+
+      .matchup-line {
+        font-size: 11px;
+        color: var(--muted);
+      }
+
+      .matchup-tag {
+        font-size: 11px;
+        color: var(--muted);
+        text-align: right;
+      }
+
+      .sentiment-bar-container {
+        margin-top: 4px;
+      }
+
+      .sentiment-bar-bg {
+        height: 9px;
+        border-radius: 999px;
+        background: #020617;
+        overflow: hidden;
+        border: 1px solid #111827;
+      }
+
+      .sentiment-bar-fill {
+        height: 100%;
+        border-radius: 999px;
+        background: linear-gradient(90deg, #22c55e, #16a34a);
+        transition: width 0.25s ease;
+      }
+
+      .sentiment-labels {
+        display: flex;
+        justify-content: space-between;
+        font-size: 11px;
+        margin-top: 2px;
+      }
+
+      .sentiment-labels span:first-child {
+        color: #bbf7d0;
+        font-weight: 500;
+      }
+
+      .sentiment-labels span:last-child {
+        color: #fecaca;
+        font-weight: 500;
+      }
+
+      .back-footer-note {
+        margin-top: 8px;
+        font-size: 11px;
+        color: var(--muted);
+      }
+
+      .back-footer-note span:first-child {
+        color: #bbf7d0;
+        font-weight: 500;
+      }
+
+      .back-footer-note span:last-child {
+        color: #fecaca;
+        font-weight: 500;
+      }
+
+      .category-header {
+        margin: 10px 2px 6px;
+        font-size: 11px;
+        color: #9ca3af;
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+      }
+
+      /* toast */
+      .swipe-toast {
+        position: fixed;
+        bottom: 80px;
+        left: 50%;
+        transform: translateX(-50%) translateY(20px);
+        background: rgba(15, 23, 42, 0.96);
+        border-radius: 999px;
+        border: 1px solid #1f2937;
+        padding: 8px 14px;
+        font-size: 12px;
+        color: var(--text);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease, transform 0.2s ease;
+        z-index: 70;
+        white-space: nowrap;
+      }
+
+      .swipe-toast.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+
+      /* line detail */
+      .stat-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        font-size: 12px;
+        margin-bottom: 4px;
+      }
+
+      .stat-row span:first-child {
+        color: var(--muted);
+      }
+
+      .stat-row span:last-child {
+        font-weight: 500;
+      }
+
+      .stat-highlight {
+        font-size: 13px;
+        font-weight: 600;
+      }
+
+      .stat-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 8px;
+        border-radius: 999px;
+        border: 1px solid #1f2937;
+        background: rgba(15, 23, 42, 0.95);
+        font-size: 11px;
+        margin-right: 6px;
+        margin-top: 4px;
+      }
+
+      .stat-pill-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 999px;
+        background: #22c55e;
+      }
+
+      .line-detail-note {
+        font-size: 11px;
+        color: var(--muted);
+        margin-top: 6px;
+      }
+
+      /* locks buttons */
+      .sportsbook-cta-btn,
+      .play-locks-cta {
+        width: 100%;
+        margin-top: 6px;
+        padding: 8px 10px;
+        border-radius: 999px;
+        border: none;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      .sportsbook-cta-btn {
+        background: #22c55e;
+        color: #020617;
+      }
+
+      .sportsbook-cta-btn:disabled {
+        opacity: 0.7;
+        cursor: default;
+      }
+
+      .play-locks-cta {
+        margin-top: 12px;
+        margin-bottom: 4px;
+        background: #3b82f6;
+        color: #e5e7eb;
+      }
+
+      /* auth overlay */
+      .auth-overlay {
+        position: fixed;
+        inset: 0;
+        background: radial-gradient(
+          circle at top,
+          rgba(15, 23, 42, 0.9),
+          rgba(2, 6, 23, 0.98)
+        );
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 80;
+      }
+
+      .auth-overlay.hidden {
+        display: none;
+      }
+
+      .auth-card {
+        width: 100%;
+        max-width: 380px;
+        background: #020617;
+        border-radius: 24px;
+        border: 1px solid var(--border);
+        padding: 20px 18px 16px;
+        box-shadow: 0 26px 60px rgba(0, 0, 0, 0.8);
+      }
+
+      .auth-title {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+
+      .auth-subtitle {
+        font-size: 13px;
+        color: var(--muted);
+        margin-bottom: 12px;
+      }
+
+      .auth-field {
+        margin-bottom: 10px;
+      }
+
+      .auth-field label {
+        display: block;
+        font-size: 11px;
+        color: var(--muted);
+        margin-bottom: 4px;
+      }
+
+      .auth-field input,
+      .auth-field select {
+        width: 100%;
+        padding: 7px 9px;
+        border-radius: 999px;
+        border: 1px solid #1f2937;
+        background: #020617;
+        color: var(--text);
+        font-size: 12px;
+      }
+
+      .auth-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+        margin-top: 8px;
+      }
+
+      .auth-primary,
+      .auth-secondary {
+        flex: 1;
+        padding: 8px 10px;
+        border-radius: 999px;
+        border: none;
+        font-size: 12px;
+        cursor: pointer;
+      }
+
+      .auth-primary {
+        background: #22c55e;
+        color: #020617;
+        font-weight: 600;
+      }
+
+      .auth-secondary {
+        background: transparent;
+        border: 1px solid #1f2937;
+        color: var(--muted);
+      }
+
+      .auth-note {
+        margin-top: 8px;
+        font-size: 10px;
+        color: var(--muted);
+        line-height: 1.4;
+      }
+
+      @media (max-width: 480px) {
+        .card-click-area {
+          max-width: 340px;
+        }
+        .sport-logo-circle {
+          width: 104px;
+          height: 104px;
+          font-size: 36px;
+        }
+        .swipe-toast {
+          font-size: 11px;
+          max-width: 90%;
+          white-space: normal;
+          text-align: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header>
+        <div class="header-left">
+          <div class="logo-group" id="logo-group">
+            <button id="app-logo-button" class="logo-button">
+              <span class="logo">SHARPSWEEP</span>
+              <span class="logo-caret">▾</span>
+            </button>
+            <div id="sports-menu" class="sports-menu"></div>
+          </div>
+          <button id="back-to-sports">← Back</button>
+        </div>
+        <div class="user-menu-wrapper" id="user-menu-wrapper">
+          <button class="menu-placeholder" id="user-menu-button">
+            <span id="user-menu-label">My Sentiments</span>
+            <span>▾</span>
+          </button>
+          <div class="user-dropdown" id="user-dropdown"></div>
+        </div>
+      </header>
+
+      <main>
+        <div class="content">
+          <div class="title-block">
+            <h1 id="main-title">Select Your Sport</h1>
+            <p id="subtitle">One card at a time. Most popular lines by sport.</p>
+            <div class="directions" id="directions">
+              Tap the <strong>center</strong> of a card to flip and see this
+              week’s matchups. Tap the <strong>right edge</strong> for
+              <strong>Sharp</strong> (next sport), and the
+              <strong>left edge</strong> for <strong>Sweep</strong> (previous
+              sport). Double-tap center to open the sport. Tap the
+              <strong>bottom-left corner</strong> of the screen to go back.
+            </div>
+          </div>
+
+          <div class="card-container">
+            <div class="card-click-area" id="card-click-area">
+              <div class="stack-card stack-3"></div>
+              <div class="stack-card stack-2"></div>
+              <div class="stack-card stack-1"></div>
+
+              <div class="card card-main" id="sport-card">
+                <!-- FRONT -->
+                <div class="card-face card-front" id="card-front">
+                  <div class="sport-logo-circle" id="sport-logo"></div>
+                  <div class="sport-front-name" id="sport-name"></div>
+                  <div class="sport-front-code" id="sport-code"></div>
+                  <div class="tap-hint" id="tap-hint-front">
+                    Tap center to flip ↻
+                  </div>
+                  <div class="index-indicator" id="index-indicator"></div>
+                </div>
+
+                <!-- BACK -->
+                <div class="card-face card-back" id="card-back">
+                  <div class="back-header">
+                    <div class="back-title" id="back-title"></div>
+                    <div class="back-sub" id="back-sub"></div>
+                  </div>
+
+                  <div class="matchups-list" id="matchups-list"></div>
+
+                  <div class="back-footer-note" id="back-footer-note">
+                    Sentiment is placeholder data:
+                    <span>Sharp</span> = swipe right,
+                    <span>Sweep</span> = swipe left. Live data coming soon.
+                  </div>
+                  <div class="tap-hint" id="tap-hint-back">
+                    Tap center to flip ↺
+                  </div>
+                  <div class="index-indicator" id="index-indicator-back"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer>Navigation • more pages coming soon</footer>
+    </div>
+
+    <!-- Auth overlay (demo sign-in) -->
+    <div class="auth-overlay" id="auth-overlay">
+      <div class="auth-card">
+        <div class="auth-title">Welcome to SharpSweep</div>
+        <div class="auth-subtitle">
+          Create a quick profile so we can track your swipes and sentiment.
+        </div>
+        <div class="auth-field">
+          <label for="auth-name">Full name</label>
+          <input id="auth-name" type="text" placeholder="Jane Doe" />
+        </div>
+        <div class="auth-field">
+          <label for="auth-email">Email</label>
+          <input
+            id="auth-email"
+            type="email"
+            placeholder="name@example.com"
+          />
+        </div>
+        <div class="auth-field">
+          <label for="auth-state">State of residence</label>
+          <select id="auth-state">
+            <option value="">Select state</option>
+            <option value="CT">Connecticut</option>
+            <option value="NY">New York</option>
+            <option value="NJ">New Jersey</option>
+            <option value="MA">Massachusetts</option>
+            <option value="TX">Texas</option>
+            <option value="CA">California</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="auth-actions">
+          <button class="auth-secondary" id="auth-skip">Skip for now</button>
+          <button class="auth-primary" id="auth-continue">Continue</button>
+        </div>
+        <div class="auth-note">
+          This is a demo experience – no real money and no identity verification
+          yet. In production, this is where full KYC and responsible gaming
+          checks will live.
+        </div>
+      </div>
+    </div>
+
+    <div class="swipe-toast" id="swipe-toast"></div>
+
+    <script>
+      const CATEGORY_LABELS = {
+        spread: "Spreads",
+        total: "Over / Unders",
+        points: "Points",
+        props: "Props",
+        alt: "Alternate Lines",
+        other: "Other",
+      };
+
+      const CATEGORY_ORDER = [
+        "spread",
+        "total",
+        "points",
+        "props",
+        "alt",
+        "other",
+      ];
+
+      // Demo sportsbook names
+      const BOOKS = [
+        "FanDuel",
+        "DraftKings",
+        "BetMGM",
+        "Caesars",
+        "ESPN BET",
+        "PointsBet",
+      ];
+
+      const SPORTS = [
+        {
+          id: "nfl",
+          name: "NFL",
+          code: "National Football League",
+          logoClass: "sport-logo-nfl",
+          emoji: "🏈",
+          matchups: [
+            {
+              name: "Chiefs @ Bills",
+              lines: [
+                {
+                  label: "Mahomes o1.5 Passing TDs",
+                  sharp: 68,
+                  sweep: 32,
+                  category: "props",
+                  book: "FanDuel",
+                },
+                {
+                  label: "Mahomes o1.5 Passing TDs",
+                  sharp: 66,
+                  sweep: 34,
+                  category: "props",
+                  book: "DraftKings",
+                },
+                {
+                  label: "Allen o36.5 Rush Yards",
+                  sharp: 57,
+                  sweep: 43,
+                  category: "props",
+                  book: "BetMGM",
+                },
+                {
+                  label: "Kelce o6.5 Receptions",
+                  sharp: 61,
+                  sweep: 39,
+                  category: "props",
+                  book: "Caesars",
+                },
+                {
+                  label: "Total Points o51.5",
+                  sharp: 54,
+                  sweep: 46,
+                  category: "total",
+                  book: "ESPN BET",
+                },
+                {
+                  label: "Chiefs -2.5",
+                  sharp: 52,
+                  sweep: 48,
+                  category: "spread",
+                  book: "PointsBet",
+                },
+              ],
+            },
+            {
+              name: "Eagles @ Cowboys",
+              lines: [
+                {
+                  label: "Hurts o44.5 Rush Yards",
+                  sharp: 55,
+                  sweep: 45,
+                  category: "props",
+                  book: "FanDuel",
+                },
+                {
+                  label: "Lamb o7.5 Targets",
+                  sharp: 60,
+                  sweep: 40,
+                  category: "props",
+                  book: "DraftKings",
+                },
+                {
+                  label: "Eagles +3.5",
+                  sharp: 58,
+                  sweep: 42,
+                  category: "spread",
+                  book: "BetMGM",
+                },
+                {
+                  label: "Total o48.5",
+                  sharp: 51,
+                  sweep: 49,
+                  category: "total",
+                  book: "Caesars",
+                },
+                {
+                  label: "Hurts 2+ Pass TDs",
+                  sharp: 49,
+                  sweep: 51,
+                  category: "props",
+                  book: "ESPN BET",
+                },
+              ],
+            },
+            {
+              name: "Ravens @ Bengals",
+              lines: [
+                {
+                  label: "Chase o6.5 Receptions",
+                  sharp: 62,
+                  sweep: 38,
+                  category: "props",
+                  book: "FanDuel",
+                },
+                {
+                  label: "Burrow o1.5 Pass TDs",
+                  sharp: 59,
+                  sweep: 41,
+                  category: "props",
+                  book: "DraftKings",
+                },
+                {
+                  label: "Andrews Anytime TD",
+                  sharp: 53,
+                  sweep: 47,
+                  category: "props",
+                  book: "BetMGM",
+                },
+                {
+                  label: "Total u46.5",
+                  sharp: 47,
+                  sweep: 53,
+                  category: "total",
+                  book: "Caesars",
+                },
+                {
+                  label: "Ravens +3.5",
+                  sharp: 56,
+                  sweep: 44,
+                  category: "spread",
+                  book: "ESPN BET",
+                },
+              ],
+            },
+            {
+              name: "49ers @ Seahawks",
+              lines: [
+                {
+                  label: "CMC o89.5 Rush+Rec Yards",
+                  sharp: 71,
+                  sweep: 29,
+                  category: "props",
+                  book: "FanDuel",
+                },
+                {
+                  label: "Metcalf o5.5 Receptions",
+                  sharp: 52,
+                  sweep: 48,
+                  category: "props",
+                  book: "DraftKings",
+                },
+                {
+                  label: "49ers -6.5",
+                  sharp: 64,
+                  sweep: 36,
+                  category: "spread",
+                  book: "BetMGM",
+                },
+                {
+                  label: "Total u44.5",
+                  sharp: 50,
+                  sweep: 50,
+                  category: "total",
+                  book: "Caesars",
+                },
+                {
+                  label: "Purdy o1.5 TD Passes",
+                  sharp: 57,
+                  sweep: 43,
+                  category: "props",
+                  book: "ESPN BET",
+                },
+              ],
+            },
+            {
+              name: "Jets @ Dolphins",
+              lines: [
+                {
+                  label: "Hill o91.5 Rec Yards",
+                  sharp: 66,
+                  sweep: 34,
+                  category: "props",
+                  book: "FanDuel",
+                },
+                {
+                  label: "Waddle o4.5 Receptions",
+                  sharp: 61,
+                  sweep: 39,
+                  category: "props",
+                  book: "DraftKings",
+                },
+                {
+                  label: "Tua o272.5 Pass Yards",
+                  sharp: 58,
+                  sweep: 42,
+                  category: "props",
+                  book: "BetMGM",
+                },
+                {
+                  label: "Jets +9.5",
+                  sharp: 45,
+                  sweep: 55,
+                  category: "spread",
+                  book: "Caesars",
+                },
+                {
+                  label: "Total o45.5",
+                  sharp: 51,
+                  sweep: 49,
+                  category: "total",
+                  book: "ESPN BET",
+                },
+              ],
+            },
+          ],
+        },
+        {
+          id: "nba",
+          name: "NBA",
+          code: "National Basketball Association",
+          logoClass: "sport-logo-nba",
+          emoji: "🏀",
+          matchups: [
+            {
+              name: "Lakers @ Warriors",
+              lines: [
+                {
+                  label: "LeBron o26.5 Points",
+                  sharp: 61,
+                  sweep: 39,
+                  category: "points",
+                  book: "FanDuel",
+                },
+                {
+                  label: "Curry o4.5 3PM",
+                  sharp: 64,
+                  sweep: 36,
+                  category: "points",
+                  book: "DraftKings",
+                },
+                {
+                  label: "Reaves o3.5 Assists",
+                  sharp: 55,
+                  sweep: 45,
+                  category: "props",
+                  book: "BetMGM",
+                },
+                {
+                  label: "Total o236.5",
+                  sharp: 52,
+                  sweep: 48,
+                  category: "total",
+                  book: "Caesars",
+                },
+                {
+                  label: "Warriors -3.5",
+                  sharp: 49,
+                  sweep: 51,
+                  category: "spread",
+                  book: "ESPN BET",
+                },
+              ],
+            },
+            {
+              name: "Celtics @ Knicks",
+              lines: [
+                {
+                  label: "Tatum o3.5 3PM",
+                  sharp: 49,
+                  sweep: 51,
+                  category: "points",
+                  book: "FanDuel",
+                },
+                {
+                  label: "Brunson o24.5 Pts",
+                  sharp: 56,
+                  sweep: 44,
+                  category: "points",
+                  book: "DraftKings",
+                },
+                {
+                  label: "Randle o9.5 Reb",
+                  sharp: 53,
+                  sweep: 47,
+                  category: "props",
+                  book: "BetMGM",
+                },
+                {
+                  label: "Total u224.5",
+                  sharp: 51,
+                  sweep: 49,
+                  category: "total",
+                  book: "Caesars",
+                },
+                {
+                  label: "Celtics -4.5",
+                  sharp: 58,
+                  sweep: 42,
+                  category: "spread",
+                  book: "ESPN BET",
+                },
+              ],
+            },
+            {
+              name: "Mavs @ Suns",
+              lines: [
+                {
+                  label: "Luka o8.5 Assists",
+                  sharp: 64,
+                  sweep: 36,
+                  category: "props",
+                  book: "FanDuel",
+                },
+                {
+                  label: "Booker o28.5 Pts",
+                  sharp: 57,
+                  sweep: 43,
+                  category: "points",
+                  book: "DraftKings",
+                },
+                {
+                  label: "Durant o7.5 Reb",
+                  sharp: 52,
+                  sweep: 48,
+                  category: "props",
+                  book: "BetMGM",
+                },
+                {
+                  label: "Total o229.5",
+                  sharp: 54,
+                  sweep: 46,
+                  category: "total",
+                  book: "Caesars",
+                },
+                {
+                  label: "Mavs +2.5",
+                  sharp: 50,
+                  sweep: 50,
+                  category: "spread",
+                  book: "ESPN BET",
+                },
+              ],
+            },
+            {
+              name: "Bucks @ Heat",
+              lines: [
+                {
+                  label: "Giannis o11.5 Rebounds",
+                  sharp: 57,
+                  sweep: 43,
+                  category: "props",
+                  book: "FanDuel",
+                },
+                {
+                  label: "Middleton o2.5 3PM",
+                  sharp: 55,
+                  sweep: 45,
+                  category: "points",
+                  book: "DraftKings",
+                },
+                {
+                  label: "Herro o20.5 Pts",
+                  sharp: 52,
+                  sweep: 48,
+                  category: "points",
+                  book: "BetMGM",
+                },
+                {
+                  label: "Total u222.5",
+                  sharp: 48,
+                  sweep: 52,
+                  category: "total",
+                  book: "Caesars",
+                },
+                {
+                  label: "Bucks -5.5",
+                  sharp: 60,
+                  sweep: 40,
+                  category: "spread",
+                  book: "ESPN BET",
+                },
+              ],
+            },
+            {
+              name: "Nuggets @ Clippers",
+              lines: [
+                {
+                  label: "Jokic o42.5 PRA",
+                  sharp: 69,
+                  sweep: 31,
+                  category: "props",
+                  book: "FanDuel",
+                },
+                {
+                  label: "Murray o21.5 Pts",
+                  sharp: 58,
+                  sweep: 42,
+                  category: "points",
+                  book: "DraftKings",
+                },
+                {
+                  label: "PG13 o5.5 Reb",
+                  sharp: 51,
+                  sweep: 49,
+                  category: "props",
+                  book: "BetMGM",
+                },
+                {
+                  label: "Total o230.5",
+                  sharp: 53,
+                  sweep: 47,
+                  category: "total",
+                  book: "Caesars",
+                },
+                {
+                  label: "Nuggets -2.5",
+                  sharp: 55,
+                  sweep: 45,
+                  category: "spread",
+                  book: "ESPN BET",
+                },
+              ],
+            },
+          ],
+        },
+        {
+          id: "mlb",
+          name: "MLB",
+          code: "Major League Baseball",
+          logoClass: "sport-logo-mlb",
+          emoji: "⚾",
+          matchups: [
+            {
+              name: "Yankees @ Red Sox",
+              lines: [
+                {
+                  label: "Judge o1.5 Total Bases",
+                  sharp: 64,
+                  sweep: 36,
+                  category: "props",
+                  book: "FanDuel",
+                },
+                {
+                  label: "Total Runs o8.5",
+                  sharp: 55,
+                  sweep: 45,
+                  category: "total",
+                  book: "DraftKings",
+                },
+                {
+                  label: "Yankees ML",
+                  sharp: 57,
+                  sweep: 43,
+                  category: "other",
+                  book: "BetMGM",
+                },
+                {
+                  label: "Cole o7.5 K's",
+                  sharp: 52,
+                  sweep: 48,
+                  category: "props",
+                  book: "Caesars",
+                },
+                {
+                  label: "Devers HR",
+                  sharp: 46,
+                  sweep: 54,
+                  category: "props",
+                  book: "ESPN BET",
+                },
+              ],
+            },
+            {
+              name: "Dodgers @ Giants",
+              lines: [
+                {
+                  label: "Freeman o1.5 Hits+Walks",
+                  sharp: 58,
+                  sweep: 42,
+                  category: "props",
+                  book: "FanDuel",
+                },
+                {
+                  label: "Total u7.5",
+                  sharp: 51,
+                  sweep: 49,
+                  category: "total",
+                  book: "DraftKings",
+                },
+                {
+                  label: "Dodgers -1.5",
+                  sharp: 60,
+                  sweep: 40,
+                  category: "spread",
+                  book: "BetMGM",
+                },
+                {
+                  label: "Betts o0.5 HR",
+                  sharp: 44,
+                  sweep: 56,
+                  category: "props",
+                  book: "Caesars",
+                },
+                {
+                  label: "Giants u3.5 Runs",
+                  sharp: 49,
+                  sweep: 51,
+                  category: "total",
+                  book: "ESPN BET",
+                },
+              ],
+            },
+            {
+              name: "Astros @ Rangers",
+              lines: [
+                {
+                  label: "Total Runs o8.5",
+                  sharp: 55,
+                  sweep: 45,
+                  category: "total",
+                  book: "FanDuel",
+                },
+                {
+                  label: "Astros ML",
+                  sharp: 53,
+                  sweep: 47,
+                  category: "other",
+                  book: "DraftKings",
+                },
+                {
+                  label: "Seager o1.5 TB",
+                  sharp: 57,
+                  sweep: 43,
+                  category: "props",
+                  book: "BetMGM",
+                },
+                {
+                  label: "Altuve o1.5 Hits",
+                  sharp: 54,
+                  sweep: 46,
+                  category: "props",
+                  book: "Caesars",
+                },
+                {
+                  label: "Rangers +1.5",
+                  sharp: 50,
+                  sweep: 50,
+                  category: "spread",
+                  book: "ESPN BET",
+                },
+              ],
+            },
+            {
+              name: "Cubs @ Cardinals",
+              lines: [
+                {
+                  label: "Stroman o5.5 Strikeouts",
+                  sharp: 52,
+                  sweep: 48,
+                  category: "props",
+                  book: "FanDuel",
+                },
+                {
+                  label: "Cards ML",
+                  sharp: 51,
+                  sweep: 49,
+                  category: "other",
+                  book: "DraftKings",
+                },
+                {
+                  label: "Total u8.5",
+                  sharp: 49,
+                  sweep: 51,
+                  category: "total",
+                  book: "BetMGM",
+                },
+                {
+                  label: "Goldy o1.5 TB",
+                  sharp: 55,
+                  sweep: 45,
+                  category: "props",
+                  book: "Caesars",
+                },
+                {
+                  label: "Happ o0.5 HR",
+                  sharp: 43,
+                  sweep: 57,
+                  category: "props",
+                  book: "ESPN BET",
+                },
+              ],
+            },
+            {
+              name: "Braves @ Mets",
+              lines: [
+                {
+                  label: "Acuna o0.5 HR",
+                  sharp: 47,
+                  sweep: 53,
+                  category: "props",
+                  book: "FanDuel",
+                },
+                {
+                  label: "Total o9.5",
+                  sharp: 52,
+                  sweep: 48,
+                  category: "total",
+                  book: "DraftKings",
+                },
+                {
+                  label: "Braves -1.5",
+                  sharp: 59,
+                  sweep: 41,
+                  category: "spread",
+                  book: "BetMGM",
+                },
+                {
+                  label: "Mets u3.5 Runs",
+                  sharp: 50,
+                  sweep: 50,
+                  category: "total",
+                  book: "Caesars",
+                },
+                {
+                  label: "Strider o8.5 K's",
+                  sharp: 62,
+                  sweep: 38,
+                  category: "props",
+                  book: "ESPN BET",
+                },
+              ],
+            },
+          ],
+        },
+      ];
+
+      let mode = "sports"; // "sports" | "matchups" | "allLines" | "lineDetails" | "sentiments" | "locks" | "archive"
+      let currentSportIndex = 0;
+      let currentMatchupIndex = 0;
+      let flipped = false;
+
+      let previousModeBeforeLineDetails = null;
+      let currentLineDetailMeta = null;
+      let currentLineDetailStats = null;
+
+      const DOUBLE_CLICK_DELAY = 250;
+      let clickTimeout = null;
+
+      let visibleLinesCount = 0;
+
+      const sentimentLog = [];
+      const sentimentStore = {}; // key -> {status: inbox|lock|archived, ...}
+
+      let currentUser = null;
+      let hasOnboarded = false;
+
+      const cardEl = document.getElementById("sport-card");
+      const cardClickArea = document.getElementById("card-click-area");
+
+      const logoEl = document.getElementById("sport-logo");
+      const nameEl = document.getElementById("sport-name");
+      const codeEl = document.getElementById("sport-code");
+      const tapHintFrontEl = document.getElementById("tap-hint-front");
+      const tapHintBackEl = document.getElementById("tap-hint-back");
+
+      const indexIndicatorFront = document.getElementById("index-indicator");
+      const indexIndicatorBack = document.getElementById("index-indicator-back");
+
+      const backTitleEl = document.getElementById("back-title");
+      const backSubEl = document.getElementById("back-sub");
+      const matchupsListEl = document.getElementById("matchups-list");
+      const backFooterNoteEl = document.getElementById("back-footer-note");
+
+      const titleEl = document.getElementById("main-title");
+      const subtitleEl = document.getElementById("subtitle");
+      const directionsEl = document.getElementById("directions");
+      const backToSportsBtn = document.getElementById("back-to-sports");
+
+      const sportsMenuEl = document.getElementById("sports-menu");
+      const appLogoButton = document.getElementById("app-logo-button");
+      const logoGroup = document.getElementById("logo-group");
+
+      const userMenuButton = document.getElementById("user-menu-button");
+      const userMenuLabel = document.getElementById("user-menu-label");
+      const userDropdown = document.getElementById("user-dropdown");
+      const userMenuWrapper = document.getElementById("user-menu-wrapper");
+
+      const authOverlay = document.getElementById("auth-overlay");
+      const authNameInput = document.getElementById("auth-name");
+      const authEmailInput = document.getElementById("auth-email");
+      const authStateSelect = document.getElementById("auth-state");
+      const authSkipBtn = document.getElementById("auth-skip");
+      const authContinueBtn = document.getElementById("auth-continue");
+
+      const swipeToastEl = document.getElementById("swipe-toast");
+
+      function getNextIndex(length, current) {
+        return (current + 1) % length;
+      }
+
+      function getPrevIndex(length, current) {
+        return current === 0 ? length - 1 : current - 1;
+      }
+
+      function currentSport() {
+        return SPORTS[currentSportIndex];
+      }
+
+      function currentMatchup() {
+        return currentSport().matchups[currentMatchupIndex];
+      }
+
+      function showSwipeToast(vote, label) {
+        const shortLabel =
+          label && label.length > 40
+            ? label.slice(0, 37).trimEnd() + "..."
+            : label || "";
+        let prefix;
+        if (vote === "sharp") prefix = "✅ Sharp";
+        else if (vote === "sweep") prefix = "🧹 Sweep";
+        else prefix = "ℹ️";
+        swipeToastEl.textContent = shortLabel
+          ? `${prefix} – ${shortLabel}`
+          : prefix;
+        swipeToastEl.classList.add("show");
+        clearTimeout(swipeToastEl._hideTimeout);
+        swipeToastEl._hideTimeout = setTimeout(() => {
+          swipeToastEl.classList.remove("show");
+        }, 1100);
+      }
+
+      function parseLineNumeric(label) {
+        const ou = label.match(/[ou](\d+\.?\d*)/i);
+        if (ou) return parseFloat(ou[1]);
+        const plain = label.match(/(\d+\.?\d*)/);
+        if (plain) return parseFloat(plain[1]);
+        return null;
+      }
+
+      function getSampleCrowdSize(key) {
+        let hash = 0;
+        for (let i = 0; i < key.length; i++) {
+          hash = (hash * 31 + key.charCodeAt(i)) % 100000;
+        }
+        return 80 + (hash % 520); // 80–599 demo crowd
+      }
+
+      function generateLineStats(meta) {
+        const sport = SPORTS[meta.sportIndex];
+        const matchup = sport.matchups[meta.matchupIndex];
+        const label = meta.label;
+        const category = meta.category || "other";
+
+        const teams = matchup.name.split("@").map((t) => t.trim());
+        const homeTeam = teams[0] || "Home Team";
+        const awayTeam = teams[1] || "Away Team";
+
+        let entityType = "player";
+        let position = null;
+        let teamName = null;
+        let marketType = "other";
+        let statName = "Stat";
+        let unit = "";
+        let season = "2024";
+        let lineValue = parseLineNumeric(label);
+
+        if (sport.id === "nfl") {
+          if (/Passing TDs?|TD Pass(es)?/i.test(label)) {
+            position = "QB";
+            marketType = "player_prop";
+            statName = "Passing TDs";
+            unit = "TDs per game";
+          } else if (/Rush Yards|Rush\+Rec/i.test(label)) {
+            position = /Allen|Hurts|CMC|Tua/i.test(label) ? "QB/RB" : "RB";
+            marketType = "player_prop";
+            statName = "Rushing Yards";
+            unit = "Yards per game";
+          } else if (/Receptions|Targets/i.test(label)) {
+            position = "WR/TE";
+            marketType = "player_prop";
+            statName = "Receptions";
+            unit = "Receptions per game";
+          } else if (category === "total") {
+            entityType = "team-total";
+            marketType = "game_total";
+            statName = "Total Points";
+            unit = "Points per game";
+          } else if (category === "spread") {
+            entityType = "team";
+            marketType = "spread";
+            statName = "Spread Margin";
+            unit = "Points vs spread";
+          }
+        } else if (sport.id === "nba") {
+          if (/PRA/i.test(label)) {
+            position = "Guard/Forward";
+            marketType = "player_prop";
+            statName = "Points+Rebounds+Assists";
+            unit = "PRA per game";
+          } else if (/Points|Pts/i.test(label)) {
+            position = "Guard/Forward";
+            marketType = "player_prop";
+            statName = "Points";
+            unit = "Points per game";
+          } else if (/Reb(ounds)?/i.test(label)) {
+            position = "Forward/Center";
+            marketType = "player_prop";
+            statName = "Rebounds";
+            unit = "Rebounds per game";
+          } else if (/Assists/i.test(label)) {
+            position = "Guard";
+            marketType = "player_prop";
+            statName = "Assists";
+            unit = "Assists per game";
+          } else if (category === "total") {
+            entityType = "team-total";
+            marketType = "game_total";
+            statName = "Total Points";
+            unit = "Points per game";
+          } else if (category === "spread") {
+            entityType = "team";
+            marketType = "spread";
+            statName = "Spread Margin";
+            unit = "Points vs spread";
+          }
+        } else if (sport.id === "mlb") {
+          if (/Total Bases|TB/i.test(label)) {
+            position = "Batter";
+            marketType = "player_prop";
+            statName = "Total Bases";
+            unit = "TB per game";
+          } else if (/Hits\+Walks|Hits/i.test(label)) {
+            position = "Batter";
+            marketType = "player_prop";
+            statName = "Hits+Walks";
+            unit = "Per game";
+          } else if (/Strikeouts|K's/i.test(label)) {
+            position = "Pitcher";
+            marketType = "player_prop";
+            statName = "Strikeouts";
+            unit = "K per game";
+          } else if (/Runs/i.test(label) && category === "total") {
+            entityType = "team-total";
+            marketType = "game_total";
+            statName = "Runs";
+            unit = "Runs per game";
+          } else if (category === "spread") {
+            entityType = "team";
+            marketType = "spread";
+            statName = "Run Line";
+            unit = "Runs vs line";
+          }
+        }
+
+        if (category === "spread" || category === "other" || category === "total") {
+          if (!position && entityType === "player") {
+            entityType = "team";
+          }
+        }
+
+        const firstWord = label.split(" ")[0];
+        let entityName = firstWord;
+        if (entityType !== "player") {
+          entityName = category === "total" ? `${homeTeam} / ${awayTeam}` : homeTeam;
+        }
+
+        if (!teamName) {
+          if (entityType === "team" || entityType === "team-total") {
+            teamName = entityName;
+          } else {
+            teamName = homeTeam;
+          }
+        }
+
+        const base = lineValue ?? 10;
+        const seasonAvg = +(base + 0.4).toFixed(1);
+        const last10Avg = +(base + 0.2).toFixed(1);
+        const homeAvg = +(base + 0.5).toFixed(1);
+        const roadAvg = +(base + 0.1).toFixed(1);
+        const vsOpponentAvg = +(base + 0.3).toFixed(1);
+
+        const sharpPct =
+          typeof meta.sharp === "number" && meta.sharp >= 0 && meta.sharp <= 100
+            ? meta.sharp
+            : 55;
+        const sweepPct = 100 - sharpPct;
+        const majoritySide = sharpPct >= sweepPct ? "sharp" : "sweep";
+
+        const totalSamples = 18;
+        const alignedCount = majoritySide === "sharp" ? 11 : 10;
+        const alignedRate = Math.round((alignedCount / totalSamples) * 100) + "%";
+
+        return {
+          entityType,
+          entityName,
+          position,
+          teamName,
+          sportName: sport.name,
+          matchupName: matchup.name,
+          season,
+          gamesPlayed: 17,
+          timesOffered: 14,
+          timesCovered: 9,
+          timesMissed: 5,
+          timesPushed: 0,
+          coverRate: "64%",
+          avgDelta: "+0.7 vs line",
+          last5: ["Cover", "Cover", "Miss", "Cover", "Cover"],
+          lineMeta: {
+            rawLabel: label,
+            category,
+            marketType,
+            statName,
+            lineValue,
+            unit,
+          },
+          seasonSplits: {
+            seasonAvg,
+            last10Avg,
+            homeAvg,
+            roadAvg,
+            vsOpponentAvg,
+          },
+          sentimentStats: {
+            sharpPct,
+            sweepPct,
+            majoritySide,
+            alignedRate,
+            alignedCount,
+            totalSamples,
+          },
+        };
+      }
+
+      function getInboxItems() {
+        return Object.values(sentimentStore).filter(
+          (item) => item.status === "inbox"
+        );
+      }
+
+      function getLockItems() {
+        return Object.values(sentimentStore).filter(
+          (item) => item.status === "lock"
+        );
+      }
+
+      function getArchiveItems() {
+        return Object.values(sentimentStore).filter(
+          (item) => item.status === "archived"
+        );
+      }
+
+      function recordSentiment(meta, vote, context) {
+        const sport = SPORTS[meta.sportIndex];
+        const matchup = sport.matchups[meta.matchupIndex];
+        const book = meta.book || "Best Available";
+        const timestamp = Date.now();
+
+        const logEntry = {
+          sportId: sport.id,
+          sportName: sport.name,
+          matchupName: matchup.name,
+          lineLabel: meta.label,
+          category: meta.category || "other",
+          book,
+          vote,
+          timestamp,
+        };
+        sentimentLog.push(logEntry);
+
+        const key = `${sport.id}|${matchup.name}|${meta.label}|${book}`;
+        let item = sentimentStore[key];
+        if (!item) {
+          const crowdKey = key;
+          const crowdSize = getSampleCrowdSize(crowdKey);
+          item = {
+            key,
+            sportId: sport.id,
+            sportName: sport.name,
+            sportIndex: meta.sportIndex,
+            matchupIndex: meta.matchupIndex,
+            matchupName: matchup.name,
+            lineLabel: meta.label,
+            category: meta.category || "other",
+            sharp:
+              typeof meta.sharp === "number" && meta.sharp >= 0 && meta.sharp <= 100
+                ? meta.sharp
+                : 55,
+            sweep:
+              typeof meta.sweep === "number" && meta.sweep >= 0 && meta.sweep <= 100
+                ? meta.sweep
+                : 45,
+            book,
+            crowdSize,
+            status: "inbox",
+            yourLastVote: vote,
+            yourTotalSwipes: 1,
+            createdAt: timestamp,
+            lastUpdated: timestamp,
+          };
+          sentimentStore[key] = item;
+        } else {
+          item.yourTotalSwipes += 1;
+          item.yourLastVote = vote;
+          item.lastUpdated = timestamp;
+        }
+
+        if (context === "sentimentsInbox") {
+          item.status = vote === "sharp" ? "lock" : "archived";
+        }
+
+        showSwipeToast(vote, meta.label);
+        console.log("Sentiment logged:", logEntry, "store:", item);
+      }
+
+      function openLineDetails(meta) {
+        if (!meta) return;
+        previousModeBeforeLineDetails =
+          mode === "lineDetails" ? previousModeBeforeLineDetails : mode;
+        currentLineDetailMeta = meta;
+        currentLineDetailStats = generateLineStats(meta);
+        mode = "lineDetails";
+        flipped = true;
+        renderScreen();
+      }
+
+      function attachSwipeToLineCard(card, meta, context) {
+        let startX = null;
+        let isPointerDown = false;
+
+        card.addEventListener("click", (e) => {
+          // single click does nothing on purpose
+          e.stopPropagation();
+        });
+
+        card.addEventListener("dblclick", (e) => {
+          e.stopPropagation();
+          openLineDetails(meta);
+        });
+
+        card.addEventListener("pointerdown", (e) => {
+          isPointerDown = true;
+          startX = e.clientX;
+        });
+
+        card.addEventListener("pointerup", (e) => {
+          if (!isPointerDown) return;
+          isPointerDown = false;
+
+          const dx = e.clientX - startX;
+          const threshold = 40;
+          if (Math.abs(dx) < threshold) return;
+
+          e.stopPropagation();
+
+          const direction = dx > 0 ? "right" : "left";
+          const vote = direction === "right" ? "sharp" : "sweep";
+
+          if (context === "sentimentsInbox") {
+            // Promote to My Locks or Archive, but stay on My Sentiments
+            recordSentiment(meta, vote, context);
+            const inboxLeft = getInboxItems().length;
+            const locksCount = getLockItems().length;
+            if (inboxLeft === 0 && locksCount > 0) {
+              mode = "locks";
+              flipped = true;
+            }
+            renderScreen();
+            return;
+          }
+
+          recordSentiment(meta, vote, context);
+
+          card.classList.add(
+            direction === "right" ? "swipe-right" : "swipe-left"
+          );
+
+          setTimeout(() => {
+            if (card.parentNode) card.parentNode.removeChild(card);
+
+            if (context === "matchupsTop") {
+              visibleLinesCount -= 1;
+              if (visibleLinesCount <= 0) {
+                const sport = currentSport();
+                if (currentMatchupIndex < sport.matchups.length - 1) {
+                  currentMatchupIndex += 1;
+                  flipped = true;
+                  renderScreen();
+                } else {
+                  const doneName = sport.name;
+                  mode = "sports";
+                  flipped = false;
+                  renderScreen();
+                  showSwipeToast("sharp", doneName + " matchups complete");
+                }
+              }
+            }
+          }, 180);
+        });
+
+        card.addEventListener("pointercancel", () => {
+          isPointerDown = false;
+        });
+      }
+
+      function renderCardFlipState() {
+        if (flipped) cardEl.classList.add("flipped");
+        else cardEl.classList.remove("flipped");
+      }
+
+      function renderSportsFront() {
+        const sport = currentSport();
+        logoEl.className = "sport-logo-circle " + sport.logoClass;
+        logoEl.textContent = sport.emoji;
+        nameEl.textContent = sport.name;
+        codeEl.textContent = sport.code;
+        tapHintFrontEl.textContent = "Tap center to flip ↻";
+        const idx = `${currentSportIndex + 1} / ${SPORTS.length}`;
+        indexIndicatorFront.textContent = idx;
+        indexIndicatorBack.textContent = idx;
+      }
+
+      function renderSportsBack() {
+        const sport = currentSport();
+        backTitleEl.textContent = `${sport.name} – This Week's Matchups`;
+        backSubEl.textContent =
+          "Preview of most popular matchups. Double-tap a matchup to open all lines.";
+        backFooterNoteEl.style.display = "block";
+
+        matchupsListEl.innerHTML = "";
+
+        sport.matchups.forEach((matchup, mIndex) => {
+          const topLine = matchup.lines[0];
+          const card = document.createElement("div");
+          card.className = "matchup-card";
+
+          const top = document.createElement("div");
+          top.className = "matchup-top";
+
+          const left = document.createElement("div");
+          const label = document.createElement("div");
+          label.className = "matchup-label";
+          label.textContent = matchup.name;
+
+          const line = document.createElement("div");
+          line.className = "matchup-line";
+          line.textContent = topLine.label;
+
+          left.appendChild(label);
+          left.appendChild(line);
+
+          const right = document.createElement("div");
+          right.className = "matchup-tag";
+          right.textContent = topLine.book || "Consensus";
+
+          top.appendChild(left);
+          top.appendChild(right);
+
+          const sentimentContainer = document.createElement("div");
+          sentimentContainer.className = "sentiment-bar-container";
+
+          const barBg = document.createElement("div");
+          barBg.className = "sentiment-bar-bg";
+
+          const barFill = document.createElement("div");
+          barFill.className = "sentiment-bar-fill";
+          barFill.style.width = topLine.sharp + "%";
+
+          barBg.appendChild(barFill);
+
+          const labels = document.createElement("div");
+          labels.className = "sentiment-labels";
+
+          const leftLabel = document.createElement("span");
+          leftLabel.textContent = "Sharp " + topLine.sharp + "%";
+          const rightLabel = document.createElement("span");
+          rightLabel.textContent = "Sweep " + topLine.sweep + "%";
+
+          labels.appendChild(leftLabel);
+          labels.appendChild(rightLabel);
+
+          sentimentContainer.appendChild(barBg);
+          sentimentContainer.appendChild(labels);
+
+          card.appendChild(top);
+          card.appendChild(sentimentContainer);
+
+          attachSwipeToLineCard(
+            card,
+            {
+              sportIndex: currentSportIndex,
+              matchupIndex: mIndex,
+              label: topLine.label,
+              category: topLine.category || "other",
+              sharp: topLine.sharp,
+              sweep: topLine.sweep,
+              book: topLine.book,
+            },
+            "sportsPreview"
+          );
+
+          card.addEventListener("dblclick", (e) => {
+            e.stopPropagation();
+            mode = "allLines";
+            currentMatchupIndex = mIndex;
+            flipped = true;
+            renderScreen();
+          });
+
+          matchupsListEl.appendChild(card);
+        });
+      }
+
+      function renderMatchupsFront() {
+        const sport = currentSport();
+        const matchup = currentMatchup();
+
+        logoEl.className = "sport-logo-circle " + sport.logoClass;
+        logoEl.textContent = sport.emoji;
+        nameEl.textContent = matchup.name;
+        codeEl.textContent = sport.name;
+        tapHintFrontEl.textContent = "Tap center to flip ↻";
+
+        const idx = `${currentMatchupIndex + 1} / ${sport.matchups.length}`;
+        indexIndicatorFront.textContent = idx;
+        indexIndicatorBack.textContent = idx;
+      }
+
+      function renderMatchupsBack() {
+        const sport = currentSport();
+        const matchup = currentMatchup();
+
+        backTitleEl.textContent = `${sport.name} – Top Lines`;
+        backSubEl.textContent =
+          "Swipe each line to record your sentiment. Clear the 5-pack to move to the next matchup.";
+        backFooterNoteEl.style.display = "block";
+
+        matchupsListEl.innerHTML = "";
+        visibleLinesCount = 0;
+
+        const linesToShow = matchup.lines.slice(0, 5);
+
+        linesToShow.forEach((ln) => {
+          const card = document.createElement("div");
+          card.className = "matchup-card";
+
+          const top = document.createElement("div");
+          top.className = "matchup-top";
+
+          const left = document.createElement("div");
+
+          const label = document.createElement("div");
+          label.className = "matchup-label";
+          label.textContent = ln.label; // line is the heading
+
+          const gameLine = document.createElement("div");
+          gameLine.className = "matchup-line";
+          gameLine.textContent = matchup.name; // game as subhead
+
+          const helper = document.createElement("div");
+          helper.className = "matchup-line";
+          helper.textContent =
+            "Swipe right for Sharp, left for Sweep. Double-tap for stats.";
+
+          left.appendChild(label);
+          left.appendChild(gameLine);
+          left.appendChild(helper);
+
+          const right = document.createElement("div");
+          right.className = "matchup-tag";
+          right.textContent = ln.book || "Consensus";
+
+          top.appendChild(left);
+          top.appendChild(right);
+
+          const sentimentContainer = document.createElement("div");
+          sentimentContainer.className = "sentiment-bar-container";
+
+          const barBg = document.createElement("div");
+          barBg.className = "sentiment-bar-bg";
+
+          const barFill = document.createElement("div");
+          barFill.className = "sentiment-bar-fill";
+          barFill.style.width = ln.sharp + "%";
+
+          barBg.appendChild(barFill);
+
+          const labels = document.createElement("div");
+          labels.className = "sentiment-labels";
+
+          const leftLabel = document.createElement("span");
+          leftLabel.textContent = "Sharp " + ln.sharp + "%";
+          const rightLabel = document.createElement("span");
+          rightLabel.textContent = "Sweep " + ln.sweep + "%";
+
+          labels.appendChild(leftLabel);
+          labels.appendChild(rightLabel);
+
+          sentimentContainer.appendChild(barBg);
+          sentimentContainer.appendChild(labels);
+
+          card.appendChild(top);
+          card.appendChild(sentimentContainer);
+
+          attachSwipeToLineCard(
+            card,
+            {
+              sportIndex: currentSportIndex,
+              matchupIndex: currentMatchupIndex,
+              label: ln.label,
+              category: ln.category || "other",
+              sharp: ln.sharp,
+              sweep: ln.sweep,
+              book: ln.book,
+            },
+            "matchupsTop"
+          );
+
+          visibleLinesCount += 1;
+          matchupsListEl.appendChild(card);
+        });
+      }
+
+      function renderAllLinesBack() {
+        const sport = currentSport();
+        const matchup = currentMatchup();
+
+        backTitleEl.textContent = `${sport.name} – All Lines`;
+        backSubEl.textContent =
+          "Lines grouped by spreads, totals, points, props and alternates. Swipe and double-tap like normal.";
+        backFooterNoteEl.style.display = "block";
+
+        matchupsListEl.innerHTML = "";
+
+        const baseLines = matchup.lines;
+        let extendedLines = baseLines.slice();
+
+        let altCounter = 1;
+        while (extendedLines.length < 12 && baseLines.length > 0) {
+          const template =
+            baseLines[(extendedLines.length - baseLines.length) % baseLines.length];
+          const cat =
+            template.category === "spread" ||
+            template.category === "total" ||
+            template.category === "points"
+              ? "alt"
+              : template.category || "alt";
+
+          extendedLines.push({
+            ...template,
+            label: `${template.label} (Alt ${altCounter})`,
+            category: cat,
+          });
+          altCounter++;
+        }
+
+        const grouped = {};
+        extendedLines.forEach((ln) => {
+          const cat = ln.category || "other";
+          if (!grouped[cat]) grouped[cat] = [];
+          grouped[cat].push(ln);
+        });
+
+        CATEGORY_ORDER.forEach((catKey) => {
+          const linesInCat = grouped[catKey];
+          if (!linesInCat || linesInCat.length === 0) return;
+
+          const header = document.createElement("div");
+          header.className = "category-header";
+          header.textContent = CATEGORY_LABELS[catKey] || CATEGORY_LABELS.other;
+          matchupsListEl.appendChild(header);
+
+          linesInCat.forEach((ln) => {
+            const card = document.createElement("div");
+            card.className = "matchup-card";
+
+            const top = document.createElement("div");
+            top.className = "matchup-top";
+
+            const left = document.createElement("div");
+            const label = document.createElement("div");
+            label.className = "matchup-label";
+            label.textContent = ln.label;
+
+            const gameLine = document.createElement("div");
+            gameLine.className = "matchup-line";
+            gameLine.textContent = matchup.name;
+
+            const helper = document.createElement("div");
+            helper.className = "matchup-line";
+            helper.textContent =
+              "Swipe right for Sharp, left for Sweep. Double-tap for stats.";
+
+            left.appendChild(label);
+            left.appendChild(gameLine);
+            left.appendChild(helper);
+
+            const right = document.createElement("div");
+            right.className = "matchup-tag";
+            right.textContent = ln.book || "Consensus";
+
+            top.appendChild(left);
+            top.appendChild(right);
+
+            const sentimentContainer = document.createElement("div");
+            sentimentContainer.className = "sentiment-bar-container";
+
+            const barBg = document.createElement("div");
+            barBg.className = "sentiment-bar-bg";
+
+            const barFill = document.createElement("div");
+            barFill.className = "sentiment-bar-fill";
+            barFill.style.width = ln.sharp + "%";
+
+            barBg.appendChild(barFill);
+
+            const labels = document.createElement("div");
+            labels.className = "sentiment-labels";
+
+            const leftLabel = document.createElement("span");
+            leftLabel.textContent = "Sharp " + ln.sharp + "%";
+            const rightLabel = document.createElement("span");
+            rightLabel.textContent = "Sweep " + ln.sweep + "%";
+
+            labels.appendChild(leftLabel);
+            labels.appendChild(rightLabel);
+
+            sentimentContainer.appendChild(barBg);
+            sentimentContainer.appendChild(labels);
+
+            card.appendChild(top);
+            card.appendChild(sentimentContainer);
+
+            attachSwipeToLineCard(
+              card,
+              {
+                sportIndex: currentSportIndex,
+                matchupIndex: currentMatchupIndex,
+                label: ln.label,
+                category: ln.category || "other",
+                sharp: ln.sharp,
+                sweep: ln.sweep,
+                book: ln.book,
+              },
+              "allLines"
+            );
+
+            matchupsListEl.appendChild(card);
+          });
+        });
+      }
+
+      function renderLineDetailsFront() {
+        const sport = SPORTS[currentLineDetailMeta.sportIndex];
+        const stats = currentLineDetailStats;
+
+        logoEl.className = "sport-logo-circle " + sport.logoClass;
+        logoEl.textContent = sport.emoji;
+
+        nameEl.textContent = currentLineDetailMeta.label;
+        codeEl.textContent = `${stats.sportName} • ${stats.matchupName}`;
+
+        tapHintFrontEl.textContent = "Tap center to go back ↺";
+
+        indexIndicatorFront.textContent = "";
+        indexIndicatorBack.textContent = "";
+      }
+
+      function renderLineDetailsBack() {
+        const stats = currentLineDetailStats;
+        const meta = currentLineDetailMeta;
+
+        backTitleEl.textContent = "Line Detail";
+        backSubEl.textContent = meta.label;
+        backFooterNoteEl.style.display = "none";
+
+        matchupsListEl.innerHTML = "";
+
+        const summaryCard = document.createElement("div");
+        summaryCard.className = "matchup-card";
+
+        const summaryTop = document.createElement("div");
+        summaryTop.className = "matchup-top";
+
+        const left = document.createElement("div");
+        const label = document.createElement("div");
+        label.className = "matchup-label stat-highlight";
+        label.textContent = stats.entityName;
+
+        const sub = document.createElement("div");
+        sub.className = "matchup-line";
+        if (stats.entityType === "player") {
+          sub.textContent = `${stats.position || "Player"} • ${
+            stats.teamName
+          } • Season ${stats.season}`;
+        } else {
+          sub.textContent = `${stats.teamName} • Season ${stats.season}`;
+        }
+
+        left.appendChild(label);
+        left.appendChild(sub);
+
+        const right = document.createElement("div");
+        right.className = "matchup-tag";
+        right.textContent = `${stats.coverRate} cover rate`;
+
+        summaryTop.appendChild(left);
+        summaryTop.appendChild(right);
+
+        const sentimentContainer = document.createElement("div");
+        sentimentContainer.className = "sentiment-bar-container";
+
+        const barBg = document.createElement("div");
+        barBg.className = "sentiment-bar-bg";
+
+        const barFill = document.createElement("div");
+        barFill.className = "sentiment-bar-fill";
+        barFill.style.width = stats.coverRate;
+
+        barBg.appendChild(barFill);
+
+        const labels = document.createElement("div");
+        labels.className = "sentiment-labels";
+
+        const leftLabel = document.createElement("span");
+        leftLabel.textContent = "Covers";
+        const rightLabel = document.createElement("span");
+        rightLabel.textContent = "Misses";
+
+        labels.appendChild(leftLabel);
+        labels.appendChild(rightLabel);
+
+        sentimentContainer.appendChild(barBg);
+        sentimentContainer.appendChild(labels);
+
+        summaryCard.appendChild(summaryTop);
+        summaryCard.appendChild(sentimentContainer);
+
+        const detailNote = document.createElement("div");
+        detailNote.className = "line-detail-note";
+        detailNote.textContent =
+          "Sample stats for layout. Live player/team data will plug into this view from a stats provider.";
+        summaryCard.appendChild(detailNote);
+
+        matchupsListEl.appendChild(summaryCard);
+
+        const perfCard = document.createElement("div");
+        perfCard.className = "matchup-card";
+
+        const pTitle = document.createElement("div");
+        pTitle.className = "matchup-label";
+        pTitle.style.marginBottom = "6px";
+        pTitle.textContent = "Line Performance – Season " + stats.season;
+        perfCard.appendChild(pTitle);
+
+        const sr1 = document.createElement("div");
+        sr1.className = "stat-row";
+        sr1.innerHTML = `<span>Games Played</span><span>${stats.gamesPlayed}</span>`;
+
+        const sr2 = document.createElement("div");
+        sr2.className = "stat-row";
+        sr2.innerHTML = `<span>Times Line Offered</span><span>${stats.timesOffered}</span>`;
+
+        const sr3 = document.createElement("div");
+        sr3.className = "stat-row";
+        sr3.innerHTML = `<span>Covered</span><span>${stats.timesCovered}</span>`;
+
+        const sr4 = document.createElement("div");
+        sr4.className = "stat-row";
+        sr4.innerHTML = `<span>Missed</span><span>${stats.timesMissed}</span>`;
+
+        const sr5 = document.createElement("div");
+        sr5.className = "stat-row";
+        sr5.innerHTML = `<span>Pushes</span><span>${stats.timesPushed}</span>`;
+
+        const sr6 = document.createElement("div");
+        sr6.className = "stat-row";
+        sr6.innerHTML = `<span>Average vs Line</span><span>${stats.avgDelta}</span>`;
+
+        perfCard.appendChild(sr1);
+        perfCard.appendChild(sr2);
+        perfCard.appendChild(sr3);
+        perfCard.appendChild(sr4);
+        perfCard.appendChild(sr5);
+        perfCard.appendChild(sr6);
+
+        const pills = document.createElement("div");
+        const pill1 = document.createElement("span");
+        pill1.className = "stat-pill";
+        pill1.innerHTML =
+          '<span class="stat-pill-dot"></span><span>Last 5: ' +
+          stats.last5.join(" • ") +
+          "</span>";
+
+        const pill2 = document.createElement("span");
+        pill2.className = "stat-pill";
+        pill2.innerHTML =
+          '<span class="stat-pill-dot"></span><span>Matchup: ' +
+          stats.matchupName +
+          "</span>";
+
+        pills.appendChild(pill1);
+        pills.appendChild(pill2);
+        perfCard.appendChild(pills);
+
+        matchupsListEl.appendChild(perfCard);
+
+        const seasonCard = document.createElement("div");
+        seasonCard.className = "matchup-card";
+
+        const sTitle = document.createElement("div");
+        sTitle.className = "matchup-label";
+        sTitle.style.marginBottom = "6px";
+        const statName = stats.lineMeta.statName || "Stat";
+        const unit = stats.lineMeta.unit || "";
+        sTitle.textContent = `Season vs Line – ${statName}`;
+        seasonCard.appendChild(sTitle);
+
+        const lv = stats.lineMeta.lineValue;
+        const lineRow = document.createElement("div");
+        lineRow.className = "stat-row";
+        lineRow.innerHTML = `<span>Line</span><span>${
+          lv != null ? lv : "N/A"
+        } ${unit}</span>`;
+        seasonCard.appendChild(lineRow);
+
+        const ss = stats.seasonSplits;
+
+        const s1 = document.createElement("div");
+        s1.className = "stat-row";
+        s1.innerHTML = `<span>Season Average</span><span>${ss.seasonAvg} ${unit}</span>`;
+
+        const s2 = document.createElement("div");
+        s2.className = "stat-row";
+        s2.innerHTML = `<span>Last 10 Games</span><span>${ss.last10Avg} ${unit}</span>`;
+
+        const s3 = document.createElement("div");
+        s3.className = "stat-row";
+        s3.innerHTML = `<span>Home Average</span><span>${ss.homeAvg} ${unit}</span>`;
+
+        const s4 = document.createElement("div");
+        s4.className = "stat-row";
+        s4.innerHTML = `<span>Road Average</span><span>${ss.roadAvg} ${unit}</span>`;
+
+        const s5 = document.createElement("div");
+        s5.className = "stat-row";
+        s5.innerHTML = `<span>vs Current Opponent</span><span>${ss.vsOpponentAvg} ${unit}</span>`;
+
+        seasonCard.appendChild(s1);
+        seasonCard.appendChild(s2);
+        seasonCard.appendChild(s3);
+        seasonCard.appendChild(s4);
+        seasonCard.appendChild(s5);
+
+        const metaRow = document.createElement("div");
+        metaRow.style.marginTop = "6px";
+
+        const pillType = document.createElement("span");
+        pillType.className = "stat-pill";
+        pillType.innerHTML =
+          '<span class="stat-pill-dot"></span><span>' +
+          (stats.lineMeta.marketType === "player_prop"
+            ? "Player Prop"
+            : stats.lineMeta.marketType === "spread"
+            ? "Spread"
+            : stats.lineMeta.marketType === "game_total"
+            ? "Game Total"
+            : "Market") +
+          "</span>";
+
+        const pillEntity = document.createElement("span");
+        pillEntity.className = "stat-pill";
+        pillEntity.innerHTML =
+          '<span class="stat-pill-dot"></span><span>' +
+          (stats.entityType === "player" ? "Player" : "Team") +
+          " • " +
+          (stats.position || stats.teamName) +
+          "</span>";
+
+        metaRow.appendChild(pillType);
+        metaRow.appendChild(pillEntity);
+        seasonCard.appendChild(metaRow);
+
+        matchupsListEl.appendChild(seasonCard);
+
+        const sentimentCard = document.createElement("div");
+        sentimentCard.className = "matchup-card";
+
+        const sentTitle = document.createElement("div");
+        sentTitle.className = "matchup-label";
+        sentTitle.style.marginBottom = "6px";
+        sentTitle.textContent = "Sentiment vs Result";
+        sentimentCard.appendChild(sentTitle);
+
+        const st = stats.sentimentStats;
+        const currentRow = document.createElement("div");
+        currentRow.className = "stat-row";
+        currentRow.innerHTML = `<span>Current Sentiment</span><span>Sharp ${st.sharpPct}% / Sweep ${st.sweepPct}%</span>`;
+        sentimentCard.appendChild(currentRow);
+
+        const majorityRow = document.createElement("div");
+        majorityRow.className = "stat-row";
+        majorityRow.innerHTML = `<span>Majority Side</span><span>${
+          st.majoritySide === "sharp" ? "Sharp" : "Sweep"
+        }</span>`;
+        sentimentCard.appendChild(majorityRow);
+
+        const alignedRow = document.createElement("div");
+        alignedRow.className = "stat-row";
+        alignedRow.innerHTML = `<span>Majority Correct</span><span>${st.alignedRate} (${st.alignedCount} of ${st.totalSamples})</span>`;
+        sentimentCard.appendChild(alignedRow);
+
+        const sentimentBarContainer = document.createElement("div");
+        sentimentBarContainer.className = "sentiment-bar-container";
+        const sbBg = document.createElement("div");
+        sbBg.className = "sentiment-bar-bg";
+        const sbFill = document.createElement("div");
+        sbFill.className = "sentiment-bar-fill";
+        sbFill.style.width = st.sharpPct + "%";
+        sbBg.appendChild(sbFill);
+
+        const sbLabels = document.createElement("div");
+        sbLabels.className = "sentiment-labels";
+        const sbL = document.createElement("span");
+        sbL.textContent = "Sharp " + st.sharpPct + "%";
+        const sbR = document.createElement("span");
+        sbR.textContent = "Sweep " + st.sweepPct + "%";
+        sbLabels.appendChild(sbL);
+        sbLabels.appendChild(sbR);
+
+        sentimentBarContainer.appendChild(sbBg);
+        sentimentBarContainer.appendChild(sbLabels);
+        sentimentCard.appendChild(sentimentBarContainer);
+
+        const note = document.createElement("div");
+        note.className = "line-detail-note";
+        note.textContent =
+          "Sample sentiment accuracy. In production this will reflect how often the majority side (Sharp or Sweep) actually hit for this line.";
+        sentimentCard.appendChild(note);
+
+        matchupsListEl.appendChild(sentimentCard);
+      }
+
+      function renderSentimentsFront() {
+        logoEl.className = "sport-logo-circle sport-logo-nba";
+        logoEl.textContent = "📊";
+        nameEl.textContent = "My Sentiments";
+        codeEl.textContent = "Your Sharp & Sweep history";
+        tapHintFrontEl.textContent = "Tap center to flip ↻";
+        indexIndicatorFront.textContent = "";
+        indexIndicatorBack.textContent = "";
+      }
+
+      function renderSentimentsBack() {
+        backTitleEl.textContent = "My Sentiments";
+        backSubEl.textContent =
+          "All your swipes in one place, sorted by hottest line. Swipe right to promote to My Locks, left to archive. Double-tap for stats.";
+        backFooterNoteEl.style.display = "none";
+
+        matchupsListEl.innerHTML = "";
+
+        const inboxItems = getInboxItems().sort((a, b) => {
+          if (b.crowdSize !== a.crowdSize) return b.crowdSize - a.crowdSize;
+          return (b.lastUpdated || 0) - (a.lastUpdated || 0);
+        });
+
+        if (inboxItems.length === 0) {
+          const empty = document.createElement("div");
+          empty.className = "matchup-card";
+          const t = document.createElement("div");
+          t.className = "matchup-label";
+          t.textContent = "No lines in My Sentiments";
+          const p = document.createElement("div");
+          p.className = "matchup-line";
+          p.textContent =
+            "Swipe a few lines in the main flow, then come back here to promote your favorites to locks.";
+          empty.appendChild(t);
+          empty.appendChild(p);
+          matchupsListEl.appendChild(empty);
+          return;
+        }
+
+        inboxItems.forEach((item) => {
+          const card = document.createElement("div");
+          card.className = "matchup-card";
+
+          const top = document.createElement("div");
+          top.className = "matchup-top";
+
+          const left = document.createElement("div");
+          const label = document.createElement("div");
+          label.className = "matchup-label";
+          label.textContent = item.lineLabel;
+
+          const line = document.createElement("div");
+          line.className = "matchup-line";
+          line.textContent = `${item.matchupName} • ${item.sportName}`;
+
+          const helper = document.createElement("div");
+          helper.className = "matchup-line";
+          helper.textContent =
+            "Swipe right for Lock, left to Archive. Double-tap to view stats.";
+
+          left.appendChild(label);
+          left.appendChild(line);
+          left.appendChild(helper);
+
+          const right = document.createElement("div");
+          right.className = "matchup-tag";
+          right.textContent = item.book || "Best Available";
+
+          top.appendChild(left);
+          top.appendChild(right);
+
+          const sentimentContainer = document.createElement("div");
+          sentimentContainer.className = "sentiment-bar-container";
+
+          const barBg = document.createElement("div");
+          barBg.className = "sentiment-bar-bg";
+
+          const barFill = document.createElement("div");
+          barFill.className = "sentiment-bar-fill";
+          barFill.style.width = item.sharp + "%";
+
+          barBg.appendChild(barFill);
+
+          const labels = document.createElement("div");
+          labels.className = "sentiment-labels";
+
+          const leftLabel = document.createElement("span");
+          leftLabel.textContent = "Sharp " + item.sharp + "%";
+          const rightLabel = document.createElement("span");
+          rightLabel.textContent = "Sweep " + item.sweep + "%";
+
+          labels.appendChild(leftLabel);
+          labels.appendChild(rightLabel);
+
+          sentimentContainer.appendChild(barBg);
+          sentimentContainer.appendChild(labels);
+
+          const youRow = document.createElement("div");
+          youRow.className = "matchup-line";
+          youRow.style.marginTop = "4px";
+          youRow.textContent = `Your last pick: ${
+            item.yourLastVote === "sharp" ? "Sharp ✅" : "Sweep 🧹"
+          } • Swipes on this line: ${item.yourTotalSwipes}`;
+
+          card.appendChild(top);
+          card.appendChild(sentimentContainer);
+          card.appendChild(youRow);
+
+          attachSwipeToLineCard(
+            card,
+            {
+              sportIndex: item.sportIndex,
+              matchupIndex: item.matchupIndex,
+              label: item.lineLabel,
+              category: item.category,
+              sharp: item.sharp,
+              sweep: item.sweep,
+              book: item.book,
+            },
+            "sentimentsInbox"
+          );
+
+          matchupsListEl.appendChild(card);
+        });
+      }
+
+      function renderLocksFront() {
+        logoEl.className = "sport-logo-circle sport-logo-nfl";
+        logoEl.textContent = "🔒";
+        nameEl.textContent = "My Locks";
+        codeEl.textContent = "Your favorite Sharp plays by book";
+        tapHintFrontEl.textContent = "Tap center to flip ↻";
+        indexIndicatorFront.textContent = "";
+        indexIndicatorBack.textContent = "";
+      }
+
+      function renderLocksBack() {
+        backTitleEl.textContent = "My Locks";
+        backSubEl.textContent =
+          "Locks are grouped by sportsbook. Double-tap a line to see stats.";
+        backFooterNoteEl.style.display = "none";
+
+        matchupsListEl.innerHTML = "";
+
+        const locks = getLockItems().sort((a, b) => {
+          const bookA = (a.book || "").toLowerCase();
+          const bookB = (b.book || "").toLowerCase();
+          if (bookA < bookB) return -1;
+          if (bookA > bookB) return 1;
+          return (b.lastUpdated || 0) - (a.lastUpdated || 0);
+        });
+
+        if (locks.length === 0) {
+          const empty = document.createElement("div");
+          empty.className = "matchup-card";
+          const t = document.createElement("div");
+          t.className = "matchup-label";
+          t.textContent = "No locks yet";
+          const p = document.createElement("div");
+          p.className = "matchup-line";
+          p.textContent =
+            "Promote lines from My Sentiments with a Sharp swipe to build your locks board.";
+          empty.appendChild(t);
+          empty.appendChild(p);
+          matchupsListEl.appendChild(empty);
+          return;
+        }
+
+        const byBook = {};
+        locks.forEach((item) => {
+          const book = item.book || "Best Available";
+          if (!byBook[book]) byBook[book] = [];
+          byBook[book].push(item);
+        });
+
+        Object.keys(byBook)
+          .sort()
+          .forEach((book) => {
+            const header = document.createElement("div");
+            header.className = "category-header";
+            header.textContent = book;
+            matchupsListEl.appendChild(header);
+
+            byBook[book].forEach((item) => {
+              const card = document.createElement("div");
+              card.className = "matchup-card";
+
+              const top = document.createElement("div");
+              top.className = "matchup-top";
+
+              const left = document.createElement("div");
+              const label = document.createElement("div");
+              label.className = "matchup-label";
+              label.textContent = item.lineLabel;
+
+              const line = document.createElement("div");
+              line.className = "matchup-line";
+              line.textContent = `${item.matchupName} • ${item.sportName}`;
+
+              left.appendChild(label);
+              left.appendChild(line);
+
+              const right = document.createElement("div");
+              right.className = "matchup-tag";
+              right.textContent = book;
+
+              top.appendChild(left);
+              top.appendChild(right);
+
+              const sentimentContainer = document.createElement("div");
+              sentimentContainer.className = "sentiment-bar-container";
+
+              const barBg = document.createElement("div");
+              barBg.className = "sentiment-bar-bg";
+
+              const barFill = document.createElement("div");
+              barFill.className = "sentiment-bar-fill";
+              barFill.style.width = item.sharp + "%";
+
+              barBg.appendChild(barFill);
+
+              const labels = document.createElement("div");
+              labels.className = "sentiment-labels";
+
+              const leftLabel = document.createElement("span");
+              leftLabel.textContent = "Sharp " + item.sharp + "%";
+              const rightLabel = document.createElement("span");
+              rightLabel.textContent = "Sweep " + item.sweep + "%";
+
+              labels.appendChild(leftLabel);
+              labels.appendChild(rightLabel);
+
+              sentimentContainer.appendChild(barBg);
+              sentimentContainer.appendChild(labels);
+
+              const youRow = document.createElement("div");
+              youRow.className = "matchup-line";
+              youRow.style.marginTop = "4px";
+              youRow.textContent = `Your lock: ${
+                item.yourLastVote === "sharp" ? "Sharp ✅" : "Sweep 🧹"
+              } • Swipes: ${item.yourTotalSwipes}`;
+
+              card.appendChild(top);
+              card.appendChild(sentimentContainer);
+              card.appendChild(youRow);
+
+              card.style.cursor = "pointer";
+              card.addEventListener("dblclick", (e) => {
+                e.stopPropagation();
+                openLineDetails({
+                  sportIndex: item.sportIndex,
+                  matchupIndex: item.matchupIndex,
+                  label: item.lineLabel,
+                  category: item.category,
+                  sharp: item.sharp,
+                  sweep: item.sweep,
+                  book: item.book,
+                });
+              });
+
+              matchupsListEl.appendChild(card);
+            });
+
+            const bookBtn = document.createElement("button");
+            bookBtn.className = "sportsbook-cta-btn";
+            bookBtn.textContent = `Place bet in ${book}`;
+            bookBtn.addEventListener("click", (e) => {
+              e.stopPropagation();
+              showSwipeToast(
+                "sharp",
+                `Affiliate link for ${book} coming soon`
+              );
+            });
+            matchupsListEl.appendChild(bookBtn);
+          });
+
+        const playBtn = document.createElement("button");
+        playBtn.className = "play-locks-cta";
+        playBtn.textContent = "PLAY YOUR LOCKS (In-House • Coming Soon)";
+        playBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          showSwipeToast("sharp", "In-house play mode coming soon");
+        });
+        matchupsListEl.appendChild(playBtn);
+      }
+
+      function renderArchiveFront() {
+        logoEl.className = "sport-logo-circle sport-logo-mlb";
+        logoEl.textContent = "🗃️";
+        nameEl.textContent = "Archive";
+        codeEl.textContent = "Lines you swept away";
+        tapHintFrontEl.textContent = "Tap center to flip ↻";
+        indexIndicatorFront.textContent = "";
+        indexIndicatorBack.textContent = "";
+      }
+
+      function renderArchiveBack() {
+        backTitleEl.textContent = "Archive";
+        backSubEl.textContent =
+          "Lines you swept away. Double-tap any line to see stats.";
+        backFooterNoteEl.style.display = "none";
+
+        matchupsListEl.innerHTML = "";
+
+        const archived = getArchiveItems().sort((a, b) => {
+          return (b.lastUpdated || 0) - (a.lastUpdated || 0);
+        });
+
+        if (archived.length === 0) {
+          const empty = document.createElement("div");
+          empty.className = "matchup-card";
+          const t = document.createElement("div");
+          t.className = "matchup-label";
+          t.textContent = "Nothing archived";
+          const p = document.createElement("div");
+          p.className = "matchup-line";
+          p.textContent =
+            "Swept lines from My Sentiments will show up here if you want to review them later.";
+          empty.appendChild(t);
+          empty.appendChild(p);
+          matchupsListEl.appendChild(empty);
+          return;
+        }
+
+        archived.forEach((item) => {
+          const card = document.createElement("div");
+          card.className = "matchup-card";
+
+          const top = document.createElement("div");
+          top.className = "matchup-top";
+
+          const left = document.createElement("div");
+          const label = document.createElement("div");
+          label.className = "matchup-label";
+          label.textContent = item.lineLabel;
+
+          const line = document.createElement("div");
+          line.className = "matchup-line";
+          line.textContent = `${item.matchupName} • ${item.sportName}`;
+
+          left.appendChild(label);
+          left.appendChild(line);
+
+          const right = document.createElement("div");
+          right.className = "matchup-tag";
+          right.textContent = item.book || "Best Available";
+
+          top.appendChild(left);
+          top.appendChild(right);
+
+          const youRow = document.createElement("div");
+          youRow.className = "matchup-line";
+          youRow.style.marginTop = "4px";
+          youRow.textContent = `You swept this line • Swipes: ${item.yourTotalSwipes}`;
+
+          card.appendChild(top);
+          card.appendChild(youRow);
+
+          card.style.cursor = "pointer";
+          card.addEventListener("dblclick", (e) => {
+            e.stopPropagation();
+            openLineDetails({
+              sportIndex: item.sportIndex,
+              matchupIndex: item.matchupIndex,
+              label: item.lineLabel,
+              category: item.category,
+              sharp: item.sharp,
+              sweep: item.sweep,
+              book: item.book,
+            });
+          });
+
+          matchupsListEl.appendChild(card);
+        });
+      }
+
+      function renderScreen() {
+        if (mode === "sports") {
+          titleEl.textContent = "Select Your Sport";
+          subtitleEl.textContent =
+            "One card at a time. Most popular lines by sport.";
+          directionsEl.innerHTML =
+            'Tap the <strong>center</strong> of a card to flip and see this week’s matchups. Tap the <strong>right edge</strong> for <strong>Sharp</strong> (next sport), and the <strong>left edge</strong> for <strong>Sweep</strong> (previous sport). Double-tap center to open the sport. Tap the <strong>bottom-left corner</strong> of the screen to go back.';
+          backToSportsBtn.style.display = "none";
+
+          renderSportsFront();
+          renderSportsBack();
+        } else if (mode === "matchups") {
+          const sport = currentSport();
+          titleEl.textContent = `${sport.name} Matchups`;
+          subtitleEl.textContent = "Each card is its own matchup.";
+          directionsEl.innerHTML =
+            'Single-tap the <strong>center</strong> to flip and see the top lines. Double-tap center to see <strong>all lines</strong>. Swipe each line to log Sharp (right) or Sweep (left). Double-tap a line to see stats. Tap the <strong>bottom-left corner</strong> to go back.';
+          backToSportsBtn.style.display = "inline-flex";
+
+          renderMatchupsFront();
+          renderMatchupsBack();
+        } else if (mode === "allLines") {
+          const sport = currentSport();
+          const matchup = currentMatchup();
+          titleEl.textContent = `${sport.name} – All Lines`;
+          subtitleEl.textContent = matchup.name;
+          directionsEl.innerHTML =
+            'Scroll to see all available lines from US sportsbooks. Swipe any line right for <strong>Sharp</strong>, left for <strong>Sweep</strong>. Double-tap a line to see its stats. Tap the <strong>bottom-left corner</strong> to go back.';
+          backToSportsBtn.style.display = "inline-flex";
+
+          renderMatchupsFront();
+          renderAllLinesBack();
+        } else if (mode === "lineDetails") {
+          const stats = currentLineDetailStats;
+          titleEl.textContent = "Line Detail";
+          subtitleEl.textContent = stats.matchupName;
+          directionsEl.innerHTML =
+            'You’re viewing stats for this line. Tap the <strong>center</strong> of the card or the <strong>bottom-left corner</strong> of the screen to go back.';
+          backToSportsBtn.style.display = "inline-flex";
+
+          renderLineDetailsFront();
+          renderLineDetailsBack();
+        } else if (mode === "sentiments") {
+          titleEl.textContent = "My Sentiments";
+          subtitleEl.textContent = "Your Sharp & Sweep plays, all in one feed.";
+          directionsEl.innerHTML =
+            'Swipe right to promote a line to <strong>My Locks</strong>. Swipe left to archive it. Double-tap a line to see full stats. Tap the <strong>bottom-left corner</strong> to go back.';
+          backToSportsBtn.style.display = "inline-flex";
+
+          renderSentimentsFront();
+          renderSentimentsBack();
+          flipped = true;
+        } else if (mode === "locks") {
+          titleEl.textContent = "My Locks";
+          subtitleEl.textContent =
+            "Lines you’ve promoted to locks, grouped by sportsbook.";
+          directionsEl.innerHTML =
+            'Double-tap any lock to view full stats. Use the green buttons to jump to a book (affiliate links coming soon). Tap the <strong>bottom-left corner</strong> to go back.';
+          backToSportsBtn.style.display = "inline-flex";
+
+          renderLocksFront();
+          renderLocksBack();
+          flipped = true;
+        } else if (mode === "archive") {
+          titleEl.textContent = "Archive";
+          subtitleEl.textContent = "Lines you swept away.";
+          directionsEl.innerHTML =
+            'Review archived lines here. Double-tap any line to view full stats. Tap the <strong>bottom-left corner</strong> to go back.';
+          backToSportsBtn.style.display = "inline-flex";
+
+          renderArchiveFront();
+          renderArchiveBack();
+          flipped = true;
+        }
+
+        renderCardFlipState();
+      }
+
+      function handleGlobalBack() {
+        if (mode === "lineDetails" && previousModeBeforeLineDetails) {
+          mode = previousModeBeforeLineDetails;
+          flipped = true;
+        } else if (mode === "allLines") {
+          mode = "matchups";
+          flipped = true;
+        } else if (mode === "matchups") {
+          mode = "sports";
+          flipped = false;
+        } else if (mode === "sentiments") {
+          mode = "sports";
+          flipped = false;
+        } else if (mode === "locks" || mode === "archive") {
+          mode = "sports";
+          flipped = false;
+        } else {
+          return;
+        }
+        renderScreen();
+      }
+
+      backToSportsBtn.addEventListener("click", () => {
+        handleGlobalBack();
+      });
+
+      function handleSingleClick(e) {
+        const rect = cardClickArea.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const zone = x / rect.width;
+
+        if (mode === "sentiments" || mode === "locks" || mode === "archive") {
+          // In these modes, center flip only; no edge navigation
+          if (zone >= 0.2 && zone <= 0.8) {
+            flipped = !flipped;
+            renderCardFlipState();
+          }
+          return;
+        }
+
+        if (zone < 0.2) {
+          if (mode === "sports") {
+            currentSportIndex = getPrevIndex(SPORTS.length, currentSportIndex);
+          } else if (mode === "matchups" || mode === "allLines") {
+            currentMatchupIndex = getPrevIndex(
+              currentSport().matchups.length,
+              currentMatchupIndex
+            );
+          }
+          if (mode !== "lineDetails") flipped = false;
+          renderScreen();
+        } else if (zone > 0.8) {
+          if (mode === "sports") {
+            currentSportIndex = getNextIndex(SPORTS.length, currentSportIndex);
+          } else if (mode === "matchups" || mode === "allLines") {
+            currentMatchupIndex = getNextIndex(
+              currentSport().matchups.length,
+              currentMatchupIndex
+            );
+          }
+          if (mode !== "lineDetails") flipped = false;
+          renderScreen();
+        } else {
+          if (mode === "lineDetails") {
+            handleGlobalBack();
+          } else {
+            flipped = !flipped;
+            renderCardFlipState();
+          }
+        }
+      }
+
+      function handleDoubleClick(e) {
+        const rect = cardClickArea.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const zone = x / rect.width;
+
+        if (mode === "lineDetails") {
+          handleGlobalBack();
+          return;
+        }
+
+        if (mode === "sentiments" || mode === "locks" || mode === "archive") {
+          flipped = !flipped;
+          renderCardFlipState();
+          return;
+        }
+
+        if (mode === "sports" && zone >= 0.2 && zone <= 0.8) {
+          mode = "matchups";
+          currentMatchupIndex = 0;
+          flipped = false;
+          renderScreen();
+          return;
+        }
+
+        if (mode === "matchups" && zone >= 0.2 && zone <= 0.8) {
+          mode = "allLines";
+          flipped = true;
+          renderScreen();
+          return;
+        }
+
+        handleSingleClick(e);
+      }
+
+      cardClickArea.addEventListener("click", (e) => {
+        if (clickTimeout) {
+          clearTimeout(clickTimeout);
+          clickTimeout = null;
+          handleDoubleClick(e);
+        } else {
+          clickTimeout = setTimeout(() => {
+            handleSingleClick(e);
+            clickTimeout = null;
+          }, DOUBLE_CLICK_DELAY);
+        }
+      });
+
+      // Sports menu
+      function buildSportsMenu() {
+        sportsMenuEl.innerHTML = "";
+        SPORTS.forEach((sport, sIndex) => {
+          const sportItem = document.createElement("div");
+          sportItem.className = "sports-menu-item";
+
+          const title = document.createElement("div");
+          title.className = "sports-menu-item-title";
+          title.textContent = sport.name;
+          sportItem.appendChild(title);
+
+          const gamesSub = document.createElement("div");
+          gamesSub.className = "sports-games-submenu";
+
+          sport.matchups.forEach((matchup, mIndex) => {
+            const gameItem = document.createElement("div");
+            gameItem.className = "game-item";
+            gameItem.textContent = matchup.name;
+            gameItem.addEventListener("click", (e) => {
+              e.stopPropagation();
+              currentSportIndex = sIndex;
+              currentMatchupIndex = mIndex;
+              mode = "allLines";
+              flipped = true;
+              sportsMenuEl.classList.remove("open");
+              renderScreen();
+            });
+            gamesSub.appendChild(gameItem);
+          });
+
+          sportItem.appendChild(gamesSub);
+          sportsMenuEl.appendChild(sportItem);
+        });
+      }
+
+      appLogoButton.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const isOpen = sportsMenuEl.classList.contains("open");
+        sportsMenuEl.classList.toggle("open", !isOpen);
+      });
+
+      // User menu
+      function updateUserMenuLabel() {
+        if (currentUser && currentUser.name) {
+          userMenuLabel.textContent = "My Hub";
+        } else {
+          userMenuLabel.textContent = "My Sentiments";
+        }
+      }
+
+      function buildUserDropdown() {
+        userDropdown.innerHTML = "";
+
+        const sentItem = document.createElement("div");
+        sentItem.className = "user-dropdown-item";
+        sentItem.textContent = "My Sentiments";
+        sentItem.addEventListener("click", () => {
+          mode = "sentiments";
+          flipped = true;
+          userDropdown.classList.remove("open");
+          renderScreen();
+        });
+        userDropdown.appendChild(sentItem);
+
+        const locksItem = document.createElement("div");
+        locksItem.className = "user-dropdown-item";
+        locksItem.textContent = "My Locks";
+        locksItem.addEventListener("click", () => {
+          mode = "locks";
+          flipped = true;
+          userDropdown.classList.remove("open");
+          renderScreen();
+        });
+        userDropdown.appendChild(locksItem);
+
+        const archiveItem = document.createElement("div");
+        archiveItem.className = "user-dropdown-item";
+        archiveItem.textContent = "Archive";
+        archiveItem.addEventListener("click", () => {
+          mode = "archive";
+          flipped = true;
+          userDropdown.classList.remove("open");
+          renderScreen();
+        });
+        userDropdown.appendChild(archiveItem);
+
+        const sep = document.createElement("div");
+        sep.className = "user-dropdown-separator";
+        userDropdown.appendChild(sep);
+
+        const authItem = document.createElement("div");
+        authItem.className = "user-dropdown-item";
+        authItem.textContent = currentUser ? "Sign out" : "Sign in / Profile";
+        authItem.addEventListener("click", () => {
+          if (currentUser) {
+            currentUser = null;
+            updateUserMenuLabel();
+            buildUserDropdown();
+            showSwipeToast("info", "Signed out");
+          } else {
+            authOverlay.classList.remove("hidden");
+          }
+          userDropdown.classList.remove("open");
+        });
+        userDropdown.appendChild(authItem);
+      }
+
+      userMenuButton.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const isOpen = userDropdown.classList.contains("open");
+        userDropdown.classList.toggle("open", !isOpen);
+      });
+
+      // Auth overlay
+      authSkipBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        hasOnboarded = true;
+        authOverlay.classList.add("hidden");
+        renderScreen();
+      });
+
+      authContinueBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const name = authNameInput.value.trim();
+        const email = authEmailInput.value.trim();
+        const state = authStateSelect.value || "";
+        currentUser = {
+          name: name || "Guest",
+          email,
+          state,
+        };
+        hasOnboarded = true;
+        authOverlay.classList.add("hidden");
+        updateUserMenuLabel();
+        buildUserDropdown();
+        renderScreen();
+      });
+
+      // Global click: close menus + bottom-left back
+      document.addEventListener("click", (e) => {
+        const target = e.target;
+
+        const clickedCard = cardClickArea.contains(target);
+        const clickedBack = backToSportsBtn.contains(target);
+        const clickedUserMenu = userMenuWrapper.contains(target);
+        const clickedLogoMenu = logoGroup.contains(target);
+        const clickedAuth = authOverlay.contains(target);
+
+        // close dropdowns if clicking outside
+        if (!clickedLogoMenu) {
+          sportsMenuEl.classList.remove("open");
+        }
+        if (!clickedUserMenu) {
+          userDropdown.classList.remove("open");
+        }
+
+        // don't trigger bottom-left back if click was on primary interactive regions
+        if (
+          clickedCard ||
+          clickedBack ||
+          clickedUserMenu ||
+          clickedLogoMenu ||
+          clickedAuth
+        ) {
+          return;
+        }
+
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+        const x = e.clientX;
+        const y = e.clientY;
+
+        if (x < vw * 0.25 && y > vh * 0.75) {
+          handleGlobalBack();
+        }
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowLeft") {
+          if (mode === "sports") {
+            currentSportIndex = getPrevIndex(SPORTS.length, currentSportIndex);
+          } else if (mode === "matchups" || mode === "allLines") {
+            currentMatchupIndex = getPrevIndex(
+              currentSport().matchups.length,
+              currentMatchupIndex
+            );
+          }
+          if (mode !== "lineDetails") flipped = false;
+          renderScreen();
+        } else if (e.key === "ArrowRight") {
+          if (mode === "sports") {
+            currentSportIndex = getNextIndex(SPORTS.length, currentSportIndex);
+          } else if (mode === "matchups" || mode === "allLines") {
+            currentMatchupIndex = getNextIndex(
+              currentSport().matchups.length,
+              currentMatchupIndex
+            );
+          }
+          if (mode !== "lineDetails") flipped = false;
+          renderScreen();
+        } else if (e.key === " ") {
+          e.preventDefault();
+          if (mode === "lineDetails") {
+            handleGlobalBack();
+          } else {
+            flipped = !flipped;
+            renderCardFlipState();
+          }
+        }
+      });
+
+      // Init
+      buildSportsMenu();
+      updateUserMenuLabel();
+      buildUserDropdown();
+      renderScreen();
+    
+/* ============================
+   NFL – LIVE ODDS + PLAYER PROPS
+   ============================ */
+
+const NFL_API_KEY = "05e71f5146e8488d9ff3c537b89f4ffc"; // <-- your real key
+
+// Safe fetch wrapper
+async function fetchJsonSafe(url) {
+  try {
+    const r = await fetch(url);
+    if (!r.ok) {
+      console.warn("Fetch not OK:", r.status, url);
+      return null;
+    }
+    return await r.json();
+  } catch (e) {
+    console.warn("Fetch failed:", url, e);
+    return null;
+  }
+}
+
+/**
+ * MAIN LOADER:
+ * 1) get CurrentSeason + CurrentWeek
+ * 2) get GameOddsByWeek
+ * 3) map game lines (spread/total/ML)
+ * 4) layer in player props for some games
+ */
+async function loadLiveNflOdds() {
+  if (!NFL_API_KEY) {
+    console.log("NFL API key not set. Using sample NFL data.");
+    return;
+  }
+
+  console.log("Fetching CurrentSeason and CurrentWeek...");
+
+  const seasonUrl = `https://api.sportsdata.io/v3/nfl/scores/json/CurrentSeason?key=${NFL_API_KEY}`;
+  const weekUrl   = `https://api.sportsdata.io/v3/nfl/scores/json/CurrentWeek?key=${NFL_API_KEY}`;
+
+  const seasonRaw = await fetchJsonSafe(seasonUrl);
+  const weekRaw   = await fetchJsonSafe(weekUrl);
+
+  const season = Number(seasonRaw);
+  const week   = Number(weekRaw);
+
+  if (!season || !week) {
+    console.log("Could not resolve season/week. Using sample NFL.");
+    return;
+  }
+
+  console.log("Loading live NFL odds for:", season, "week", week);
+
+  const oddsUrl = `https://api.sportsdata.io/v3/nfl/odds/json/GameOddsByWeek/${season}/${week}?key=${NFL_API_KEY}`;
+  const oddsData = await fetchJsonSafe(oddsUrl);
+
+  if (!Array.isArray(oddsData) || oddsData.length === 0) {
+    console.log("No NFL odds returned. Using sample NFL.");
+    return;
+  }
+
+  // Step 1: map game lines
+  applyLiveNflOdds(oddsData);
+
+  // Step 2: attach props on top
+  await augmentNflMatchupsWithProps(oddsData);
+
+  // If user is on NFL, refresh UI
+  if (currentSport().id === "nfl") {
+    renderScreen();
+  }
+
+  console.log("NFL odds + props updated.");
+}
+
+/**
+ * GAME LINES MAPPER
+ * - builds matchup.name like "DET @ KC"
+ * - builds lines[] with spread / total / moneyline from each book
+ * - stores _scoreId so we can attach props later
+ */
+function applyLiveNflOdds(oddsData) {
+  const nflSport = SPORTS.find((s) => s.id === "nfl");
+  if (!nflSport) return;
+
+  const mapped = [];
+
+  oddsData.forEach((game) => {
+    // Try to find something readable for team names
+    const homeCode =
+      game.HomeTeam ||
+      game.HomeTeamKey ||
+      game.HomeTeamID ||
+      "HOME";
+
+    const awayCode =
+      game.AwayTeam ||
+      game.AwayTeamKey ||
+      game.AwayTeamID ||
+      "AWAY";
+
+    const homeName = game.HomeTeamName || homeCode;
+    const awayName = game.AwayTeamName || awayCode;
+
+    const matchupName = `${awayName} @ ${homeName}`;
+
+    const pre = game.PregameOdds || [];
+    if (!pre.length) return;
+
+    const lines = [];
+
+    pre.forEach((odd) => {
+      const book =
+        odd.SportsbookName ||
+        odd.Sportsbook ||
+        odd.SportsBook ||
+        `Sportsbook ${odd.SportsbookId || ""}`.trim();
+
+      // Spread (based on FavoredTeam + Spread)
+      if (typeof odd.Spread === "number" && odd.FavoredTeam) {
+        const spreadLabel = `${odd.FavoredTeam} ${
+          odd.Spread > 0 ? "+" : ""
+        }${odd.Spread}`;
+        lines.push({
+          label: spreadLabel,
+          category: "spread",
+          sharp: 55,
+          sweep: 45,
+          book,
+        });
+      }
+
+      // Total
+      if (typeof odd.OverUnder === "number") {
+        lines.push({
+          label: `Total ${odd.OverUnder}`,
+          category: "total",
+          sharp: 53,
+          sweep: 47,
+          book,
+        });
+      }
+
+      // Moneylines (home)
+      if (typeof odd.HomeTeamMoneyLine === "number") {
+        const val = odd.HomeTeamMoneyLine;
+        lines.push({
+          label: `${homeName} ${val > 0 ? "+" : ""}${val} ML`,
+          category: "moneyline",
+          sharp: 52,
+          sweep: 48,
+          book,
+        });
+      }
+      // Moneylines (away)
+      if (typeof odd.AwayTeamMoneyLine === "number") {
+        const val = odd.AwayTeamMoneyLine;
+        lines.push({
+          label: `${awayName} ${val > 0 ? "+" : ""}${val} ML`,
+          category: "moneyline",
+          sharp: 52,
+          sweep: 48,
+          book,
+        });
+      }
+    });
+
+    if (!lines.length) return;
+
+    mapped.push({
+      name: matchupName,
+      lines: lines.slice(0, 20), // cap so card doesn't explode
+      _scoreId: game.ScoreId || game.ScoreID || null,
+      _gameId: game.GameId || game.GameID || null,
+    });
+  });
+
+  if (!mapped.length) {
+    console.log("NFL mapping found no usable games. Keeping sample NFL.");
+    return;
+  }
+
+  nflSport.matchups = mapped;
+  console.log("NFL updated with", mapped.length, "live games.");
+}
+
+/**
+ * PROPS MAPPER
+ * - for a few games, calls BettingPlayerPropsByScoreID
+ * - converts props → "Player oXX.X [Stat]"
+ * - pushes them into matchup.lines as category: "props"
+ */
+async function augmentNflMatchupsWithProps(oddsData) {
+  const nflSport = SPORTS.find((s) => s.id === "nfl");
+  if (!nflSport) return;
+
+  const gamesWithScore = oddsData.filter(
+    (g) => g.ScoreId || g.ScoreID
+  );
+
+  if (!gamesWithScore.length) {
+    console.log("No ScoreId on NFL games, skipping props.");
+    return;
+  }
+
+  const MAX_GAMES_WITH_PROPS = 4; // demo limit
+  const limited = gamesWithScore.slice(0, MAX_GAMES_WITH_PROPS);
+
+  console.log(
+    `Loading player props for ${limited.length} NFL games (demo limit).`
+  );
+
+  function findMatchupByScoreId(scoreId) {
+    return nflSport.matchups.find(
+      (m) => m._scoreId === scoreId || m._scoreId === Number(scoreId)
+    );
+  }
+
+  for (const game of limited) {
+    const scoreId = game.ScoreId || game.ScoreID;
+    if (!scoreId) continue;
+
+    const matchup = findMatchupByScoreId(scoreId);
+    if (!matchup) continue;
+
+    const propsUrl = `https://api.sportsdata.io/v3/nfl/odds/json/BettingPlayerPropsByScoreID/${scoreId}?key=${NFL_API_KEY}`;
+    const propsData = await fetchJsonSafe(propsUrl);
+
+    if (!Array.isArray(propsData) || !propsData.length) {
+      console.log("No props for ScoreId", scoreId);
+      continue;
+    }
+
+    const propLines = [];
+
+    propsData.forEach((prop) => {
+      const book =
+        prop.SportsbookName ||
+        prop.Sportsbook ||
+        prop.SportsBook ||
+        "Sportsbook";
+
+      const playerName =
+        prop.PlayerName ||
+        prop.Name ||
+        prop.ParticipantName ||
+        "Player";
+
+      const statType =
+        prop.BettingMarketTypeDescription ||
+        prop.BettingMarketType ||
+        prop.MarketDescription ||
+        "Prop";
+
+      const baseValue =
+        typeof prop.Value === "number"
+          ? prop.Value
+          : typeof prop.Total === "number"
+          ? prop.Total
+          : null;
+
+      const overOutcome =
+        (prop.BettingOutcomes || []).find(
+          (o) =>
+            o.BettingOutcomeType === "Over" ||
+            o.BettingOutcomeType === "OVER" ||
+            o.OutcomeType === "Over"
+        ) || null;
+
+      const displayValue =
+        overOutcome && typeof overOutcome.Value === "number"
+          ? overOutcome.Value
+          : baseValue;
+
+      if (displayValue == null) return;
+
+      const label = `${playerName} o${displayValue} ${statType}`.replace(
+        /\s+/g,
+        " "
+      );
+
+      propLines.push({
+        label,
+        category: "props",
+        sharp: 55, // placeholder sentiment
+        sweep: 45,
+        book,
+      });
+    });
+
+    if (!propLines.length) continue;
+
+    const MAX_PROPS_PER_GAME = 10;
+    const selectedPropLines = propLines.slice(0, MAX_PROPS_PER_GAME);
+
+    matchup.lines = matchup.lines.concat(selectedPropLines);
+    console.log(
+      `Attached ${selectedPropLines.length} props to matchup:`,
+      matchup.name
+    );
+  }
+}
+
+// AUTO-LOAD NFL WHEN PAGE IS READY
+document.addEventListener("DOMContentLoaded", loadLiveNflOdds);
+
+/* ============================
+   AUTH: ENTER APP (SKIP / CONTINUE)
+   ============================ */
+
+function exitAuthAndEnterApp(source) {
+  console.log("exitAuthAndEnterApp called from:", source);
+
+  // 1) hide signup wrapper by walking up from any auth button
+  const anyAuthBtn =
+    document.getElementById("auth-skip") ||
+    document.getElementById("auth-continue");
+
+  if (anyAuthBtn) {
+    let el = anyAuthBtn;
+    for (let i = 0; i < 6 && el && el !== document.body; i++) {
+      console.log("Hiding auth ancestor:", el.tagName, el.className || el.id || "");
+      el.style.display = "none";
+      el = el.parentElement;
+    }
+  }
+
+  // 2) show main app shell
+  const appShell = document.querySelector(".app-shell");
+  if (appShell) {
+    appShell.style.display = "flex";
+    appShell.style.opacity = "1";
+    appShell.style.visibility = "visible";
+  }
+
+  // 3) set mode and render
+  if (typeof mode !== "undefined") {
+    mode = "sports";
+  }
+  if (typeof renderScreen === "function") {
+    renderScreen();
+  }
+}
+
+function wireAuthButtons() {
+  console.log("wireAuthButtons running…");
+
+  const ids = ["auth-skip", "auth-continue"];
+  ids.forEach((id) => {
+    const btn = document.getElementById(id);
+    if (btn) {
+      console.log("Wiring auth button:", id);
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        console.log("Auth button clicked:", id);
+        exitAuthAndEnterApp(id);
+      });
+    } else {
+      console.log("Auth button not found at wire time:", id);
+    }
+  });
+}
+
+// Run after window load so buttons definitely exist
+window.addEventListener("load", wireAuthButtons);
+function exitAuthAndEnterApp(source) {
+  console.log("exitAuthAndEnterApp called from:", source);
+
+  const anyAuthBtn =
+    document.getElementById("auth-skip") ||
+    document.getElementById("auth-continue") ||
+    document.getElementById("signInBtn") ||
+    document.getElementById("signUpBtn");
+
+  if (anyAuthBtn) {
+    let el = anyAuthBtn;
+    for (let i = 0; i < 8 && el && el !== document.body; i++) {
+      el.style.display = "none";
+      el = el.parentElement;
+    }
+  }
+
+  const appShell = document.querySelector(".app-shell");
+  if (appShell) {
+    appShell.style.display = "flex";
+    appShell.style.opacity = "1";
+    appShell.style.visibility = "visible";
+  }
+
+  if (typeof mode !== "undefined") mode = "sports";
+  if (typeof renderScreen === "function") renderScreen();
+}
+
+async function handleSignIn() {
+  const email = (document.getElementById("email")?.value || "").trim();
+  const password = document.getElementById("password")?.value || "";
+  if (!email || !password) return alert("Enter email and password");
+  if (!window.supabase) return alert("Supabase not loaded");
+
+  const { error } = await window.supabase.auth.signInWithPassword({ email, password });
+  if (error) return alert(error.message);
+
+  exitAuthAndEnterApp("signIn");
+}
+
+async function handleSignUp() {
+  const email = (document.getElementById("email")?.value || "").trim();
+  const password = document.getElementById("password")?.value || "";
+  if (!email || !password) return alert("Enter email and password");
+  if (!window.supabase) return alert("Supabase not loaded");
+
+  const { error } = await window.supabase.auth.signUp({ email, password });
+  if (error) return alert(error.message);
+
+  alert("Account created. Check email if confirmation is required.");
+}
+
+function wireAuthButtons() {
+  // SKIP = guest mode (no auth required)
+  const skipBtn = document.getElementById("auth-skip");
+  if (skipBtn) {
+    skipBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      exitAuthAndEnterApp("auth-skip");
+    });
+  }
+
+  // CONTINUE = requires auth
+  const continueBtn = document.getElementById("auth-continue");
+  if (continueBtn) {
+    continueBtn.addEventListener("click", async (e) => {
+      e.preventDefault();
+
+      const { data, error } = await window.supabase.auth.getUser();
+      if (error || !data?.user) {
+        alert("Please sign in first.");
+        return;
+      }
+
+      exitAuthAndEnterApp("auth-continue");
+    });
+  }
+
+  // SIGN IN / SIGN UP
+  const signInBtn = document.getElementById("signInBtn");
+  const signUpBtn = document.getElementById("signUpBtn");
+
+  if (signInBtn) signInBtn.addEventListener("click", handleSignIn);
+  if (signUpBtn) signUpBtn.addEventListener("click", handleSignUp);
+}
+
+window.addEventListener("load", wireAuthButtons);
+        </script>
+
+<!-- =========================
+     AUTH OVERLAY (HTML)
+     ========================= -->
+<div id="auth-overlay">
+  <button id="auth-skip" type="button">Skip</button>
+  <button id="auth-continue" type="button">Continue</button>
+
+  <br /><br />
+
+  <input id="email" type="email" placeholder="Email" />
+  <input id="password" type="password" placeholder="Password" />
+
+  <br /><br />
+
+  <button id="signInBtn" type="button">Sign In</button>
+  <button id="signUpBtn" type="button">Create Account</button>
+</div>
+
+<!-- =========================
+     SUPABASE CLIENT (must be in HTML)
+     ========================= -->
+<script type="module">
+  import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+  window.supabase = createClient(
+    "https://kmgrpyvcxonfjswxusbt.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImttZ3JweXZjeG9uZmpzd3h1c2J0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2NjE4NTIsImV4cCI6MjA4MTIzNzg1Mn0.teDypPoT-TMPkIDGemYVRfCNdmK0uAbOCDaiHfNmgac"
+  );
+</script>
+
+</body>
+</html>
+
+        
+</script>
+
+</body>
+</html>
+
+
