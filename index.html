@@ -3943,7 +3943,14 @@ document.addEventListener("DOMContentLoaded", loadLiveNflOdds);
 
   window.addEventListener("load", wireAuthButtons);
 </script>
-
+<style>
+  #auth-overlay.is-hidden {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+</style>
+      
 <!-- =========================
      AUTH OVERLAY (HTML)
      ========================= -->
@@ -3974,86 +3981,87 @@ document.addEventListener("DOMContentLoaded", loadLiveNflOdds);
 
   console.log("SUPABASE READY:", !!window.supabase);
 
-  // 2) Enter app helper
-  function exitAuthAndEnterApp(source) {
-    console.log("exitAuthAndEnterApp:", source);
+// 2) Enter app helper
+function exitAuthAndEnterApp(source) {
+  console.log("exitAuthAndEnterApp:", source);
 
-    const overlay = document.getElementById("auth-overlay");
-    if (overlay) overlay.style.display = "none";
+  const overlay = document.getElementById("auth-overlay");
+  if (overlay) overlay.classList.add("is-hidden"); // hard hide
 
-    const appShell = document.querySelector(".app-shell");
-    if (appShell) {
-      appShell.style.display = "flex";
-      appShell.style.opacity = "1";
-      appShell.style.visibility = "visible";
-    } else {
-      console.warn("Missing .app-shell in HTML. Add it or update selector.");
-    }
-
-    if (typeof mode !== "undefined") mode = "sports";
-    if (typeof renderScreen === "function") renderScreen();
+  const appShell = document.querySelector(".app-shell");
+  if (appShell) {
+    appShell.style.display = "flex";
+    appShell.style.opacity = "1";
+    appShell.style.visibility = "visible";
   }
 
-  async function handleSignIn() {
-    const email = (document.getElementById("email")?.value || "").trim();
-    const password = document.getElementById("password")?.value || "";
-    if (!email || !password) return alert("Enter email and password");
+  if (typeof mode !== "undefined") mode = "sports";
+  if (typeof renderScreen === "function") renderScreen();
+}
 
-    const res = await window.supabase.auth.signInWithPassword({ email, password });
-    console.log("SIGNIN RESPONSE:", res);
+async function handleSignIn() {
+  const email = (document.getElementById("email")?.value || "").trim();
+  const password = document.getElementById("password")?.value || "";
+  if (!email || !password) return alert("Enter email and password");
 
-    if (res.error) return alert(res.error.message);
+  const res = await window.supabase.auth.signInWithPassword({ email, password });
+  console.log("SIGNIN RESPONSE:", res);
 
-    const sess = await window.supabase.auth.getSession();
-    console.log("POST SIGNIN SESSION:", sess.data.session);
+  if (res.error) return alert(res.error.message);
 
-    if (!sess.data.session) return alert("Signed in but no session created.");
+  const sess = await window.supabase.auth.getSession();
+  console.log("POST SIGNIN SESSION:", sess.data.session);
 
-    exitAuthAndEnterApp("signIn");
-  }
+  if (!sess.data.session) return alert("Signed in but no session created.");
 
-  async function handleSignUp() {
-    const email = (document.getElementById("email")?.value || "").trim();
-    const password = document.getElementById("password")?.value || "";
-    if (!email || !password) return alert("Enter email and password");
+  exitAuthAndEnterApp("signIn");
+}
 
-    const res = await window.supabase.auth.signUp({ email, password });
-    console.log("SIGNUP RESPONSE:", res);
+async function handleSignUp() {
+  const email = (document.getElementById("email")?.value || "").trim();
+  const password = document.getElementById("password")?.value || "";
+  if (!email || !password) return alert("Enter email and password");
 
-    if (res.error) return alert(res.error.message);
+  const res = await window.supabase.auth.signUp({ email, password });
+  console.log("SIGNUP RESPONSE:", res);
 
-    alert("Account created. If email confirmation is enabled, confirm then sign in.");
-  }
+  if (res.error) return alert(res.error.message);
 
-  // 3) Wire buttons after DOM exists
-  window.addEventListener("load", () => {
-    console.log("WIRING AUTH BUTTONS…");
+  alert("Account created. Confirm email if required, then sign in.");
+}
 
-    document.getElementById("auth-skip")?.addEventListener("click", (e) => {
-      e.preventDefault();
-      exitAuthAndEnterApp("skip");
-    });
+// 3) Wire buttons after DOM exists
+window.addEventListener("load", () => {
+  console.log("WIRING AUTH BUTTONS…");
 
-    document.getElementById("auth-continue")?.addEventListener("click", async (e) => {
-      e.preventDefault();
-      const sess = await window.supabase.auth.getSession();
-      console.log("CONTINUE SESSION:", sess.data.session);
-      if (!sess.data.session) return alert("Please sign in first.");
-      exitAuthAndEnterApp("continue");
-    });
-
-    document.getElementById("signInBtn")?.addEventListener("click", (e) => {
-      e.preventDefault();
-      console.log("SIGN IN CLICK");
-      handleSignIn();
-    });
-
-    document.getElementById("signUpBtn")?.addEventListener("click", (e) => {
-      e.preventDefault();
-      console.log("SIGN UP CLICK");
-      handleSignUp();
-    });
+  // Skip: guest
+  document.getElementById("auth-skip")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    exitAuthAndEnterApp("skip");
   });
+
+  // Continue: requires session
+  document.getElementById("auth-continue")?.addEventListener("click", async (e) => {
+    e.preventDefault();
+    const sess = await window.supabase.auth.getSession();
+    console.log("CONTINUE SESSION:", sess.data.session);
+    if (!sess.data.session) return alert("Please sign in first.");
+    exitAuthAndEnterApp("continue");
+  });
+
+  document.getElementById("signInBtn")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    console.log("SIGN IN CLICK");
+    handleSignIn();
+  });
+
+  document.getElementById("signUpBtn")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    console.log("SIGN UP CLICK");
+    handleSignUp();
+  });
+});
+
 </script>
 
 </body>
