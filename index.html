@@ -3805,188 +3805,181 @@ async function augmentNflMatchupsWithProps(oddsData) {
 // AUTO-LOAD NFL WHEN PAGE IS READY
 document.addEventListener("DOMContentLoaded", loadLiveNflOdds);
 
-/* ============================
-   AUTH: ENTER APP (SKIP / CONTINUE)
-   ============================ */
+<script>
+  // AUTO-LOAD NFL WHEN PAGE IS READY
+  document.addEventListener("DOMContentLoaded", loadLiveNflOdds);
 
-function exitAuthAndEnterApp(source) {
-  console.log("exitAuthAndEnterApp called from:", source);
+  /* ============================
+     AUTH: ENTER APP (SKIP / CONTINUE)
+     ============================ */
 
-  // 1) hide signup wrapper by walking up from any auth button
-  const anyAuthBtn =
-    document.getElementById("auth-skip") ||
-    document.getElementById("auth-continue");
+  function exitAuthAndEnterApp(source) {
+    console.log("exitAuthAndEnterApp called from:", source);
 
-  if (anyAuthBtn) {
-    let el = anyAuthBtn;
-    for (let i = 0; i < 6 && el && el !== document.body; i++) {
-      console.log("Hiding auth ancestor:", el.tagName, el.className || el.id || "");
-      el.style.display = "none";
-      el = el.parentElement;
+    // Hide the auth overlay cleanly (no ancestor-walking hacks)
+    const overlay = document.getElementById("auth-overlay");
+    if (overlay) overlay.style.display = "none";
+
+    // Show main app shell
+    const appShell = document.querySelector(".app-shell");
+    if (appShell) {
+      appShell.style.display = "flex";
+      appShell.style.opacity = "1";
+      appShell.style.visibility = "visible";
     }
+
+    // Set mode + render
+    if (typeof mode !== "undefined") mode = "sports";
+    if (typeof renderScreen === "function") renderScreen();
   }
 
-  // 2) show main app shell
-  const appShell = document.querySelector(".app-shell");
-  if (appShell) {
-    appShell.style.display = "flex";
-    appShell.style.opacity = "1";
-    appShell.style.visibility = "visible";
+  async function handleSignIn() {
+    const email = (document.getElementById("email")?.value || "").trim();
+    const password = document.getElementById("password")?.value || "";
+
+    if (!email || !password) return alert("Enter email and password");
+    if (!window.supabase) return alert("Supabase not loaded yet. Refresh.");
+
+    console.log("Attempting sign in for:", email);
+
+    const res = await window.supabase.auth.signInWithPassword({ email, password });
+    console.log("SIGNIN RESPONSE:", res);
+
+    if (res.error) {
+      alert(res.error.message);
+      return;
+    }
+
+    // Confirm session exists
+    const sessionRes = await window.supabase.auth.getSession();
+    console.log("POST SIGNIN getSession:", sessionRes);
+
+    if (!sessionRes.data?.session) {
+      alert("Signed in, but no session was created. (Auth persistence issue)");
+      return;
+    }
+
+    exitAuthAndEnterApp("signIn");
   }
 
-  // 3) set mode and render
-  if (typeof mode !== "undefined") {
-    mode = "sports";
-  }
-  if (typeof renderScreen === "function") {
-    renderScreen();
-  }
-}
+  async function handleSignUp() {
+    const email = (document.getElementById("email")?.value || "").trim();
+    const password = document.getElementById("password")?.value || "";
 
-function wireAuthButtons() {
-  console.log("wireAuthButtons running…");
+    if (!email || !password) return alert("Enter email and password");
+    if (!window.supabase) return alert("Supabase not loaded yet. Refresh.");
 
-  const ids = ["auth-skip", "auth-continue"];
-  ids.forEach((id) => {
-    const btn = document.getElementById(id);
-    if (btn) {
-      console.log("Wiring auth button:", id);
-      btn.addEventListener("click", (e) => {
+    console.log("Attempting sign up for:", email);
+
+    const res = await window.supabase.auth.signUp({ email, password });
+    console.log("SIGNUP RESPONSE:", res);
+
+    if (res.error) {
+      alert(res.error.message);
+      return;
+    }
+
+    alert("Account created. If email confirmation is enabled, confirm then Sign In.");
+  }
+
+  function wireAuthButtons() {
+    console.log("wireAuthButtons running…");
+
+    // SKIP = guest mode
+    const skipBtn = document.getElementById("auth-skip");
+    if (skipBtn) {
+      skipBtn.addEventListener("click", (e) => {
         e.preventDefault();
-        console.log("Auth button clicked:", id);
-        exitAuthAndEnterApp(id);
+        e.stopPropagation();
+        exitAuthAndEnterApp("auth-skip");
+      });
+    }
+
+    // CONTINUE = requires auth
+    const continueBtn = document.getElementById("auth-continue");
+    if (continueBtn) {
+      continueBtn.addEventListener("click", async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const sessionRes = await window.supabase.auth.getSession();
+        console.log("CONTINUE getSession:", sessionRes);
+
+        if (!sessionRes.data?.session) {
+          alert("Please sign in first.");
+          return;
+        }
+
+        exitAuthAndEnterApp("auth-continue");
+      });
+    }
+
+    // SIGN IN / SIGN UP
+    const signInBtn = document.getElementById("signInBtn");
+    const signUpBtn = document.getElementById("signUpBtn");
+
+    if (signInBtn) {
+      signInBtn.addEventListener("click", async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log("SIGN IN button clicked");
+        await handleSignIn();
       });
     } else {
-      console.log("Auth button not found at wire time:", id);
+      console.log("Missing #signInBtn in DOM");
     }
-  });
-}
 
-// Run after window load so buttons definitely exist
-window.addEventListener("load", wireAuthButtons);
-function exitAuthAndEnterApp(source) {
-  console.log("exitAuthAndEnterApp called from:", source);
-
-  const anyAuthBtn =
-    document.getElementById("auth-skip") ||
-    document.getElementById("auth-continue") ||
-    document.getElementById("signInBtn") ||
-    document.getElementById("signUpBtn");
-
-  if (anyAuthBtn) {
-    let el = anyAuthBtn;
-    for (let i = 0; i < 8 && el && el !== document.body; i++) {
-      el.style.display = "none";
-      el = el.parentElement;
+    if (signUpBtn) {
+      signUpBtn.addEventListener("click", async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log("SIGN UP button clicked");
+        await handleSignUp();
+      });
+    } else {
+      console.log("Missing #signUpBtn in DOM");
     }
   }
 
-  const appShell = document.querySelector(".app-shell");
-  if (appShell) {
-    appShell.style.display = "flex";
-    appShell.style.opacity = "1";
-    appShell.style.visibility = "visible";
-  }
-
-  if (typeof mode !== "undefined") mode = "sports";
-  if (typeof renderScreen === "function") renderScreen();
-}
-
-async function handleSignIn() {
-  const email = (document.getElementById("email")?.value || "").trim();
-  const password = document.getElementById("password")?.value || "";
-  if (!email || !password) return alert("Enter email and password");
-  if (!window.supabase) return alert("Supabase not loaded");
-
-  const { error } = await window.supabase.auth.signInWithPassword({ email, password });
-  if (error) return alert(error.message);
-
-  exitAuthAndEnterApp("signIn");
-}
-
-async function handleSignUp() {
-  const email = (document.getElementById("email")?.value || "").trim();
-  const password = document.getElementById("password")?.value || "";
-  if (!email || !password) return alert("Enter email and password");
-  if (!window.supabase) return alert("Supabase not loaded");
-
-  const { error } = await window.supabase.auth.signUp({ email, password });
-  if (error) return alert(error.message);
-
-  alert("Account created. Check email if confirmation is required.");
-}
-
-function wireAuthButtons() {
-  // SKIP = guest mode (no auth required)
-  const skipBtn = document.getElementById("auth-skip");
-  if (skipBtn) {
-    skipBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      exitAuthAndEnterApp("auth-skip");
-    });
-  }
-
-  // CONTINUE = requires auth
-  const continueBtn = document.getElementById("auth-continue");
-  if (continueBtn) {
-    continueBtn.addEventListener("click", async (e) => {
-      e.preventDefault();
-
-      const { data, error } = await window.supabase.auth.getUser();
-      if (error || !data?.user) {
-        alert("Please sign in first.");
-        return;
-      }
-
-      exitAuthAndEnterApp("auth-continue");
-    });
-  }
-
-  // SIGN IN / SIGN UP
-  const signInBtn = document.getElementById("signInBtn");
-  const signUpBtn = document.getElementById("signUpBtn");
-
-  if (signInBtn) signInBtn.addEventListener("click", handleSignIn);
-  if (signUpBtn) signUpBtn.addEventListener("click", handleSignUp);
-}
-
-window.addEventListener("load", wireAuthButtons);
-        </script>
+  window.addEventListener("load", wireAuthButtons);
+</script>
 
 <!-- =========================
      AUTH OVERLAY (HTML)
      ========================= -->
-<div id="auth-overlay">
+<div id="auth-overlay" style="position:fixed;inset:0;background:#0e0e0e;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;">
   <button id="auth-skip" type="button">Skip</button>
   <button id="auth-continue" type="button">Continue</button>
 
-  <br /><br />
-
   <input id="email" type="email" placeholder="Email" />
   <input id="password" type="password" placeholder="Password" />
-
-  <br /><br />
 
   <button id="signInBtn" type="button">Sign In</button>
   <button id="signUpBtn" type="button">Create Account</button>
 </div>
 
 <!-- =========================
-     SUPABASE CLIENT (must be in HTML)
+     SUPABASE CLIENT (MUST be last, and only once)
      ========================= -->
 <script type="module">
   import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-  window.supabase = createClient(
-    "https://kmgrpyvcxonfjswxusbt.supabase.co",
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImttZ3JweXZjeG9uZmpzd3h1c2J0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2NjE4NTIsImV4cCI6MjA4MTIzNzg1Mn0.teDypPoT-TMPkIDGemYVRfCNdmK0uAbOCDaiHfNmgac"
-  );
-</script>
+  const SUPABASE_URL = "https://kmgrpyvcxonfjswxusbt.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImttZ3JweXZjeG9uZmpzd3h1c2J0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2NjE4NTIsImV4cCI6MjA4MTIzNzg1Mn0.teDypPoT-TMPkIDGemYVRfCNdmK0uAbOCDaiHfNmgac";
 
-</body>
-</html>
+  window.supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+    },
+  });
 
-        
+  console.log("SUPABASE READY:", !!window.supabase);
+
+  // OPTIONAL: if already logged in, allow Continue to work immediately
+  const sessionRes = await window.supabase.auth.getSession();
+  console.log("INITIAL getSession:", sessionRes);
 </script>
 
 </body>
