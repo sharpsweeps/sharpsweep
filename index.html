@@ -2,8 +2,9 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>SharpSweep – Demo MVP</title>
+    <title>BeforeTheBet – Demo MVP</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <style>
       :root {
         color-scheme: dark;
@@ -12,7 +13,14 @@
         --border: #1e293b;
         --text: #e2e8f0;
         --muted: #64748b;
-        --accent: #22c55e;
+
+        /* actions */
+        --confident: #22c55e;
+        --doubt: #ef4444;
+
+        /* SideBias */
+        --sidebias-blue: #3b82f6;
+        --sidebias-green: #22c55e;
       }
 
       * {
@@ -21,8 +29,8 @@
 
       body {
         margin: 0;
-        font-family: system-ui, -apple-system, BlinkMacSystemFont,
-          "SF Pro Text", "Segoe UI", sans-serif;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+          "Segoe UI", sans-serif;
         background: radial-gradient(circle at top, #0f172a 0, #020617 55%);
         color: var(--text);
         min-height: 100vh;
@@ -81,7 +89,7 @@
       .logo-button {
         display: inline-flex;
         align-items: center;
-        gap: 4px;
+        gap: 6px;
         padding: 4px 10px;
         border-radius: 999px;
         border: 1px solid transparent;
@@ -96,10 +104,10 @@
 
       .logo {
         font-size: 12px;
-        font-weight: 600;
-        letter-spacing: 0.22em;
+        font-weight: 650;
+        letter-spacing: 0.18em;
         text-transform: uppercase;
-        color: var(--muted);
+        color: #cbd5e1;
       }
 
       .logo-caret {
@@ -130,7 +138,6 @@
         font-size: 12px;
         color: #e5e7eb;
         cursor: default;
-        position: relative;
       }
 
       .sports-menu-item:hover {
@@ -189,7 +196,7 @@
         background: transparent;
         display: inline-flex;
         align-items: center;
-        gap: 4px;
+        gap: 6px;
       }
 
       .menu-placeholder:hover {
@@ -383,49 +390,16 @@
         box-shadow: 0 12px 28px rgba(0, 0, 0, 0.6);
       }
 
-      .sport-logo-mlb {
-        background: radial-gradient(circle at top left, #f97316, #ea580c);
-      }
       .sport-logo-nba {
         background: radial-gradient(circle at top left, #38bdf8, #0ea5e9);
-      }
-      .sport-logo-ncaamb {
-        background: radial-gradient(circle at top left, #a855f7, #7c3aed);
-      }
-      .sport-logo-boxing {
-        background: radial-gradient(circle at top left, #fb7185, #ef4444);
       }
       .sport-logo-nfl {
         background: radial-gradient(circle at top left, #4ade80, #22c55e);
       }
-      .sport-logo-ncaaf {
-        background: radial-gradient(circle at top left, #fb923c, #ea580c);
-      }
-      .sport-logo-golf {
-        background: radial-gradient(circle at top left, #facc15, #eab308);
-      }
-      .sport-logo-nhl {
-        background: radial-gradient(circle at top left, #67e8f9, #22d3ee);
-      }
-      .sport-logo-cfl {
-        background: radial-gradient(circle at top left, #a3e635, #84cc16);
-      }
-      .sport-logo-ufc {
-        background: radial-gradient(circle at top left, #fb7185, #ef4444);
-      }
-      .sport-logo-mls {
-        background: radial-gradient(circle at top left, #22c55e, #15803d);
-      }
-      .sport-logo-premier {
-        background: radial-gradient(circle at top left, #6366f1, #4f46e5);
-      }
-      .sport-logo-tennis {
-        background: radial-gradient(circle at top left, #facc15, #22c55e);
-      }
 
       .sport-front-name {
         font-size: 18px;
-        font-weight: 500;
+        font-weight: 600;
         margin-top: 10px;
       }
 
@@ -465,7 +439,7 @@
 
       .back-title {
         font-size: 16px;
-        font-weight: 600;
+        font-weight: 650;
       }
 
       .back-sub {
@@ -511,7 +485,7 @@
 
       .matchup-label {
         font-size: 13px;
-        font-weight: 500;
+        font-weight: 600;
         color: #e5e7eb;
       }
 
@@ -524,6 +498,7 @@
         font-size: 11px;
         color: var(--muted);
         text-align: right;
+        white-space: nowrap;
       }
 
       .sentiment-bar-container {
@@ -538,11 +513,12 @@
         border: 1px solid #111827;
       }
 
+      /* SideBias fill color is set inline based on state */
       .sentiment-bar-fill {
         height: 100%;
         border-radius: 999px;
-        background: linear-gradient(90deg, #22c55e, #16a34a);
-        transition: width 0.25s ease;
+        background: var(--sidebias-blue);
+        transition: width 0.25s ease, background 0.25s ease;
       }
 
       .sentiment-labels {
@@ -553,13 +529,13 @@
       }
 
       .sentiment-labels span:first-child {
-        color: #bbf7d0;
-        font-weight: 500;
+        color: #bfdbfe;
+        font-weight: 650;
       }
 
       .sentiment-labels span:last-child {
         color: #fecaca;
-        font-weight: 500;
+        font-weight: 650;
       }
 
       .back-footer-note {
@@ -570,12 +546,12 @@
 
       .back-footer-note span:first-child {
         color: #bbf7d0;
-        font-weight: 500;
+        font-weight: 650;
       }
 
       .back-footer-note span:last-child {
         color: #fecaca;
-        font-weight: 500;
+        font-weight: 650;
       }
 
       .category-header {
@@ -624,12 +600,12 @@
       }
 
       .stat-row span:last-child {
-        font-weight: 500;
+        font-weight: 600;
       }
 
       .stat-highlight {
         font-size: 13px;
-        font-weight: 600;
+        font-weight: 750;
       }
 
       .stat-pill {
@@ -649,7 +625,7 @@
         width: 7px;
         height: 7px;
         border-radius: 999px;
-        background: #22c55e;
+        background: var(--sidebias-green);
       }
 
       .line-detail-note {
@@ -667,12 +643,12 @@
         border-radius: 999px;
         border: none;
         font-size: 12px;
-        font-weight: 600;
+        font-weight: 750;
         cursor: pointer;
       }
 
       .sportsbook-cta-btn {
-        background: #22c55e;
+        background: var(--confident);
         color: #020617;
       }
 
@@ -684,12 +660,12 @@
       .play-locks-cta {
         margin-top: 12px;
         margin-bottom: 4px;
-        background: #3b82f6;
+        background: var(--sidebias-blue);
         color: #e5e7eb;
       }
 
-      /* auth overlay */
-      .auth-overlay {
+      /* Auth overlay (fixed + correct) */
+      #auth-overlay {
         position: fixed;
         inset: 0;
         background: radial-gradient(
@@ -703,8 +679,8 @@
         z-index: 80;
       }
 
-      .auth-overlay.hidden {
-        display: none;
+      #auth-overlay.hidden {
+        display: none !important;
       }
 
       .auth-card {
@@ -719,7 +695,7 @@
 
       .auth-title {
         font-size: 18px;
-        font-weight: 600;
+        font-weight: 750;
         margin-bottom: 4px;
       }
 
@@ -740,10 +716,9 @@
         margin-bottom: 4px;
       }
 
-      .auth-field input,
-      .auth-field select {
+      .auth-field input {
         width: 100%;
-        padding: 7px 9px;
+        padding: 8px 10px;
         border-radius: 999px;
         border: 1px solid #1f2937;
         background: #020617;
@@ -753,8 +728,6 @@
 
       .auth-actions {
         display: flex;
-        justify-content: space-between;
-        align-items: center;
         gap: 8px;
         margin-top: 8px;
       }
@@ -770,15 +743,15 @@
       }
 
       .auth-primary {
-        background: #22c55e;
+        background: var(--confident);
         color: #020617;
-        font-weight: 600;
+        font-weight: 800;
       }
 
       .auth-secondary {
         background: transparent;
         border: 1px solid #1f2937;
-        color: var(--muted);
+        color: #cbd5e1;
       }
 
       .auth-note {
@@ -806,22 +779,24 @@
       }
     </style>
   </head>
+
   <body>
     <div class="app-shell">
       <header>
         <div class="header-left">
           <div class="logo-group" id="logo-group">
-            <button id="app-logo-button" class="logo-button">
-              <span class="logo">SHARPSWEEP</span>
+            <button id="app-logo-button" class="logo-button" type="button">
+              <span class="logo">BEFORETHEBET</span>
               <span class="logo-caret">▾</span>
             </button>
             <div id="sports-menu" class="sports-menu"></div>
           </div>
-          <button id="back-to-sports">← Back</button>
+          <button id="back-to-sports" type="button">← Back</button>
         </div>
+
         <div class="user-menu-wrapper" id="user-menu-wrapper">
-          <button class="menu-placeholder" id="user-menu-button">
-            <span id="user-menu-label">My Sentiments</span>
+          <button class="menu-placeholder" id="user-menu-button" type="button">
+            <span id="user-menu-label">SideBias</span>
             <span>▾</span>
           </button>
           <div class="user-dropdown" id="user-dropdown"></div>
@@ -836,8 +811,8 @@
             <div class="directions" id="directions">
               Tap the <strong>center</strong> of a card to flip and see this
               week’s matchups. Tap the <strong>right edge</strong> for
-              <strong>Sharp</strong> (next sport), and the
-              <strong>left edge</strong> for <strong>Sweep</strong> (previous
+              <strong>Confident</strong> (next sport), and the
+              <strong>left edge</strong> for <strong>Doubt it</strong> (previous
               sport). Double-tap center to open the sport. Tap the
               <strong>bottom-left corner</strong> of the screen to go back.
             </div>
@@ -871,10 +846,12 @@
                   <div class="matchups-list" id="matchups-list"></div>
 
                   <div class="back-footer-note" id="back-footer-note">
-                    Sentiment is placeholder data:
-                    <span>Sharp</span> = swipe right,
-                    <span>Sweep</span> = swipe left. Live data coming soon.
+                    SideBias starts 50/50 (blue). After a logged-in user swipes
+                    on a line, it turns green.
+                    <span>Confident</span> = swipe right,
+                    <span>Doubt it</span> = swipe left.
                   </div>
+
                   <div class="tap-hint" id="tap-hint-back">
                     Tap center to flip ↺
                   </div>
@@ -889,21 +866,71 @@
       <footer>Navigation • more pages coming soon</footer>
     </div>
 
-    
-          <button class="auth-secondary" id="auth-skip">Skip for now</button>
-          <button class="auth-primary" id="auth-continue">Continue</button>
+    <!-- AUTH OVERLAY -->
+    <div id="auth-overlay">
+      <div class="auth-card">
+        <div class="auth-title">Sign in</div>
+        <div class="auth-subtitle">
+          Sign in to enable SideBias tracking (green after first swipe).
         </div>
+
+        <div class="auth-field">
+          <label for="email">Email</label>
+          <input id="email" type="email" placeholder="you@email.com" />
+        </div>
+
+        <div class="auth-field">
+          <label for="password">Password</label>
+          <input id="password" type="password" placeholder="••••••••" />
+        </div>
+
+        <div class="auth-actions">
+          <button class="auth-secondary" id="auth-skip" type="button">
+            Skip
+          </button>
+          <button class="auth-secondary" id="signUpBtn" type="button">
+            Create
+          </button>
+          <button class="auth-primary" id="signInBtn" type="button">
+            Sign In
+          </button>
+        </div>
+
+        <div class="auth-actions" style="margin-top: 8px">
+          <button class="auth-primary" id="auth-continue" type="button">
+            Continue
+          </button>
+        </div>
+
         <div class="auth-note">
-          This is a demo experience – no real money and no identity verification
-          yet. In production, this is where full KYC and responsible gaming
-          checks will live.
+          Demo MVP. No real money. Auth is for enabling SideBias tracking only.
         </div>
       </div>
     </div>
 
     <div class="swipe-toast" id="swipe-toast"></div>
 
+    <!-- Supabase (reliable non-module build) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <script>
+      /***************************************************************
+       * BEFORETHEBET (single-file MVP)
+       * - Renames:
+       *   SharpSweep -> BeforeTheBet
+       *   Sharp/Sweep -> Confident/Doubt it
+       *   My Sentiments -> SideBias
+       * - SideBias defaults to 50/50 (blue)
+       * - Turns green after FIRST logged-in swipe on a line
+       * - MLB removed for now
+       ***************************************************************/
+
+      /* =========================
+         CONFIG / CONSTANTS
+         ========================= */
+      const ACTION_RIGHT = "confident";
+      const ACTION_LEFT = "doubt";
+
       const CATEGORY_LABELS = {
         spread: "Spreads",
         total: "Over / Unders",
@@ -911,27 +938,16 @@
         props: "Props",
         alt: "Alternate Lines",
         other: "Other",
+        moneyline: "Moneylines",
       };
 
-      const CATEGORY_ORDER = [
-        "spread",
-        "total",
-        "points",
-        "props",
-        "alt",
-        "other",
-      ];
+      const CATEGORY_ORDER = ["spread", "total", "moneyline", "points", "props", "alt", "other"];
 
-      // Demo sportsbook names
-      const BOOKS = [
-        "FanDuel",
-        "DraftKings",
-        "BetMGM",
-        "Caesars",
-        "ESPN BET",
-        "PointsBet",
-      ];
+      const BOOKS = ["FanDuel", "DraftKings", "BetMGM", "Caesars", "ESPN BET", "PointsBet"];
 
+      /* =========================
+         DEMO SPORTS (MLB removed)
+         ========================= */
       const SPORTS = [
         {
           id: "nfl",
@@ -943,208 +959,20 @@
             {
               name: "Chiefs @ Bills",
               lines: [
-                {
-                  label: "Mahomes o1.5 Passing TDs",
-                  sharp: 68,
-                  sweep: 32,
-                  category: "props",
-                  book: "FanDuel",
-                },
-                {
-                  label: "Mahomes o1.5 Passing TDs",
-                  sharp: 66,
-                  sweep: 34,
-                  category: "props",
-                  book: "DraftKings",
-                },
-                {
-                  label: "Allen o36.5 Rush Yards",
-                  sharp: 57,
-                  sweep: 43,
-                  category: "props",
-                  book: "BetMGM",
-                },
-                {
-                  label: "Kelce o6.5 Receptions",
-                  sharp: 61,
-                  sweep: 39,
-                  category: "props",
-                  book: "Caesars",
-                },
-                {
-                  label: "Total Points o51.5",
-                  sharp: 54,
-                  sweep: 46,
-                  category: "total",
-                  book: "ESPN BET",
-                },
-                {
-                  label: "Chiefs -2.5",
-                  sharp: 52,
-                  sweep: 48,
-                  category: "spread",
-                  book: "PointsBet",
-                },
+                { label: "Mahomes o1.5 Passing TDs", category: "props", book: "FanDuel" },
+                { label: "Allen o36.5 Rush Yards", category: "props", book: "BetMGM" },
+                { label: "Kelce o6.5 Receptions", category: "props", book: "Caesars" },
+                { label: "Total 51.5", category: "total", book: "ESPN BET" },
+                { label: "Chiefs -2.5", category: "spread", book: "PointsBet" },
               ],
             },
             {
               name: "Eagles @ Cowboys",
               lines: [
-                {
-                  label: "Hurts o44.5 Rush Yards",
-                  sharp: 55,
-                  sweep: 45,
-                  category: "props",
-                  book: "FanDuel",
-                },
-                {
-                  label: "Lamb o7.5 Targets",
-                  sharp: 60,
-                  sweep: 40,
-                  category: "props",
-                  book: "DraftKings",
-                },
-                {
-                  label: "Eagles +3.5",
-                  sharp: 58,
-                  sweep: 42,
-                  category: "spread",
-                  book: "BetMGM",
-                },
-                {
-                  label: "Total o48.5",
-                  sharp: 51,
-                  sweep: 49,
-                  category: "total",
-                  book: "Caesars",
-                },
-                {
-                  label: "Hurts 2+ Pass TDs",
-                  sharp: 49,
-                  sweep: 51,
-                  category: "props",
-                  book: "ESPN BET",
-                },
-              ],
-            },
-            {
-              name: "Ravens @ Bengals",
-              lines: [
-                {
-                  label: "Chase o6.5 Receptions",
-                  sharp: 62,
-                  sweep: 38,
-                  category: "props",
-                  book: "FanDuel",
-                },
-                {
-                  label: "Burrow o1.5 Pass TDs",
-                  sharp: 59,
-                  sweep: 41,
-                  category: "props",
-                  book: "DraftKings",
-                },
-                {
-                  label: "Andrews Anytime TD",
-                  sharp: 53,
-                  sweep: 47,
-                  category: "props",
-                  book: "BetMGM",
-                },
-                {
-                  label: "Total u46.5",
-                  sharp: 47,
-                  sweep: 53,
-                  category: "total",
-                  book: "Caesars",
-                },
-                {
-                  label: "Ravens +3.5",
-                  sharp: 56,
-                  sweep: 44,
-                  category: "spread",
-                  book: "ESPN BET",
-                },
-              ],
-            },
-            {
-              name: "49ers @ Seahawks",
-              lines: [
-                {
-                  label: "CMC o89.5 Rush+Rec Yards",
-                  sharp: 71,
-                  sweep: 29,
-                  category: "props",
-                  book: "FanDuel",
-                },
-                {
-                  label: "Metcalf o5.5 Receptions",
-                  sharp: 52,
-                  sweep: 48,
-                  category: "props",
-                  book: "DraftKings",
-                },
-                {
-                  label: "49ers -6.5",
-                  sharp: 64,
-                  sweep: 36,
-                  category: "spread",
-                  book: "BetMGM",
-                },
-                {
-                  label: "Total u44.5",
-                  sharp: 50,
-                  sweep: 50,
-                  category: "total",
-                  book: "Caesars",
-                },
-                {
-                  label: "Purdy o1.5 TD Passes",
-                  sharp: 57,
-                  sweep: 43,
-                  category: "props",
-                  book: "ESPN BET",
-                },
-              ],
-            },
-            {
-              name: "Jets @ Dolphins",
-              lines: [
-                {
-                  label: "Hill o91.5 Rec Yards",
-                  sharp: 66,
-                  sweep: 34,
-                  category: "props",
-                  book: "FanDuel",
-                },
-                {
-                  label: "Waddle o4.5 Receptions",
-                  sharp: 61,
-                  sweep: 39,
-                  category: "props",
-                  book: "DraftKings",
-                },
-                {
-                  label: "Tua o272.5 Pass Yards",
-                  sharp: 58,
-                  sweep: 42,
-                  category: "props",
-                  book: "BetMGM",
-                },
-                {
-                  label: "Jets +9.5",
-                  sharp: 45,
-                  sweep: 55,
-                  category: "spread",
-                  book: "Caesars",
-                },
-                {
-                  label: "Total o45.5",
-                  sharp: 51,
-                  sweep: 49,
-                  category: "total",
-                  book: "ESPN BET",
-                },
+                { label: "Hurts o44.5 Rush Yards", category: "props", book: "FanDuel" },
+                { label: "Lamb o7.5 Targets", category: "props", book: "DraftKings" },
+                { label: "Eagles +3.5", category: "spread", book: "BetMGM" },
+                { label: "Total 48.5", category: "total", book: "Caesars" },
               ],
             },
           ],
@@ -1159,417 +987,29 @@
             {
               name: "Lakers @ Warriors",
               lines: [
-                {
-                  label: "LeBron o26.5 Points",
-                  sharp: 61,
-                  sweep: 39,
-                  category: "points",
-                  book: "FanDuel",
-                },
-                {
-                  label: "Curry o4.5 3PM",
-                  sharp: 64,
-                  sweep: 36,
-                  category: "points",
-                  book: "DraftKings",
-                },
-                {
-                  label: "Reaves o3.5 Assists",
-                  sharp: 55,
-                  sweep: 45,
-                  category: "props",
-                  book: "BetMGM",
-                },
-                {
-                  label: "Total o236.5",
-                  sharp: 52,
-                  sweep: 48,
-                  category: "total",
-                  book: "Caesars",
-                },
-                {
-                  label: "Warriors -3.5",
-                  sharp: 49,
-                  sweep: 51,
-                  category: "spread",
-                  book: "ESPN BET",
-                },
+                { label: "LeBron o26.5 Points", category: "points", book: "FanDuel" },
+                { label: "Curry o4.5 3PM", category: "points", book: "DraftKings" },
+                { label: "Total 236.5", category: "total", book: "Caesars" },
+                { label: "Warriors -3.5", category: "spread", book: "ESPN BET" },
               ],
             },
             {
               name: "Celtics @ Knicks",
               lines: [
-                {
-                  label: "Tatum o3.5 3PM",
-                  sharp: 49,
-                  sweep: 51,
-                  category: "points",
-                  book: "FanDuel",
-                },
-                {
-                  label: "Brunson o24.5 Pts",
-                  sharp: 56,
-                  sweep: 44,
-                  category: "points",
-                  book: "DraftKings",
-                },
-                {
-                  label: "Randle o9.5 Reb",
-                  sharp: 53,
-                  sweep: 47,
-                  category: "props",
-                  book: "BetMGM",
-                },
-                {
-                  label: "Total u224.5",
-                  sharp: 51,
-                  sweep: 49,
-                  category: "total",
-                  book: "Caesars",
-                },
-                {
-                  label: "Celtics -4.5",
-                  sharp: 58,
-                  sweep: 42,
-                  category: "spread",
-                  book: "ESPN BET",
-                },
-              ],
-            },
-            {
-              name: "Mavs @ Suns",
-              lines: [
-                {
-                  label: "Luka o8.5 Assists",
-                  sharp: 64,
-                  sweep: 36,
-                  category: "props",
-                  book: "FanDuel",
-                },
-                {
-                  label: "Booker o28.5 Pts",
-                  sharp: 57,
-                  sweep: 43,
-                  category: "points",
-                  book: "DraftKings",
-                },
-                {
-                  label: "Durant o7.5 Reb",
-                  sharp: 52,
-                  sweep: 48,
-                  category: "props",
-                  book: "BetMGM",
-                },
-                {
-                  label: "Total o229.5",
-                  sharp: 54,
-                  sweep: 46,
-                  category: "total",
-                  book: "Caesars",
-                },
-                {
-                  label: "Mavs +2.5",
-                  sharp: 50,
-                  sweep: 50,
-                  category: "spread",
-                  book: "ESPN BET",
-                },
-              ],
-            },
-            {
-              name: "Bucks @ Heat",
-              lines: [
-                {
-                  label: "Giannis o11.5 Rebounds",
-                  sharp: 57,
-                  sweep: 43,
-                  category: "props",
-                  book: "FanDuel",
-                },
-                {
-                  label: "Middleton o2.5 3PM",
-                  sharp: 55,
-                  sweep: 45,
-                  category: "points",
-                  book: "DraftKings",
-                },
-                {
-                  label: "Herro o20.5 Pts",
-                  sharp: 52,
-                  sweep: 48,
-                  category: "points",
-                  book: "BetMGM",
-                },
-                {
-                  label: "Total u222.5",
-                  sharp: 48,
-                  sweep: 52,
-                  category: "total",
-                  book: "Caesars",
-                },
-                {
-                  label: "Bucks -5.5",
-                  sharp: 60,
-                  sweep: 40,
-                  category: "spread",
-                  book: "ESPN BET",
-                },
-              ],
-            },
-            {
-              name: "Nuggets @ Clippers",
-              lines: [
-                {
-                  label: "Jokic o42.5 PRA",
-                  sharp: 69,
-                  sweep: 31,
-                  category: "props",
-                  book: "FanDuel",
-                },
-                {
-                  label: "Murray o21.5 Pts",
-                  sharp: 58,
-                  sweep: 42,
-                  category: "points",
-                  book: "DraftKings",
-                },
-                {
-                  label: "PG13 o5.5 Reb",
-                  sharp: 51,
-                  sweep: 49,
-                  category: "props",
-                  book: "BetMGM",
-                },
-                {
-                  label: "Total o230.5",
-                  sharp: 53,
-                  sweep: 47,
-                  category: "total",
-                  book: "Caesars",
-                },
-                {
-                  label: "Nuggets -2.5",
-                  sharp: 55,
-                  sweep: 45,
-                  category: "spread",
-                  book: "ESPN BET",
-                },
-              ],
-            },
-          ],
-        },
-        {
-          id: "mlb",
-          name: "MLB",
-          code: "Major League Baseball",
-          logoClass: "sport-logo-mlb",
-          emoji: "⚾",
-          matchups: [
-            {
-              name: "Yankees @ Red Sox",
-              lines: [
-                {
-                  label: "Judge o1.5 Total Bases",
-                  sharp: 64,
-                  sweep: 36,
-                  category: "props",
-                  book: "FanDuel",
-                },
-                {
-                  label: "Total Runs o8.5",
-                  sharp: 55,
-                  sweep: 45,
-                  category: "total",
-                  book: "DraftKings",
-                },
-                {
-                  label: "Yankees ML",
-                  sharp: 57,
-                  sweep: 43,
-                  category: "other",
-                  book: "BetMGM",
-                },
-                {
-                  label: "Cole o7.5 K's",
-                  sharp: 52,
-                  sweep: 48,
-                  category: "props",
-                  book: "Caesars",
-                },
-                {
-                  label: "Devers HR",
-                  sharp: 46,
-                  sweep: 54,
-                  category: "props",
-                  book: "ESPN BET",
-                },
-              ],
-            },
-            {
-              name: "Dodgers @ Giants",
-              lines: [
-                {
-                  label: "Freeman o1.5 Hits+Walks",
-                  sharp: 58,
-                  sweep: 42,
-                  category: "props",
-                  book: "FanDuel",
-                },
-                {
-                  label: "Total u7.5",
-                  sharp: 51,
-                  sweep: 49,
-                  category: "total",
-                  book: "DraftKings",
-                },
-                {
-                  label: "Dodgers -1.5",
-                  sharp: 60,
-                  sweep: 40,
-                  category: "spread",
-                  book: "BetMGM",
-                },
-                {
-                  label: "Betts o0.5 HR",
-                  sharp: 44,
-                  sweep: 56,
-                  category: "props",
-                  book: "Caesars",
-                },
-                {
-                  label: "Giants u3.5 Runs",
-                  sharp: 49,
-                  sweep: 51,
-                  category: "total",
-                  book: "ESPN BET",
-                },
-              ],
-            },
-            {
-              name: "Astros @ Rangers",
-              lines: [
-                {
-                  label: "Total Runs o8.5",
-                  sharp: 55,
-                  sweep: 45,
-                  category: "total",
-                  book: "FanDuel",
-                },
-                {
-                  label: "Astros ML",
-                  sharp: 53,
-                  sweep: 47,
-                  category: "other",
-                  book: "DraftKings",
-                },
-                {
-                  label: "Seager o1.5 TB",
-                  sharp: 57,
-                  sweep: 43,
-                  category: "props",
-                  book: "BetMGM",
-                },
-                {
-                  label: "Altuve o1.5 Hits",
-                  sharp: 54,
-                  sweep: 46,
-                  category: "props",
-                  book: "Caesars",
-                },
-                {
-                  label: "Rangers +1.5",
-                  sharp: 50,
-                  sweep: 50,
-                  category: "spread",
-                  book: "ESPN BET",
-                },
-              ],
-            },
-            {
-              name: "Cubs @ Cardinals",
-              lines: [
-                {
-                  label: "Stroman o5.5 Strikeouts",
-                  sharp: 52,
-                  sweep: 48,
-                  category: "props",
-                  book: "FanDuel",
-                },
-                {
-                  label: "Cards ML",
-                  sharp: 51,
-                  sweep: 49,
-                  category: "other",
-                  book: "DraftKings",
-                },
-                {
-                  label: "Total u8.5",
-                  sharp: 49,
-                  sweep: 51,
-                  category: "total",
-                  book: "BetMGM",
-                },
-                {
-                  label: "Goldy o1.5 TB",
-                  sharp: 55,
-                  sweep: 45,
-                  category: "props",
-                  book: "Caesars",
-                },
-                {
-                  label: "Happ o0.5 HR",
-                  sharp: 43,
-                  sweep: 57,
-                  category: "props",
-                  book: "ESPN BET",
-                },
-              ],
-            },
-            {
-              name: "Braves @ Mets",
-              lines: [
-                {
-                  label: "Acuna o0.5 HR",
-                  sharp: 47,
-                  sweep: 53,
-                  category: "props",
-                  book: "FanDuel",
-                },
-                {
-                  label: "Total o9.5",
-                  sharp: 52,
-                  sweep: 48,
-                  category: "total",
-                  book: "DraftKings",
-                },
-                {
-                  label: "Braves -1.5",
-                  sharp: 59,
-                  sweep: 41,
-                  category: "spread",
-                  book: "BetMGM",
-                },
-                {
-                  label: "Mets u3.5 Runs",
-                  sharp: 50,
-                  sweep: 50,
-                  category: "total",
-                  book: "Caesars",
-                },
-                {
-                  label: "Strider o8.5 K's",
-                  sharp: 62,
-                  sweep: 38,
-                  category: "props",
-                  book: "ESPN BET",
-                },
+                { label: "Tatum o3.5 3PM", category: "points", book: "FanDuel" },
+                { label: "Brunson o24.5 Pts", category: "points", book: "DraftKings" },
+                { label: "Total 224.5", category: "total", book: "Caesars" },
+                { label: "Celtics -4.5", category: "spread", book: "ESPN BET" },
               ],
             },
           ],
         },
       ];
 
-      let mode = "sports"; // "sports" | "matchups" | "allLines" | "lineDetails" | "sentiments" | "locks" | "archive"
+      /* =========================
+         STATE
+         ========================= */
+      let mode = "sports"; // sports | matchups | allLines | lineDetails | sidebias | locks | archive
       let currentSportIndex = 0;
       let currentMatchupIndex = 0;
       let flipped = false;
@@ -1580,15 +1020,20 @@
 
       const DOUBLE_CLICK_DELAY = 250;
       let clickTimeout = null;
-
       let visibleLinesCount = 0;
 
-      const sentimentLog = [];
-      const sentimentStore = {}; // key -> {status: inbox|lock|archived, ...}
+      // SideBias store
+      // key -> { confidentVotes, doubtVotes, totalVotes, hasLoggedInVote, status, ... }
+      const sideBiasStore = {}; // global for this session/demo
+      const sideBiasLog = [];
 
-      let currentUser = null;
-      let hasOnboarded = false;
+      // Auth
+      let currentUser = null; // { id, email }
+      let isLoggedIn = false;
 
+      /* =========================
+         DOM HOOKS
+         ========================= */
       const cardEl = document.getElementById("sport-card");
       const cardClickArea = document.getElementById("card-click-area");
 
@@ -1621,14 +1066,16 @@
       const userMenuWrapper = document.getElementById("user-menu-wrapper");
 
       const authOverlay = document.getElementById("auth-overlay");
-      const authNameInput = document.getElementById("auth-name");
-      const authEmailInput = document.getElementById("auth-email");
-      const authStateSelect = document.getElementById("auth-state");
       const authSkipBtn = document.getElementById("auth-skip");
       const authContinueBtn = document.getElementById("auth-continue");
+      const signInBtn = document.getElementById("signInBtn");
+      const signUpBtn = document.getElementById("signUpBtn");
 
       const swipeToastEl = document.getElementById("swipe-toast");
 
+      /* =========================
+         HELPERS
+         ========================= */
       function getNextIndex(length, current) {
         return (current + 1) % length;
       }
@@ -1647,16 +1094,13 @@
 
       function showSwipeToast(vote, label) {
         const shortLabel =
-          label && label.length > 40
-            ? label.slice(0, 37).trimEnd() + "..."
-            : label || "";
-        let prefix;
-        if (vote === "sharp") prefix = "✅ Sharp";
-        else if (vote === "sweep") prefix = "🧹 Sweep";
-        else prefix = "ℹ️";
-        swipeToastEl.textContent = shortLabel
-          ? `${prefix} – ${shortLabel}`
-          : prefix;
+          label && label.length > 40 ? label.slice(0, 37).trimEnd() + "..." : label || "";
+
+        let prefix = "ℹ️";
+        if (vote === ACTION_RIGHT) prefix = "✅ Confident";
+        else if (vote === ACTION_LEFT) prefix = "❓ Doubt it";
+
+        swipeToastEl.textContent = shortLabel ? `${prefix} – ${shortLabel}` : prefix;
         swipeToastEl.classList.add("show");
         clearTimeout(swipeToastEl._hideTimeout);
         swipeToastEl._hideTimeout = setTimeout(() => {
@@ -1664,6 +1108,117 @@
         }, 1100);
       }
 
+      function normalizeLineKey(meta) {
+        const sport = SPORTS[meta.sportIndex];
+        const matchup = sport.matchups[meta.matchupIndex];
+        const book = meta.book || "Best Available";
+        return `${sport.id}|${matchup.name}|${meta.label}|${book}`;
+      }
+
+      function getOrCreateSideBiasItem(meta) {
+        const key = normalizeLineKey(meta);
+        if (!sideBiasStore[key]) {
+          sideBiasStore[key] = {
+            key,
+            sportId: SPORTS[meta.sportIndex].id,
+            sportName: SPORTS[meta.sportIndex].name,
+            sportIndex: meta.sportIndex,
+            matchupIndex: meta.matchupIndex,
+            matchupName: SPORTS[meta.sportIndex].matchups[meta.matchupIndex].name,
+            lineLabel: meta.label,
+            category: meta.category || "other",
+            book: meta.book || "Best Available",
+
+            // SideBias starts 50/50
+            confidentVotes: 0,
+            doubtVotes: 0,
+            totalVotes: 0,
+            hasLoggedInVote: false,
+
+            status: "inbox", // inbox | lock | archived
+            yourLastVote: null,
+            yourTotalSwipes: 0,
+
+            createdAt: Date.now(),
+            lastUpdated: Date.now(),
+          };
+        }
+        return sideBiasStore[key];
+      }
+
+      function computeSideBiasPct(item) {
+        // If nobody has voted (logged-in), show 50/50 baseline.
+        if (!item.hasLoggedInVote) {
+          return { confidentPct: 50, doubtPct: 50, isActivated: false };
+        }
+        const total = Math.max(1, item.totalVotes);
+        const confidentPct = Math.round((item.confidentVotes / total) * 100);
+        const doubtPct = 100 - confidentPct;
+        return { confidentPct, doubtPct, isActivated: true };
+      }
+
+      function recordSideBias(meta, vote, context) {
+        const item = getOrCreateSideBiasItem(meta);
+        const timestamp = Date.now();
+
+        // Always track your swipe locally
+        item.yourTotalSwipes += 1;
+        item.yourLastVote = vote;
+        item.lastUpdated = timestamp;
+
+        // Only "activate" SideBias (turn green) if logged-in
+        if (isLoggedIn) {
+          item.totalVotes += 1;
+          if (vote === ACTION_RIGHT) item.confidentVotes += 1;
+          else item.doubtVotes += 1;
+          item.hasLoggedInVote = true;
+        hintMaybeLogin();
+
+        // For inbox swipe behavior in SideBias screen:
+        if (context === "sidebiasInbox") {
+          item.status = vote === ACTION_RIGHT ? "lock" : "archived";
+        }
+
+        sideBiasLog.push({
+          key: item.key,
+          vote,
+          timestamp,
+          loggedIn: isLoggedIn,
+        });
+
+        showSwipeToast(vote, meta.label);
+        console.log("SideBias logged:", { vote, loggedIn: isLoggedIn, item });
+      }
+
+      function hintMaybeLogin() {
+        if (!isLoggedIn) {
+          // gentle UX hint (not blocking)
+          // only show once every few swipes
+          const n = sideBiasLog.length;
+          if (n === 1 || n === 4 || n === 8) {
+            showSwipeToast("info", "Sign in to activate SideBias (green) on swipes");
+          }
+        }
+      }
+
+      function getInboxItems() {
+        return Object.values(sideBiasStore).filter((x) => x.status === "inbox");
+      }
+      function getLockItems() {
+        return Object.values(sideBiasStore).filter((x) => x.status === "lock");
+      }
+      function getArchiveItems() {
+        return Object.values(sideBiasStore).filter((x) => x.status === "archived");
+      }
+
+      function renderCardFlipState() {
+        if (flipped) cardEl.classList.add("flipped");
+        else cardEl.classList.remove("flipped");
+      }
+
+      /* =========================
+         LINE DETAILS (demo stats)
+         ========================= */
       function parseLineNumeric(label) {
         const ou = label.match(/[ou](\d+\.?\d*)/i);
         if (ou) return parseFloat(ou[1]);
@@ -1672,167 +1227,24 @@
         return null;
       }
 
-      function getSampleCrowdSize(key) {
-        let hash = 0;
-        for (let i = 0; i < key.length; i++) {
-          hash = (hash * 31 + key.charCodeAt(i)) % 100000;
-        }
-        return 80 + (hash % 520); // 80–599 demo crowd
-      }
-
       function generateLineStats(meta) {
         const sport = SPORTS[meta.sportIndex];
         const matchup = sport.matchups[meta.matchupIndex];
         const label = meta.label;
         const category = meta.category || "other";
-
-        const teams = matchup.name.split("@").map((t) => t.trim());
-        const homeTeam = teams[0] || "Home Team";
-        const awayTeam = teams[1] || "Away Team";
-
-        let entityType = "player";
-        let position = null;
-        let teamName = null;
-        let marketType = "other";
-        let statName = "Stat";
-        let unit = "";
-        let season = "2024";
-        let lineValue = parseLineNumeric(label);
-
-        if (sport.id === "nfl") {
-          if (/Passing TDs?|TD Pass(es)?/i.test(label)) {
-            position = "QB";
-            marketType = "player_prop";
-            statName = "Passing TDs";
-            unit = "TDs per game";
-          } else if (/Rush Yards|Rush\+Rec/i.test(label)) {
-            position = /Allen|Hurts|CMC|Tua/i.test(label) ? "QB/RB" : "RB";
-            marketType = "player_prop";
-            statName = "Rushing Yards";
-            unit = "Yards per game";
-          } else if (/Receptions|Targets/i.test(label)) {
-            position = "WR/TE";
-            marketType = "player_prop";
-            statName = "Receptions";
-            unit = "Receptions per game";
-          } else if (category === "total") {
-            entityType = "team-total";
-            marketType = "game_total";
-            statName = "Total Points";
-            unit = "Points per game";
-          } else if (category === "spread") {
-            entityType = "team";
-            marketType = "spread";
-            statName = "Spread Margin";
-            unit = "Points vs spread";
-          }
-        } else if (sport.id === "nba") {
-          if (/PRA/i.test(label)) {
-            position = "Guard/Forward";
-            marketType = "player_prop";
-            statName = "Points+Rebounds+Assists";
-            unit = "PRA per game";
-          } else if (/Points|Pts/i.test(label)) {
-            position = "Guard/Forward";
-            marketType = "player_prop";
-            statName = "Points";
-            unit = "Points per game";
-          } else if (/Reb(ounds)?/i.test(label)) {
-            position = "Forward/Center";
-            marketType = "player_prop";
-            statName = "Rebounds";
-            unit = "Rebounds per game";
-          } else if (/Assists/i.test(label)) {
-            position = "Guard";
-            marketType = "player_prop";
-            statName = "Assists";
-            unit = "Assists per game";
-          } else if (category === "total") {
-            entityType = "team-total";
-            marketType = "game_total";
-            statName = "Total Points";
-            unit = "Points per game";
-          } else if (category === "spread") {
-            entityType = "team";
-            marketType = "spread";
-            statName = "Spread Margin";
-            unit = "Points vs spread";
-          }
-        } else if (sport.id === "mlb") {
-          if (/Total Bases|TB/i.test(label)) {
-            position = "Batter";
-            marketType = "player_prop";
-            statName = "Total Bases";
-            unit = "TB per game";
-          } else if (/Hits\+Walks|Hits/i.test(label)) {
-            position = "Batter";
-            marketType = "player_prop";
-            statName = "Hits+Walks";
-            unit = "Per game";
-          } else if (/Strikeouts|K's/i.test(label)) {
-            position = "Pitcher";
-            marketType = "player_prop";
-            statName = "Strikeouts";
-            unit = "K per game";
-          } else if (/Runs/i.test(label) && category === "total") {
-            entityType = "team-total";
-            marketType = "game_total";
-            statName = "Runs";
-            unit = "Runs per game";
-          } else if (category === "spread") {
-            entityType = "team";
-            marketType = "spread";
-            statName = "Run Line";
-            unit = "Runs vs line";
-          }
-        }
-
-        if (category === "spread" || category === "other" || category === "total") {
-          if (!position && entityType === "player") {
-            entityType = "team";
-          }
-        }
-
-        const firstWord = label.split(" ")[0];
-        let entityName = firstWord;
-        if (entityType !== "player") {
-          entityName = category === "total" ? `${homeTeam} / ${awayTeam}` : homeTeam;
-        }
-
-        if (!teamName) {
-          if (entityType === "team" || entityType === "team-total") {
-            teamName = entityName;
-          } else {
-            teamName = homeTeam;
-          }
-        }
+        const lineValue = parseLineNumeric(label);
 
         const base = lineValue ?? 10;
         const seasonAvg = +(base + 0.4).toFixed(1);
         const last10Avg = +(base + 0.2).toFixed(1);
-        const homeAvg = +(base + 0.5).toFixed(1);
-        const roadAvg = +(base + 0.1).toFixed(1);
-        const vsOpponentAvg = +(base + 0.3).toFixed(1);
 
-        const sharpPct =
-          typeof meta.sharp === "number" && meta.sharp >= 0 && meta.sharp <= 100
-            ? meta.sharp
-            : 55;
-        const sweepPct = 100 - sharpPct;
-        const majoritySide = sharpPct >= sweepPct ? "sharp" : "sweep";
-
-        const totalSamples = 18;
-        const alignedCount = majoritySide === "sharp" ? 11 : 10;
-        const alignedRate = Math.round((alignedCount / totalSamples) * 100) + "%";
+        const item = getOrCreateSideBiasItem(meta);
+        const sb = computeSideBiasPct(item);
 
         return {
-          entityType,
-          entityName,
-          position,
-          teamName,
           sportName: sport.name,
           matchupName: matchup.name,
-          season,
+          season: "2024",
           gamesPlayed: 17,
           timesOffered: 14,
           timesCovered: 9,
@@ -1841,117 +1253,14 @@
           coverRate: "64%",
           avgDelta: "+0.7 vs line",
           last5: ["Cover", "Cover", "Miss", "Cover", "Cover"],
-          lineMeta: {
-            rawLabel: label,
-            category,
-            marketType,
-            statName,
-            lineValue,
-            unit,
-          },
-          seasonSplits: {
-            seasonAvg,
-            last10Avg,
-            homeAvg,
-            roadAvg,
-            vsOpponentAvg,
-          },
-          sentimentStats: {
-            sharpPct,
-            sweepPct,
-            majoritySide,
-            alignedRate,
-            alignedCount,
-            totalSamples,
-          },
+          lineMeta: { rawLabel: label, category, lineValue },
+          seasonSplits: { seasonAvg, last10Avg },
+          sidebias: sb,
         };
-      }
-
-      function getInboxItems() {
-        return Object.values(sentimentStore).filter(
-          (item) => item.status === "inbox"
-        );
-      }
-
-      function getLockItems() {
-        return Object.values(sentimentStore).filter(
-          (item) => item.status === "lock"
-        );
-      }
-
-      function getArchiveItems() {
-        return Object.values(sentimentStore).filter(
-          (item) => item.status === "archived"
-        );
-      }
-
-      function recordSentiment(meta, vote, context) {
-        const sport = SPORTS[meta.sportIndex];
-        const matchup = sport.matchups[meta.matchupIndex];
-        const book = meta.book || "Best Available";
-        const timestamp = Date.now();
-
-        const logEntry = {
-          sportId: sport.id,
-          sportName: sport.name,
-          matchupName: matchup.name,
-          lineLabel: meta.label,
-          category: meta.category || "other",
-          book,
-          vote,
-          timestamp,
-        };
-        sentimentLog.push(logEntry);
-
-        const key = `${sport.id}|${matchup.name}|${meta.label}|${book}`;
-        let item = sentimentStore[key];
-        if (!item) {
-          const crowdKey = key;
-          const crowdSize = getSampleCrowdSize(crowdKey);
-          item = {
-            key,
-            sportId: sport.id,
-            sportName: sport.name,
-            sportIndex: meta.sportIndex,
-            matchupIndex: meta.matchupIndex,
-            matchupName: matchup.name,
-            lineLabel: meta.label,
-            category: meta.category || "other",
-            sharp:
-              typeof meta.sharp === "number" && meta.sharp >= 0 && meta.sharp <= 100
-                ? meta.sharp
-                : 55,
-            sweep:
-              typeof meta.sweep === "number" && meta.sweep >= 0 && meta.sweep <= 100
-                ? meta.sweep
-                : 45,
-            book,
-            crowdSize,
-            status: "inbox",
-            yourLastVote: vote,
-            yourTotalSwipes: 1,
-            createdAt: timestamp,
-            lastUpdated: timestamp,
-          };
-          sentimentStore[key] = item;
-        } else {
-          item.yourTotalSwipes += 1;
-          item.yourLastVote = vote;
-          item.lastUpdated = timestamp;
-        }
-
-        if (context === "sentimentsInbox") {
-          item.status = vote === "sharp" ? "lock" : "archived";
-        }
-
-        showSwipeToast(vote, meta.label);
-        console.log("Sentiment logged:", logEntry, "store:", item);
       }
 
       function openLineDetails(meta) {
-        if (!meta) return;
-        previousModeBeforeLineDetails =
-          mode === "lineDetails" ? previousModeBeforeLineDetails : mode;
+        previousModeBeforeLineDetails = mode === "lineDetails" ? previousModeBeforeLineDetails : mode;
         currentLineDetailMeta = meta;
         currentLineDetailStats = generateLineStats(meta);
         mode = "lineDetails";
@@ -1959,14 +1268,12 @@
         renderScreen();
       }
 
+      /* =========================
+         SWIPE HANDLER FOR LINE CARDS
+         ========================= */
       function attachSwipeToLineCard(card, meta, context) {
         let startX = null;
         let isPointerDown = false;
-
-        card.addEventListener("click", (e) => {
-          // single click does nothing on purpose
-          e.stopPropagation();
-        });
 
         card.addEventListener("dblclick", (e) => {
           e.stopPropagation();
@@ -1989,11 +1296,13 @@
           e.stopPropagation();
 
           const direction = dx > 0 ? "right" : "left";
-          const vote = direction === "right" ? "sharp" : "sweep";
+          const vote = direction === "right" ? ACTION_RIGHT : ACTION_LEFT;
 
-          if (context === "sentimentsInbox") {
-            // Promote to My Locks or Archive, but stay on My Sentiments
-            recordSentiment(meta, vote, context);
+          // record first so SideBias updates
+          recordSideBias(meta, vote, context);
+
+          // in SideBias inbox screen, we move items between lists and rerender
+          if (context === "sidebiasInbox") {
             const inboxLeft = getInboxItems().length;
             const locksCount = getLockItems().length;
             if (inboxLeft === 0 && locksCount > 0) {
@@ -2004,11 +1313,8 @@
             return;
           }
 
-          recordSentiment(meta, vote, context);
-
-          card.classList.add(
-            direction === "right" ? "swipe-right" : "swipe-left"
-          );
+          // normal swipe animation
+          card.classList.add(direction === "right" ? "swipe-right" : "swipe-left");
 
           setTimeout(() => {
             if (card.parentNode) card.parentNode.removeChild(card);
@@ -2022,11 +1328,10 @@
                   flipped = true;
                   renderScreen();
                 } else {
-                  const doneName = sport.name;
                   mode = "sports";
                   flipped = false;
                   renderScreen();
-                  showSwipeToast("sharp", doneName + " matchups complete");
+                  showSwipeToast(ACTION_RIGHT, sport.name + " matchups complete");
                 }
               }
             }
@@ -2038,11 +1343,9 @@
         });
       }
 
-      function renderCardFlipState() {
-        if (flipped) cardEl.classList.add("flipped");
-        else cardEl.classList.remove("flipped");
-      }
-
+      /* =========================
+         RENDER: SPORTS (front/back)
+         ========================= */
       function renderSportsFront() {
         const sport = currentSport();
         logoEl.className = "sport-logo-circle " + sport.logoClass;
@@ -2059,9 +1362,8 @@
         const sport = currentSport();
         backTitleEl.textContent = `${sport.name} – This Week's Matchups`;
         backSubEl.textContent =
-          "Preview of most popular matchups. Double-tap a matchup to open all lines.";
+          "Preview of top matchups. Double-tap a matchup to open all lines.";
         backFooterNoteEl.style.display = "block";
-
         matchupsListEl.innerHTML = "";
 
         sport.matchups.forEach((matchup, mIndex) => {
@@ -2091,6 +1393,17 @@
           top.appendChild(left);
           top.appendChild(right);
 
+          // SideBias bar (50/50 blue until activated by logged-in swipe)
+          const meta = {
+            sportIndex: currentSportIndex,
+            matchupIndex: mIndex,
+            label: topLine.label,
+            category: topLine.category || "other",
+            book: topLine.book,
+          };
+          const item = getOrCreateSideBiasItem(meta);
+          const sb = computeSideBiasPct(item);
+
           const sentimentContainer = document.createElement("div");
           sentimentContainer.className = "sentiment-bar-container";
 
@@ -2099,7 +1412,8 @@
 
           const barFill = document.createElement("div");
           barFill.className = "sentiment-bar-fill";
-          barFill.style.width = topLine.sharp + "%";
+          barFill.style.width = sb.confidentPct + "%";
+          barFill.style.background = sb.isActivated ? "var(--sidebias-green)" : "var(--sidebias-blue)";
 
           barBg.appendChild(barFill);
 
@@ -2107,9 +1421,9 @@
           labels.className = "sentiment-labels";
 
           const leftLabel = document.createElement("span");
-          leftLabel.textContent = "Sharp " + topLine.sharp + "%";
+          leftLabel.textContent = "Confident " + sb.confidentPct + "%";
           const rightLabel = document.createElement("span");
-          rightLabel.textContent = "Sweep " + topLine.sweep + "%";
+          rightLabel.textContent = "Doubt it " + sb.doubtPct + "%";
 
           labels.appendChild(leftLabel);
           labels.appendChild(rightLabel);
@@ -2120,19 +1434,8 @@
           card.appendChild(top);
           card.appendChild(sentimentContainer);
 
-          attachSwipeToLineCard(
-            card,
-            {
-              sportIndex: currentSportIndex,
-              matchupIndex: mIndex,
-              label: topLine.label,
-              category: topLine.category || "other",
-              sharp: topLine.sharp,
-              sweep: topLine.sweep,
-              book: topLine.book,
-            },
-            "sportsPreview"
-          );
+          // swipe on matchup preview card = log sidebias on the top line
+          attachSwipeToLineCard(card, meta, "sportsPreview");
 
           card.addEventListener("dblclick", (e) => {
             e.stopPropagation();
@@ -2146,6 +1449,9 @@
         });
       }
 
+      /* =========================
+         RENDER: MATCHUPS (front/back)
+         ========================= */
       function renderMatchupsFront() {
         const sport = currentSport();
         const matchup = currentMatchup();
@@ -2167,7 +1473,7 @@
 
         backTitleEl.textContent = `${sport.name} – Top Lines`;
         backSubEl.textContent =
-          "Swipe each line to record your sentiment. Clear the 5-pack to move to the next matchup.";
+          "Swipe each line: Confident (right) / Doubt it (left). Clear the pack to move to the next matchup.";
         backFooterNoteEl.style.display = "block";
 
         matchupsListEl.innerHTML = "";
@@ -2186,16 +1492,15 @@
 
           const label = document.createElement("div");
           label.className = "matchup-label";
-          label.textContent = ln.label; // line is the heading
+          label.textContent = ln.label;
 
           const gameLine = document.createElement("div");
           gameLine.className = "matchup-line";
-          gameLine.textContent = matchup.name; // game as subhead
+          gameLine.textContent = matchup.name;
 
           const helper = document.createElement("div");
           helper.className = "matchup-line";
-          helper.textContent =
-            "Swipe right for Sharp, left for Sweep. Double-tap for stats.";
+          helper.textContent = "Swipe right = Confident. Swipe left = Doubt it. Double-tap = stats.";
 
           left.appendChild(label);
           left.appendChild(gameLine);
@@ -2208,6 +1513,17 @@
           top.appendChild(left);
           top.appendChild(right);
 
+          // SideBias
+          const meta = {
+            sportIndex: currentSportIndex,
+            matchupIndex: currentMatchupIndex,
+            label: ln.label,
+            category: ln.category || "other",
+            book: ln.book,
+          };
+          const item = getOrCreateSideBiasItem(meta);
+          const sb = computeSideBiasPct(item);
+
           const sentimentContainer = document.createElement("div");
           sentimentContainer.className = "sentiment-bar-container";
 
@@ -2216,7 +1532,8 @@
 
           const barFill = document.createElement("div");
           barFill.className = "sentiment-bar-fill";
-          barFill.style.width = ln.sharp + "%";
+          barFill.style.width = sb.confidentPct + "%";
+          barFill.style.background = sb.isActivated ? "var(--sidebias-green)" : "var(--sidebias-blue)";
 
           barBg.appendChild(barFill);
 
@@ -2224,9 +1541,9 @@
           labels.className = "sentiment-labels";
 
           const leftLabel = document.createElement("span");
-          leftLabel.textContent = "Sharp " + ln.sharp + "%";
+          leftLabel.textContent = "Confident " + sb.confidentPct + "%";
           const rightLabel = document.createElement("span");
-          rightLabel.textContent = "Sweep " + ln.sweep + "%";
+          rightLabel.textContent = "Doubt it " + sb.doubtPct + "%";
 
           labels.appendChild(leftLabel);
           labels.appendChild(rightLabel);
@@ -2237,32 +1554,23 @@
           card.appendChild(top);
           card.appendChild(sentimentContainer);
 
-          attachSwipeToLineCard(
-            card,
-            {
-              sportIndex: currentSportIndex,
-              matchupIndex: currentMatchupIndex,
-              label: ln.label,
-              category: ln.category || "other",
-              sharp: ln.sharp,
-              sweep: ln.sweep,
-              book: ln.book,
-            },
-            "matchupsTop"
-          );
+          attachSwipeToLineCard(card, meta, "matchupsTop");
 
           visibleLinesCount += 1;
           matchupsListEl.appendChild(card);
         });
       }
 
+      /* =========================
+         RENDER: ALL LINES (back)
+         ========================= */
       function renderAllLinesBack() {
         const sport = currentSport();
         const matchup = currentMatchup();
 
         backTitleEl.textContent = `${sport.name} – All Lines`;
         backSubEl.textContent =
-          "Lines grouped by spreads, totals, points, props and alternates. Swipe and double-tap like normal.";
+          "Swipe any line: Confident (right) / Doubt it (left). Double-tap a line for stats.";
         backFooterNoteEl.style.display = "block";
 
         matchupsListEl.innerHTML = "";
@@ -2272,12 +1580,9 @@
 
         let altCounter = 1;
         while (extendedLines.length < 12 && baseLines.length > 0) {
-          const template =
-            baseLines[(extendedLines.length - baseLines.length) % baseLines.length];
+          const template = baseLines[(extendedLines.length - baseLines.length) % baseLines.length];
           const cat =
-            template.category === "spread" ||
-            template.category === "total" ||
-            template.category === "points"
+            template.category === "spread" || template.category === "total" || template.category === "points"
               ? "alt"
               : template.category || "alt";
 
@@ -2323,8 +1628,7 @@
 
             const helper = document.createElement("div");
             helper.className = "matchup-line";
-            helper.textContent =
-              "Swipe right for Sharp, left for Sweep. Double-tap for stats.";
+            helper.textContent = "Swipe right = Confident. Swipe left = Doubt it. Double-tap = stats.";
 
             left.appendChild(label);
             left.appendChild(gameLine);
@@ -2337,6 +1641,17 @@
             top.appendChild(left);
             top.appendChild(right);
 
+            // SideBias
+            const meta = {
+              sportIndex: currentSportIndex,
+              matchupIndex: currentMatchupIndex,
+              label: ln.label,
+              category: ln.category || "other",
+              book: ln.book,
+            };
+            const item = getOrCreateSideBiasItem(meta);
+            const sb = computeSideBiasPct(item);
+
             const sentimentContainer = document.createElement("div");
             sentimentContainer.className = "sentiment-bar-container";
 
@@ -2345,7 +1660,8 @@
 
             const barFill = document.createElement("div");
             barFill.className = "sentiment-bar-fill";
-            barFill.style.width = ln.sharp + "%";
+            barFill.style.width = sb.confidentPct + "%";
+            barFill.style.background = sb.isActivated ? "var(--sidebias-green)" : "var(--sidebias-blue)";
 
             barBg.appendChild(barFill);
 
@@ -2353,9 +1669,9 @@
             labels.className = "sentiment-labels";
 
             const leftLabel = document.createElement("span");
-            leftLabel.textContent = "Sharp " + ln.sharp + "%";
+            leftLabel.textContent = "Confident " + sb.confidentPct + "%";
             const rightLabel = document.createElement("span");
-            rightLabel.textContent = "Sweep " + ln.sweep + "%";
+            rightLabel.textContent = "Doubt it " + sb.doubtPct + "%";
 
             labels.appendChild(leftLabel);
             labels.appendChild(rightLabel);
@@ -2366,35 +1682,26 @@
             card.appendChild(top);
             card.appendChild(sentimentContainer);
 
-            attachSwipeToLineCard(
-              card,
-              {
-                sportIndex: currentSportIndex,
-                matchupIndex: currentMatchupIndex,
-                label: ln.label,
-                category: ln.category || "other",
-                sharp: ln.sharp,
-                sweep: ln.sweep,
-                book: ln.book,
-              },
-              "allLines"
-            );
+            attachSwipeToLineCard(card, meta, "allLines");
 
             matchupsListEl.appendChild(card);
           });
         });
       }
 
+      /* =========================
+         RENDER: LINE DETAILS
+         ========================= */
       function renderLineDetailsFront() {
-        const sport = SPORTS[currentLineDetailMeta.sportIndex];
+        const meta = currentLineDetailMeta;
+        const sport = SPORTS[meta.sportIndex];
         const stats = currentLineDetailStats;
 
         logoEl.className = "sport-logo-circle " + sport.logoClass;
         logoEl.textContent = sport.emoji;
 
-        nameEl.textContent = currentLineDetailMeta.label;
+        nameEl.textContent = meta.label;
         codeEl.textContent = `${stats.sportName} • ${stats.matchupName}`;
-
         tapHintFrontEl.textContent = "Tap center to go back ↺";
 
         indexIndicatorFront.textContent = "";
@@ -2408,39 +1715,38 @@
         backTitleEl.textContent = "Line Detail";
         backSubEl.textContent = meta.label;
         backFooterNoteEl.style.display = "none";
-
         matchupsListEl.innerHTML = "";
 
         const summaryCard = document.createElement("div");
         summaryCard.className = "matchup-card";
 
-        const summaryTop = document.createElement("div");
-        summaryTop.className = "matchup-top";
+        const title = document.createElement("div");
+        title.className = "matchup-label stat-highlight";
+        title.textContent = "SideBias + Stats (Demo)";
+        summaryCard.appendChild(title);
 
-        const left = document.createElement("div");
-        const label = document.createElement("div");
-        label.className = "matchup-label stat-highlight";
-        label.textContent = stats.entityName;
+        const row1 = document.createElement("div");
+        row1.className = "stat-row";
+        row1.innerHTML = `<span>Matchup</span><span>${stats.matchupName}</span>`;
+        summaryCard.appendChild(row1);
 
-        const sub = document.createElement("div");
-        sub.className = "matchup-line";
-        if (stats.entityType === "player") {
-          sub.textContent = `${stats.position || "Player"} • ${
-            stats.teamName
-          } • Season ${stats.season}`;
-        } else {
-          sub.textContent = `${stats.teamName} • Season ${stats.season}`;
-        }
+        const row2 = document.createElement("div");
+        row2.className = "stat-row";
+        row2.innerHTML = `<span>Season Avg</span><span>${stats.seasonSplits.seasonAvg}</span>`;
+        summaryCard.appendChild(row2);
 
-        left.appendChild(label);
-        left.appendChild(sub);
+        const row3 = document.createElement("div");
+        row3.className = "stat-row";
+        row3.innerHTML = `<span>Last 10 Avg</span><span>${stats.seasonSplits.last10Avg}</span>`;
+        summaryCard.appendChild(row3);
 
-        const right = document.createElement("div");
-        right.className = "matchup-tag";
-        right.textContent = `${stats.coverRate} cover rate`;
+        const item = getOrCreateSideBiasItem(meta);
+        const sb = computeSideBiasPct(item);
 
-        summaryTop.appendChild(left);
-        summaryTop.appendChild(right);
+        const sbRow = document.createElement("div");
+        sbRow.className = "stat-row";
+        sbRow.innerHTML = `<span>SideBias</span><span>Confident ${sb.confidentPct}% / Doubt it ${sb.doubtPct}%</span>`;
+        summaryCard.appendChild(sbRow);
 
         const sentimentContainer = document.createElement("div");
         sentimentContainer.className = "sentiment-bar-container";
@@ -2450,265 +1756,64 @@
 
         const barFill = document.createElement("div");
         barFill.className = "sentiment-bar-fill";
-        barFill.style.width = stats.coverRate;
-
+        barFill.style.width = sb.confidentPct + "%";
+        barFill.style.background = sb.isActivated ? "var(--sidebias-green)" : "var(--sidebias-blue)";
         barBg.appendChild(barFill);
 
         const labels = document.createElement("div");
         labels.className = "sentiment-labels";
-
-        const leftLabel = document.createElement("span");
-        leftLabel.textContent = "Covers";
-        const rightLabel = document.createElement("span");
-        rightLabel.textContent = "Misses";
-
-        labels.appendChild(leftLabel);
-        labels.appendChild(rightLabel);
+        const l = document.createElement("span");
+        l.textContent = "Confident " + sb.confidentPct + "%";
+        const r = document.createElement("span");
+        r.textContent = "Doubt it " + sb.doubtPct + "%";
+        labels.appendChild(l);
+        labels.appendChild(r);
 
         sentimentContainer.appendChild(barBg);
         sentimentContainer.appendChild(labels);
-
-        summaryCard.appendChild(summaryTop);
         summaryCard.appendChild(sentimentContainer);
-
-        const detailNote = document.createElement("div");
-        detailNote.className = "line-detail-note";
-        detailNote.textContent =
-          "Sample stats for layout. Live player/team data will plug into this view from a stats provider.";
-        summaryCard.appendChild(detailNote);
-
-        matchupsListEl.appendChild(summaryCard);
-
-        const perfCard = document.createElement("div");
-        perfCard.className = "matchup-card";
-
-        const pTitle = document.createElement("div");
-        pTitle.className = "matchup-label";
-        pTitle.style.marginBottom = "6px";
-        pTitle.textContent = "Line Performance – Season " + stats.season;
-        perfCard.appendChild(pTitle);
-
-        const sr1 = document.createElement("div");
-        sr1.className = "stat-row";
-        sr1.innerHTML = `<span>Games Played</span><span>${stats.gamesPlayed}</span>`;
-
-        const sr2 = document.createElement("div");
-        sr2.className = "stat-row";
-        sr2.innerHTML = `<span>Times Line Offered</span><span>${stats.timesOffered}</span>`;
-
-        const sr3 = document.createElement("div");
-        sr3.className = "stat-row";
-        sr3.innerHTML = `<span>Covered</span><span>${stats.timesCovered}</span>`;
-
-        const sr4 = document.createElement("div");
-        sr4.className = "stat-row";
-        sr4.innerHTML = `<span>Missed</span><span>${stats.timesMissed}</span>`;
-
-        const sr5 = document.createElement("div");
-        sr5.className = "stat-row";
-        sr5.innerHTML = `<span>Pushes</span><span>${stats.timesPushed}</span>`;
-
-        const sr6 = document.createElement("div");
-        sr6.className = "stat-row";
-        sr6.innerHTML = `<span>Average vs Line</span><span>${stats.avgDelta}</span>`;
-
-        perfCard.appendChild(sr1);
-        perfCard.appendChild(sr2);
-        perfCard.appendChild(sr3);
-        perfCard.appendChild(sr4);
-        perfCard.appendChild(sr5);
-        perfCard.appendChild(sr6);
-
-        const pills = document.createElement("div");
-        const pill1 = document.createElement("span");
-        pill1.className = "stat-pill";
-        pill1.innerHTML =
-          '<span class="stat-pill-dot"></span><span>Last 5: ' +
-          stats.last5.join(" • ") +
-          "</span>";
-
-        const pill2 = document.createElement("span");
-        pill2.className = "stat-pill";
-        pill2.innerHTML =
-          '<span class="stat-pill-dot"></span><span>Matchup: ' +
-          stats.matchupName +
-          "</span>";
-
-        pills.appendChild(pill1);
-        pills.appendChild(pill2);
-        perfCard.appendChild(pills);
-
-        matchupsListEl.appendChild(perfCard);
-
-        const seasonCard = document.createElement("div");
-        seasonCard.className = "matchup-card";
-
-        const sTitle = document.createElement("div");
-        sTitle.className = "matchup-label";
-        sTitle.style.marginBottom = "6px";
-        const statName = stats.lineMeta.statName || "Stat";
-        const unit = stats.lineMeta.unit || "";
-        sTitle.textContent = `Season vs Line – ${statName}`;
-        seasonCard.appendChild(sTitle);
-
-        const lv = stats.lineMeta.lineValue;
-        const lineRow = document.createElement("div");
-        lineRow.className = "stat-row";
-        lineRow.innerHTML = `<span>Line</span><span>${
-          lv != null ? lv : "N/A"
-        } ${unit}</span>`;
-        seasonCard.appendChild(lineRow);
-
-        const ss = stats.seasonSplits;
-
-        const s1 = document.createElement("div");
-        s1.className = "stat-row";
-        s1.innerHTML = `<span>Season Average</span><span>${ss.seasonAvg} ${unit}</span>`;
-
-        const s2 = document.createElement("div");
-        s2.className = "stat-row";
-        s2.innerHTML = `<span>Last 10 Games</span><span>${ss.last10Avg} ${unit}</span>`;
-
-        const s3 = document.createElement("div");
-        s3.className = "stat-row";
-        s3.innerHTML = `<span>Home Average</span><span>${ss.homeAvg} ${unit}</span>`;
-
-        const s4 = document.createElement("div");
-        s4.className = "stat-row";
-        s4.innerHTML = `<span>Road Average</span><span>${ss.roadAvg} ${unit}</span>`;
-
-        const s5 = document.createElement("div");
-        s5.className = "stat-row";
-        s5.innerHTML = `<span>vs Current Opponent</span><span>${ss.vsOpponentAvg} ${unit}</span>`;
-
-        seasonCard.appendChild(s1);
-        seasonCard.appendChild(s2);
-        seasonCard.appendChild(s3);
-        seasonCard.appendChild(s4);
-        seasonCard.appendChild(s5);
-
-        const metaRow = document.createElement("div");
-        metaRow.style.marginTop = "6px";
-
-        const pillType = document.createElement("span");
-        pillType.className = "stat-pill";
-        pillType.innerHTML =
-          '<span class="stat-pill-dot"></span><span>' +
-          (stats.lineMeta.marketType === "player_prop"
-            ? "Player Prop"
-            : stats.lineMeta.marketType === "spread"
-            ? "Spread"
-            : stats.lineMeta.marketType === "game_total"
-            ? "Game Total"
-            : "Market") +
-          "</span>";
-
-        const pillEntity = document.createElement("span");
-        pillEntity.className = "stat-pill";
-        pillEntity.innerHTML =
-          '<span class="stat-pill-dot"></span><span>' +
-          (stats.entityType === "player" ? "Player" : "Team") +
-          " • " +
-          (stats.position || stats.teamName) +
-          "</span>";
-
-        metaRow.appendChild(pillType);
-        metaRow.appendChild(pillEntity);
-        seasonCard.appendChild(metaRow);
-
-        matchupsListEl.appendChild(seasonCard);
-
-        const sentimentCard = document.createElement("div");
-        sentimentCard.className = "matchup-card";
-
-        const sentTitle = document.createElement("div");
-        sentTitle.className = "matchup-label";
-        sentTitle.style.marginBottom = "6px";
-        sentTitle.textContent = "Sentiment vs Result";
-        sentimentCard.appendChild(sentTitle);
-
-        const st = stats.sentimentStats;
-        const currentRow = document.createElement("div");
-        currentRow.className = "stat-row";
-        currentRow.innerHTML = `<span>Current Sentiment</span><span>Sharp ${st.sharpPct}% / Sweep ${st.sweepPct}%</span>`;
-        sentimentCard.appendChild(currentRow);
-
-        const majorityRow = document.createElement("div");
-        majorityRow.className = "stat-row";
-        majorityRow.innerHTML = `<span>Majority Side</span><span>${
-          st.majoritySide === "sharp" ? "Sharp" : "Sweep"
-        }</span>`;
-        sentimentCard.appendChild(majorityRow);
-
-        const alignedRow = document.createElement("div");
-        alignedRow.className = "stat-row";
-        alignedRow.innerHTML = `<span>Majority Correct</span><span>${st.alignedRate} (${st.alignedCount} of ${st.totalSamples})</span>`;
-        sentimentCard.appendChild(alignedRow);
-
-        const sentimentBarContainer = document.createElement("div");
-        sentimentBarContainer.className = "sentiment-bar-container";
-        const sbBg = document.createElement("div");
-        sbBg.className = "sentiment-bar-bg";
-        const sbFill = document.createElement("div");
-        sbFill.className = "sentiment-bar-fill";
-        sbFill.style.width = st.sharpPct + "%";
-        sbBg.appendChild(sbFill);
-
-        const sbLabels = document.createElement("div");
-        sbLabels.className = "sentiment-labels";
-        const sbL = document.createElement("span");
-        sbL.textContent = "Sharp " + st.sharpPct + "%";
-        const sbR = document.createElement("span");
-        sbR.textContent = "Sweep " + st.sweepPct + "%";
-        sbLabels.appendChild(sbL);
-        sbLabels.appendChild(sbR);
-
-        sentimentBarContainer.appendChild(sbBg);
-        sentimentBarContainer.appendChild(sbLabels);
-        sentimentCard.appendChild(sentimentBarContainer);
 
         const note = document.createElement("div");
         note.className = "line-detail-note";
         note.textContent =
-          "Sample sentiment accuracy. In production this will reflect how often the majority side (Sharp or Sweep) actually hit for this line.";
-        sentimentCard.appendChild(note);
+          "SideBias is local demo state. With Supabase tables, we’ll make this real-time across users.";
+        summaryCard.appendChild(note);
 
-        matchupsListEl.appendChild(sentimentCard);
+        matchupsListEl.appendChild(summaryCard);
       }
 
-      function renderSentimentsFront() {
+      /* =========================
+         RENDER: SIDEBIAS (front/back)
+         ========================= */
+      function renderSideBiasFront() {
         logoEl.className = "sport-logo-circle sport-logo-nba";
         logoEl.textContent = "📊";
-        nameEl.textContent = "My Sentiments";
-        codeEl.textContent = "Your Sharp & Sweep history";
+        nameEl.textContent = "SideBias";
+        codeEl.textContent = "Your Confident & Doubt it history";
         tapHintFrontEl.textContent = "Tap center to flip ↻";
         indexIndicatorFront.textContent = "";
         indexIndicatorBack.textContent = "";
       }
 
-      function renderSentimentsBack() {
-        backTitleEl.textContent = "My Sentiments";
+      function renderSideBiasBack() {
+        backTitleEl.textContent = "SideBias";
         backSubEl.textContent =
-          "All your swipes in one place, sorted by hottest line. Swipe right to promote to My Locks, left to archive. Double-tap for stats.";
+          "All your swipes in one place (hottest first). Swipe right to promote to My Locks, left to archive. Double-tap for stats.";
         backFooterNoteEl.style.display = "none";
 
         matchupsListEl.innerHTML = "";
 
-        const inboxItems = getInboxItems().sort((a, b) => {
-          if (b.crowdSize !== a.crowdSize) return b.crowdSize - a.crowdSize;
-          return (b.lastUpdated || 0) - (a.lastUpdated || 0);
-        });
+        const inboxItems = getInboxItems().sort((a, b) => (b.lastUpdated || 0) - (a.lastUpdated || 0));
 
         if (inboxItems.length === 0) {
           const empty = document.createElement("div");
           empty.className = "matchup-card";
           const t = document.createElement("div");
           t.className = "matchup-label";
-          t.textContent = "No lines in My Sentiments";
+          t.textContent = "No lines in SideBias yet";
           const p = document.createElement("div");
           p.className = "matchup-line";
-          p.textContent =
-            "Swipe a few lines in the main flow, then come back here to promote your favorites to locks.";
+          p.textContent = "Swipe a few lines, then come back here to promote favorites to locks.";
           empty.appendChild(t);
           empty.appendChild(p);
           matchupsListEl.appendChild(empty);
@@ -2733,8 +1838,7 @@
 
           const helper = document.createElement("div");
           helper.className = "matchup-line";
-          helper.textContent =
-            "Swipe right for Lock, left to Archive. Double-tap to view stats.";
+          helper.textContent = "Swipe right = Lock. Swipe left = Archive. Double-tap = stats.";
 
           left.appendChild(label);
           left.appendChild(line);
@@ -2747,6 +1851,8 @@
           top.appendChild(left);
           top.appendChild(right);
 
+          const sb = computeSideBiasPct(item);
+
           const sentimentContainer = document.createElement("div");
           sentimentContainer.className = "sentiment-bar-container";
 
@@ -2755,18 +1861,16 @@
 
           const barFill = document.createElement("div");
           barFill.className = "sentiment-bar-fill";
-          barFill.style.width = item.sharp + "%";
-
+          barFill.style.width = sb.confidentPct + "%";
+          barFill.style.background = sb.isActivated ? "var(--sidebias-green)" : "var(--sidebias-blue)";
           barBg.appendChild(barFill);
 
           const labels = document.createElement("div");
           labels.className = "sentiment-labels";
-
           const leftLabel = document.createElement("span");
-          leftLabel.textContent = "Sharp " + item.sharp + "%";
+          leftLabel.textContent = "Confident " + sb.confidentPct + "%";
           const rightLabel = document.createElement("span");
-          rightLabel.textContent = "Sweep " + item.sweep + "%";
-
+          rightLabel.textContent = "Doubt it " + sb.doubtPct + "%";
           labels.appendChild(leftLabel);
           labels.appendChild(rightLabel);
 
@@ -2777,8 +1881,8 @@
           youRow.className = "matchup-line";
           youRow.style.marginTop = "4px";
           youRow.textContent = `Your last pick: ${
-            item.yourLastVote === "sharp" ? "Sharp ✅" : "Sweep 🧹"
-          } • Swipes on this line: ${item.yourTotalSwipes}`;
+            item.yourLastVote === ACTION_RIGHT ? "Confident ✅" : item.yourLastVote === ACTION_LEFT ? "Doubt it ❓" : "—"
+          } • Swipes: ${item.yourTotalSwipes}${!isLoggedIn ? " • (Sign in to activate green)" : ""}`;
 
           card.appendChild(top);
           card.appendChild(sentimentContainer);
@@ -2791,22 +1895,23 @@
               matchupIndex: item.matchupIndex,
               label: item.lineLabel,
               category: item.category,
-              sharp: item.sharp,
-              sweep: item.sweep,
               book: item.book,
             },
-            "sentimentsInbox"
+            "sidebiasInbox"
           );
 
           matchupsListEl.appendChild(card);
         });
       }
 
+      /* =========================
+         RENDER: LOCKS / ARCHIVE
+         ========================= */
       function renderLocksFront() {
         logoEl.className = "sport-logo-circle sport-logo-nfl";
         logoEl.textContent = "🔒";
         nameEl.textContent = "My Locks";
-        codeEl.textContent = "Your favorite Sharp plays by book";
+        codeEl.textContent = "Your confident plays by book";
         tapHintFrontEl.textContent = "Tap center to flip ↻";
         indexIndicatorFront.textContent = "";
         indexIndicatorBack.textContent = "";
@@ -2814,20 +1919,12 @@
 
       function renderLocksBack() {
         backTitleEl.textContent = "My Locks";
-        backSubEl.textContent =
-          "Locks are grouped by sportsbook. Double-tap a line to see stats.";
+        backSubEl.textContent = "Locks are grouped by sportsbook. Double-tap a line for stats.";
         backFooterNoteEl.style.display = "none";
 
         matchupsListEl.innerHTML = "";
 
-        const locks = getLockItems().sort((a, b) => {
-          const bookA = (a.book || "").toLowerCase();
-          const bookB = (b.book || "").toLowerCase();
-          if (bookA < bookB) return -1;
-          if (bookA > bookB) return 1;
-          return (b.lastUpdated || 0) - (a.lastUpdated || 0);
-        });
-
+        const locks = getLockItems().sort((a, b) => (b.lastUpdated || 0) - (a.lastUpdated || 0));
         if (locks.length === 0) {
           const empty = document.createElement("div");
           empty.className = "matchup-card";
@@ -2836,8 +1933,7 @@
           t.textContent = "No locks yet";
           const p = document.createElement("div");
           p.className = "matchup-line";
-          p.textContent =
-            "Promote lines from My Sentiments with a Sharp swipe to build your locks board.";
+          p.textContent = "Go to SideBias and swipe right to promote a line to locks.";
           empty.appendChild(t);
           empty.appendChild(p);
           matchupsListEl.appendChild(empty);
@@ -2862,6 +1958,7 @@
             byBook[book].forEach((item) => {
               const card = document.createElement("div");
               card.className = "matchup-card";
+              card.style.cursor = "pointer";
 
               const top = document.createElement("div");
               top.className = "matchup-top";
@@ -2885,44 +1982,32 @@
               top.appendChild(left);
               top.appendChild(right);
 
+              const sb = computeSideBiasPct(item);
               const sentimentContainer = document.createElement("div");
               sentimentContainer.className = "sentiment-bar-container";
-
               const barBg = document.createElement("div");
               barBg.className = "sentiment-bar-bg";
-
               const barFill = document.createElement("div");
               barFill.className = "sentiment-bar-fill";
-              barFill.style.width = item.sharp + "%";
-
+              barFill.style.width = sb.confidentPct + "%";
+              barFill.style.background = sb.isActivated ? "var(--sidebias-green)" : "var(--sidebias-blue)";
               barBg.appendChild(barFill);
 
               const labels = document.createElement("div");
               labels.className = "sentiment-labels";
-
-              const leftLabel = document.createElement("span");
-              leftLabel.textContent = "Sharp " + item.sharp + "%";
-              const rightLabel = document.createElement("span");
-              rightLabel.textContent = "Sweep " + item.sweep + "%";
-
-              labels.appendChild(leftLabel);
-              labels.appendChild(rightLabel);
+              const l = document.createElement("span");
+              l.textContent = "Confident " + sb.confidentPct + "%";
+              const r = document.createElement("span");
+              r.textContent = "Doubt it " + sb.doubtPct + "%";
+              labels.appendChild(l);
+              labels.appendChild(r);
 
               sentimentContainer.appendChild(barBg);
               sentimentContainer.appendChild(labels);
 
-              const youRow = document.createElement("div");
-              youRow.className = "matchup-line";
-              youRow.style.marginTop = "4px";
-              youRow.textContent = `Your lock: ${
-                item.yourLastVote === "sharp" ? "Sharp ✅" : "Sweep 🧹"
-              } • Swipes: ${item.yourTotalSwipes}`;
-
               card.appendChild(top);
               card.appendChild(sentimentContainer);
-              card.appendChild(youRow);
 
-              card.style.cursor = "pointer";
               card.addEventListener("dblclick", (e) => {
                 e.stopPropagation();
                 openLineDetails({
@@ -2930,8 +2015,6 @@
                   matchupIndex: item.matchupIndex,
                   label: item.lineLabel,
                   category: item.category,
-                  sharp: item.sharp,
-                  sweep: item.sweep,
                   book: item.book,
                 });
               });
@@ -2944,10 +2027,7 @@
             bookBtn.textContent = `Place bet in ${book}`;
             bookBtn.addEventListener("click", (e) => {
               e.stopPropagation();
-              showSwipeToast(
-                "sharp",
-                `Affiliate link for ${book} coming soon`
-              );
+              showSwipeToast(ACTION_RIGHT, `Affiliate link for ${book} coming soon`);
             });
             matchupsListEl.appendChild(bookBtn);
           });
@@ -2957,16 +2037,16 @@
         playBtn.textContent = "PLAY YOUR LOCKS (In-House • Coming Soon)";
         playBtn.addEventListener("click", (e) => {
           e.stopPropagation();
-          showSwipeToast("sharp", "In-house play mode coming soon");
+          showSwipeToast(ACTION_RIGHT, "In-house play mode coming soon");
         });
         matchupsListEl.appendChild(playBtn);
       }
 
       function renderArchiveFront() {
-        logoEl.className = "sport-logo-circle sport-logo-mlb";
+        logoEl.className = "sport-logo-circle sport-logo-nba";
         logoEl.textContent = "🗃️";
         nameEl.textContent = "Archive";
-        codeEl.textContent = "Lines you swept away";
+        codeEl.textContent = "Lines you doubted";
         tapHintFrontEl.textContent = "Tap center to flip ↻";
         indexIndicatorFront.textContent = "";
         indexIndicatorBack.textContent = "";
@@ -2974,16 +2054,12 @@
 
       function renderArchiveBack() {
         backTitleEl.textContent = "Archive";
-        backSubEl.textContent =
-          "Lines you swept away. Double-tap any line to see stats.";
+        backSubEl.textContent = "Lines you archived. Double-tap a line for stats.";
         backFooterNoteEl.style.display = "none";
 
         matchupsListEl.innerHTML = "";
 
-        const archived = getArchiveItems().sort((a, b) => {
-          return (b.lastUpdated || 0) - (a.lastUpdated || 0);
-        });
-
+        const archived = getArchiveItems().sort((a, b) => (b.lastUpdated || 0) - (a.lastUpdated || 0));
         if (archived.length === 0) {
           const empty = document.createElement("div");
           empty.className = "matchup-card";
@@ -2992,8 +2068,7 @@
           t.textContent = "Nothing archived";
           const p = document.createElement("div");
           p.className = "matchup-line";
-          p.textContent =
-            "Swept lines from My Sentiments will show up here if you want to review them later.";
+          p.textContent = "SideBias → swipe left to archive lines.";
           empty.appendChild(t);
           empty.appendChild(p);
           matchupsListEl.appendChild(empty);
@@ -3003,6 +2078,7 @@
         archived.forEach((item) => {
           const card = document.createElement("div");
           card.className = "matchup-card";
+          card.style.cursor = "pointer";
 
           const top = document.createElement("div");
           top.className = "matchup-top";
@@ -3026,15 +2102,8 @@
           top.appendChild(left);
           top.appendChild(right);
 
-          const youRow = document.createElement("div");
-          youRow.className = "matchup-line";
-          youRow.style.marginTop = "4px";
-          youRow.textContent = `You swept this line • Swipes: ${item.yourTotalSwipes}`;
-
           card.appendChild(top);
-          card.appendChild(youRow);
 
-          card.style.cursor = "pointer";
           card.addEventListener("dblclick", (e) => {
             e.stopPropagation();
             openLineDetails({
@@ -3042,8 +2111,6 @@
               matchupIndex: item.matchupIndex,
               label: item.lineLabel,
               category: item.category,
-              sharp: item.sharp,
-              sweep: item.sweep,
               book: item.book,
             });
           });
@@ -3052,13 +2119,15 @@
         });
       }
 
+      /* =========================
+         SCREEN ROUTER
+         ========================= */
       function renderScreen() {
         if (mode === "sports") {
           titleEl.textContent = "Select Your Sport";
-          subtitleEl.textContent =
-            "One card at a time. Most popular lines by sport.";
+          subtitleEl.textContent = "One card at a time. Most popular lines by sport.";
           directionsEl.innerHTML =
-            'Tap the <strong>center</strong> of a card to flip and see this week’s matchups. Tap the <strong>right edge</strong> for <strong>Sharp</strong> (next sport), and the <strong>left edge</strong> for <strong>Sweep</strong> (previous sport). Double-tap center to open the sport. Tap the <strong>bottom-left corner</strong> of the screen to go back.';
+            'Tap the <strong>center</strong> to flip. Tap the <strong>right edge</strong> for <strong>Confident</strong> (next sport), and the <strong>left edge</strong> for <strong>Doubt it</strong> (previous sport). Double-tap center to open the sport. Tap the <strong>bottom-left corner</strong> to go back.';
           backToSportsBtn.style.display = "none";
 
           renderSportsFront();
@@ -3068,7 +2137,7 @@
           titleEl.textContent = `${sport.name} Matchups`;
           subtitleEl.textContent = "Each card is its own matchup.";
           directionsEl.innerHTML =
-            'Single-tap the <strong>center</strong> to flip and see the top lines. Double-tap center to see <strong>all lines</strong>. Swipe each line to log Sharp (right) or Sweep (left). Double-tap a line to see stats. Tap the <strong>bottom-left corner</strong> to go back.';
+            'Single-tap center to flip and see top lines. Double-tap center for <strong>all lines</strong>. Swipe right = <strong>Confident</strong>. Swipe left = <strong>Doubt it</strong>. Double-tap a line for stats. Tap <strong>bottom-left</strong> to go back.';
           backToSportsBtn.style.display = "inline-flex";
 
           renderMatchupsFront();
@@ -3079,37 +2148,35 @@
           titleEl.textContent = `${sport.name} – All Lines`;
           subtitleEl.textContent = matchup.name;
           directionsEl.innerHTML =
-            'Scroll to see all available lines from US sportsbooks. Swipe any line right for <strong>Sharp</strong>, left for <strong>Sweep</strong>. Double-tap a line to see its stats. Tap the <strong>bottom-left corner</strong> to go back.';
+            'Scroll lines. Swipe right = <strong>Confident</strong>, swipe left = <strong>Doubt it</strong>. Double-tap a line for stats. Tap <strong>bottom-left</strong> to go back.';
           backToSportsBtn.style.display = "inline-flex";
 
           renderMatchupsFront();
           renderAllLinesBack();
         } else if (mode === "lineDetails") {
-          const stats = currentLineDetailStats;
           titleEl.textContent = "Line Detail";
-          subtitleEl.textContent = stats.matchupName;
+          subtitleEl.textContent = currentLineDetailStats.matchupName;
           directionsEl.innerHTML =
-            'You’re viewing stats for this line. Tap the <strong>center</strong> of the card or the <strong>bottom-left corner</strong> of the screen to go back.';
+            'Viewing line details. Tap the <strong>center</strong> or <strong>bottom-left</strong> to go back.';
           backToSportsBtn.style.display = "inline-flex";
 
           renderLineDetailsFront();
           renderLineDetailsBack();
-        } else if (mode === "sentiments") {
-          titleEl.textContent = "My Sentiments";
-          subtitleEl.textContent = "Your Sharp & Sweep plays, all in one feed.";
+        } else if (mode === "sidebias") {
+          titleEl.textContent = "SideBias";
+          subtitleEl.textContent = "Your Confident & Doubt it plays, in one feed.";
           directionsEl.innerHTML =
-            'Swipe right to promote a line to <strong>My Locks</strong>. Swipe left to archive it. Double-tap a line to see full stats. Tap the <strong>bottom-left corner</strong> to go back.';
+            'Swipe right to promote a line to <strong>My Locks</strong>. Swipe left to archive. Double-tap a line for stats. Tap <strong>bottom-left</strong> to go back.';
           backToSportsBtn.style.display = "inline-flex";
 
-          renderSentimentsFront();
-          renderSentimentsBack();
+          renderSideBiasFront();
+          renderSideBiasBack();
           flipped = true;
         } else if (mode === "locks") {
           titleEl.textContent = "My Locks";
-          subtitleEl.textContent =
-            "Lines you’ve promoted to locks, grouped by sportsbook.";
+          subtitleEl.textContent = "Lines you promoted to locks, grouped by sportsbook.";
           directionsEl.innerHTML =
-            'Double-tap any lock to view full stats. Use the green buttons to jump to a book (affiliate links coming soon). Tap the <strong>bottom-left corner</strong> to go back.';
+            'Double-tap a lock to view stats. Tap <strong>bottom-left</strong> to go back.';
           backToSportsBtn.style.display = "inline-flex";
 
           renderLocksFront();
@@ -3117,9 +2184,9 @@
           flipped = true;
         } else if (mode === "archive") {
           titleEl.textContent = "Archive";
-          subtitleEl.textContent = "Lines you swept away.";
+          subtitleEl.textContent = "Lines you archived.";
           directionsEl.innerHTML =
-            'Review archived lines here. Double-tap any line to view full stats. Tap the <strong>bottom-left corner</strong> to go back.';
+            'Double-tap a line to view stats. Tap <strong>bottom-left</strong> to go back.';
           backToSportsBtn.style.display = "inline-flex";
 
           renderArchiveFront();
@@ -3140,10 +2207,7 @@
         } else if (mode === "matchups") {
           mode = "sports";
           flipped = false;
-        } else if (mode === "sentiments") {
-          mode = "sports";
-          flipped = false;
-        } else if (mode === "locks" || mode === "archive") {
+        } else if (mode === "sidebias" || mode === "locks" || mode === "archive") {
           mode = "sports";
           flipped = false;
         } else {
@@ -3152,17 +2216,14 @@
         renderScreen();
       }
 
-      backToSportsBtn.addEventListener("click", () => {
-        handleGlobalBack();
-      });
+      backToSportsBtn.addEventListener("click", () => handleGlobalBack());
 
       function handleSingleClick(e) {
         const rect = cardClickArea.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const zone = x / rect.width;
 
-        if (mode === "sentiments" || mode === "locks" || mode === "archive") {
-          // In these modes, center flip only; no edge navigation
+        if (mode === "sidebias" || mode === "locks" || mode === "archive") {
           if (zone >= 0.2 && zone <= 0.8) {
             flipped = !flipped;
             renderCardFlipState();
@@ -3171,31 +2232,22 @@
         }
 
         if (zone < 0.2) {
-          if (mode === "sports") {
-            currentSportIndex = getPrevIndex(SPORTS.length, currentSportIndex);
-          } else if (mode === "matchups" || mode === "allLines") {
-            currentMatchupIndex = getPrevIndex(
-              currentSport().matchups.length,
-              currentMatchupIndex
-            );
-          }
+          if (mode === "sports") currentSportIndex = getPrevIndex(SPORTS.length, currentSportIndex);
+          else if (mode === "matchups" || mode === "allLines")
+            currentMatchupIndex = getPrevIndex(currentSport().matchups.length, currentMatchupIndex);
+
           if (mode !== "lineDetails") flipped = false;
           renderScreen();
         } else if (zone > 0.8) {
-          if (mode === "sports") {
-            currentSportIndex = getNextIndex(SPORTS.length, currentSportIndex);
-          } else if (mode === "matchups" || mode === "allLines") {
-            currentMatchupIndex = getNextIndex(
-              currentSport().matchups.length,
-              currentMatchupIndex
-            );
-          }
+          if (mode === "sports") currentSportIndex = getNextIndex(SPORTS.length, currentSportIndex);
+          else if (mode === "matchups" || mode === "allLines")
+            currentMatchupIndex = getNextIndex(currentSport().matchups.length, currentMatchupIndex);
+
           if (mode !== "lineDetails") flipped = false;
           renderScreen();
         } else {
-          if (mode === "lineDetails") {
-            handleGlobalBack();
-          } else {
+          if (mode === "lineDetails") handleGlobalBack();
+          else {
             flipped = !flipped;
             renderCardFlipState();
           }
@@ -3212,7 +2264,7 @@
           return;
         }
 
-        if (mode === "sentiments" || mode === "locks" || mode === "archive") {
+        if (mode === "sidebias" || mode === "locks" || mode === "archive") {
           flipped = !flipped;
           renderCardFlipState();
           return;
@@ -3249,7 +2301,9 @@
         }
       });
 
-      // Sports menu
+      /* =========================
+         MENUS
+         ========================= */
       function buildSportsMenu() {
         sportsMenuEl.innerHTML = "";
         SPORTS.forEach((sport, sIndex) => {
@@ -3291,28 +2345,23 @@
         sportsMenuEl.classList.toggle("open", !isOpen);
       });
 
-      // User menu
       function updateUserMenuLabel() {
-        if (currentUser && currentUser.name) {
-          userMenuLabel.textContent = "My Hub";
-        } else {
-          userMenuLabel.textContent = "My Sentiments";
-        }
+        userMenuLabel.textContent = "SideBias";
       }
 
       function buildUserDropdown() {
         userDropdown.innerHTML = "";
 
-        const sentItem = document.createElement("div");
-        sentItem.className = "user-dropdown-item";
-        sentItem.textContent = "My Sentiments";
-        sentItem.addEventListener("click", () => {
-          mode = "sentiments";
+        const sbItem = document.createElement("div");
+        sbItem.className = "user-dropdown-item";
+        sbItem.textContent = "SideBias";
+        sbItem.addEventListener("click", () => {
+          mode = "sidebias";
           flipped = true;
           userDropdown.classList.remove("open");
           renderScreen();
         });
-        userDropdown.appendChild(sentItem);
+        userDropdown.appendChild(sbItem);
 
         const locksItem = document.createElement("div");
         locksItem.className = "user-dropdown-item";
@@ -3342,16 +2391,19 @@
 
         const authItem = document.createElement("div");
         authItem.className = "user-dropdown-item";
-        authItem.textContent = currentUser ? "Sign out" : "Sign in / Profile";
-        authItem.addEventListener("click", () => {
-          if (currentUser) {
+        authItem.textContent = isLoggedIn ? "Sign out" : "Sign in";
+        authItem.addEventListener("click", async () => {
+          if (isLoggedIn) {
+            try {
+              await window.supabase.auth.signOut();
+            } catch (_) {}
+            isLoggedIn = false;
             currentUser = null;
-            updateUserMenuLabel();
-            buildUserDropdown();
             showSwipeToast("info", "Signed out");
           } else {
             authOverlay.classList.remove("hidden");
           }
+          buildUserDropdown();
           userDropdown.classList.remove("open");
         });
         userDropdown.appendChild(authItem);
@@ -3363,676 +2415,301 @@
         userDropdown.classList.toggle("open", !isOpen);
       });
 
-      // Auth overlay
-      authSkipBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        hasOnboarded = true;
-        authOverlay.classList.add("hidden");
-        renderScreen();
-      });
-
-      authContinueBtn.addEventListener("click", (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        const name = authNameInput.value.trim();
-        const email = authEmailInput.value.trim();
-        const state = authStateSelect.value || "";
-        currentUser = {
-          name: name || "Guest",
-          email,
-          state,
-        };
-        hasOnboarded = true;
-        authOverlay.classList.add("hidden");
-        updateUserMenuLabel();
-        buildUserDropdown();
-        renderScreen();
-      });
-
       // Global click: close menus + bottom-left back
       document.addEventListener("click", (e) => {
         const target = e.target;
-
         const clickedCard = cardClickArea.contains(target);
         const clickedBack = backToSportsBtn.contains(target);
         const clickedUserMenu = userMenuWrapper.contains(target);
         const clickedLogoMenu = logoGroup.contains(target);
         const clickedAuth = authOverlay.contains(target);
 
-        // close dropdowns if clicking outside
-        if (!clickedLogoMenu) {
-          sportsMenuEl.classList.remove("open");
-        }
-        if (!clickedUserMenu) {
-          userDropdown.classList.remove("open");
-        }
+        if (!clickedLogoMenu) sportsMenuEl.classList.remove("open");
+        if (!clickedUserMenu) userDropdown.classList.remove("open");
 
-        // don't trigger bottom-left back if click was on primary interactive regions
-        if (
-          clickedCard ||
-          clickedBack ||
-          clickedUserMenu ||
-          clickedLogoMenu ||
-          clickedAuth
-        ) {
-          return;
-        }
+        if (clickedCard || clickedBack || clickedUserMenu || clickedLogoMenu || clickedAuth) return;
 
         const vw = window.innerWidth;
         const vh = window.innerHeight;
-        const x = e.clientX;
-        const y = e.clientY;
-
-        if (x < vw * 0.25 && y > vh * 0.75) {
-          handleGlobalBack();
-        }
+        if (e.clientX < vw * 0.25 && e.clientY > vh * 0.75) handleGlobalBack();
       });
 
       document.addEventListener("keydown", (e) => {
         if (e.key === "ArrowLeft") {
-          if (mode === "sports") {
-            currentSportIndex = getPrevIndex(SPORTS.length, currentSportIndex);
-          } else if (mode === "matchups" || mode === "allLines") {
-            currentMatchupIndex = getPrevIndex(
-              currentSport().matchups.length,
-              currentMatchupIndex
-            );
-          }
+          if (mode === "sports") currentSportIndex = getPrevIndex(SPORTS.length, currentSportIndex);
+          else if (mode === "matchups" || mode === "allLines")
+            currentMatchupIndex = getPrevIndex(currentSport().matchups.length, currentMatchupIndex);
+
           if (mode !== "lineDetails") flipped = false;
           renderScreen();
         } else if (e.key === "ArrowRight") {
-          if (mode === "sports") {
-            currentSportIndex = getNextIndex(SPORTS.length, currentSportIndex);
-          } else if (mode === "matchups" || mode === "allLines") {
-            currentMatchupIndex = getNextIndex(
-              currentSport().matchups.length,
-              currentMatchupIndex
-            );
-          }
+          if (mode === "sports") currentSportIndex = getNextIndex(SPORTS.length, currentSportIndex);
+          else if (mode === "matchups" || mode === "allLines")
+            currentMatchupIndex = getNextIndex(currentSport().matchups.length, currentMatchupIndex);
+
           if (mode !== "lineDetails") flipped = false;
           renderScreen();
         } else if (e.key === " ") {
           e.preventDefault();
-          if (mode === "lineDetails") {
-            handleGlobalBack();
-          } else {
+          if (mode === "lineDetails") handleGlobalBack();
+          else {
             flipped = !flipped;
             renderCardFlipState();
           }
         }
       });
 
-      // Init
-      buildSportsMenu();
-      updateUserMenuLabel();
-      buildUserDropdown();
-      renderScreen();
-    
-/* ============================
-   NFL – LIVE ODDS + PLAYER PROPS
-   ============================ */
-
-const NFL_API_KEY = "05e71f5146e8488d9ff3c537b89f4ffc"; // <-- your real key
-
-// Safe fetch wrapper
-async function fetchJsonSafe(url) {
-  try {
-    const r = await fetch(url);
-    if (!r.ok) {
-      console.warn("Fetch not OK:", r.status, url);
-      return null;
-    }
-    return await r.json();
-  } catch (e) {
-    console.warn("Fetch failed:", url, e);
-    return null;
-  }
-}
-
-/**
- * MAIN LOADER:
- * 1) get CurrentSeason + CurrentWeek
- * 2) get GameOddsByWeek
- * 3) map game lines (spread/total/ML)
- * 4) layer in player props for some games
- */
-async function loadLiveNflOdds() {
-  if (!NFL_API_KEY) {
-    console.log("NFL API key not set. Using sample NFL data.");
-    return;
-  }
-
-  console.log("Fetching CurrentSeason and CurrentWeek...");
-
-  const seasonUrl = `https://api.sportsdata.io/v3/nfl/scores/json/CurrentSeason?key=${NFL_API_KEY}`;
-  const weekUrl   = `https://api.sportsdata.io/v3/nfl/scores/json/CurrentWeek?key=${NFL_API_KEY}`;
-
-  const seasonRaw = await fetchJsonSafe(seasonUrl);
-  const weekRaw   = await fetchJsonSafe(weekUrl);
-
-  const season = Number(seasonRaw);
-  const week   = Number(weekRaw);
-
-  if (!season || !week) {
-    console.log("Could not resolve season/week. Using sample NFL.");
-    return;
-  }
-
-  console.log("Loading live NFL odds for:", season, "week", week);
-
-  const oddsUrl = `https://api.sportsdata.io/v3/nfl/odds/json/GameOddsByWeek/${season}/${week}?key=${NFL_API_KEY}`;
-  const oddsData = await fetchJsonSafe(oddsUrl);
-
-  if (!Array.isArray(oddsData) || oddsData.length === 0) {
-    console.log("No NFL odds returned. Using sample NFL.");
-    return;
-  }
-
-  // Step 1: map game lines
-  applyLiveNflOdds(oddsData);
-
-  // Step 2: attach props on top
-  await augmentNflMatchupsWithProps(oddsData);
-
-  // If user is on NFL, refresh UI
-  if (currentSport().id === "nfl") {
-    renderScreen();
-  }
-
-  console.log("NFL odds + props updated.");
-}
-
-/**
- * GAME LINES MAPPER
- * - builds matchup.name like "DET @ KC"
- * - builds lines[] with spread / total / moneyline from each book
- * - stores _scoreId so we can attach props later
- */
-function applyLiveNflOdds(oddsData) {
-  const nflSport = SPORTS.find((s) => s.id === "nfl");
-  if (!nflSport) return;
-
-  const mapped = [];
-
-  oddsData.forEach((game) => {
-    // Try to find something readable for team names
-    const homeCode =
-      game.HomeTeam ||
-      game.HomeTeamKey ||
-      game.HomeTeamID ||
-      "HOME";
-
-    const awayCode =
-      game.AwayTeam ||
-      game.AwayTeamKey ||
-      game.AwayTeamID ||
-      "AWAY";
-
-    const homeName = game.HomeTeamName || homeCode;
-    const awayName = game.AwayTeamName || awayCode;
-
-    const matchupName = `${awayName} @ ${homeName}`;
-
-    const pre = game.PregameOdds || [];
-    if (!pre.length) return;
-
-    const lines = [];
-
-    pre.forEach((odd) => {
-      const book =
-        odd.SportsbookName ||
-        odd.Sportsbook ||
-        odd.SportsBook ||
-        `Sportsbook ${odd.SportsbookId || ""}`.trim();
-
-      // Spread (based on FavoredTeam + Spread)
-      if (typeof odd.Spread === "number" && odd.FavoredTeam) {
-        const spreadLabel = `${odd.FavoredTeam} ${
-          odd.Spread > 0 ? "+" : ""
-        }${odd.Spread}`;
-        lines.push({
-          label: spreadLabel,
-          category: "spread",
-          sharp: 55,
-          sweep: 45,
-          book,
-        });
-      }
-
-      // Total
-      if (typeof odd.OverUnder === "number") {
-        lines.push({
-          label: `Total ${odd.OverUnder}`,
-          category: "total",
-          sharp: 53,
-          sweep: 47,
-          book,
-        });
-      }
-
-      // Moneylines (home)
-      if (typeof odd.HomeTeamMoneyLine === "number") {
-        const val = odd.HomeTeamMoneyLine;
-        lines.push({
-          label: `${homeName} ${val > 0 ? "+" : ""}${val} ML`,
-          category: "moneyline",
-          sharp: 52,
-          sweep: 48,
-          book,
-        });
-      }
-      // Moneylines (away)
-      if (typeof odd.AwayTeamMoneyLine === "number") {
-        const val = odd.AwayTeamMoneyLine;
-        lines.push({
-          label: `${awayName} ${val > 0 ? "+" : ""}${val} ML`,
-          category: "moneyline",
-          sharp: 52,
-          sweep: 48,
-          book,
-        });
-      }
-    });
-
-    if (!lines.length) return;
-
-    mapped.push({
-      name: matchupName,
-      lines: lines.slice(0, 20), // cap so card doesn't explode
-      _scoreId: game.ScoreId || game.ScoreID || null,
-      _gameId: game.GameId || game.GameID || null,
-    });
-  });
-
-  if (!mapped.length) {
-    console.log("NFL mapping found no usable games. Keeping sample NFL.");
-    return;
-  }
-
-  nflSport.matchups = mapped;
-  console.log("NFL updated with", mapped.length, "live games.");
-}
-
-/**
- * PROPS MAPPER
- * - for a few games, calls BettingPlayerPropsByScoreID
- * - converts props → "Player oXX.X [Stat]"
- * - pushes them into matchup.lines as category: "props"
- */
-async function augmentNflMatchupsWithProps(oddsData) {
-  const nflSport = SPORTS.find((s) => s.id === "nfl");
-  if (!nflSport) return;
-
-  const gamesWithScore = oddsData.filter(
-    (g) => g.ScoreId || g.ScoreID
-  );
-
-  if (!gamesWithScore.length) {
-    console.log("No ScoreId on NFL games, skipping props.");
-    return;
-  }
-
-  const MAX_GAMES_WITH_PROPS = 4; // demo limit
-  const limited = gamesWithScore.slice(0, MAX_GAMES_WITH_PROPS);
-
-  console.log(
-    `Loading player props for ${limited.length} NFL games (demo limit).`
-  );
-
-  function findMatchupByScoreId(scoreId) {
-    return nflSport.matchups.find(
-      (m) => m._scoreId === scoreId || m._scoreId === Number(scoreId)
-    );
-  }
-
-  for (const game of limited) {
-    const scoreId = game.ScoreId || game.ScoreID;
-    if (!scoreId) continue;
-
-    const matchup = findMatchupByScoreId(scoreId);
-    if (!matchup) continue;
-
-    const propsUrl = `https://api.sportsdata.io/v3/nfl/odds/json/BettingPlayerPropsByScoreID/${scoreId}?key=${NFL_API_KEY}`;
-    const propsData = await fetchJsonSafe(propsUrl);
-
-    if (!Array.isArray(propsData) || !propsData.length) {
-      console.log("No props for ScoreId", scoreId);
-      continue;
-    }
-
-    const propLines = [];
-
-    propsData.forEach((prop) => {
-      const book =
-        prop.SportsbookName ||
-        prop.Sportsbook ||
-        prop.SportsBook ||
-        "Sportsbook";
-
-      const playerName =
-        prop.PlayerName ||
-        prop.Name ||
-        prop.ParticipantName ||
-        "Player";
-
-      const statType =
-        prop.BettingMarketTypeDescription ||
-        prop.BettingMarketType ||
-        prop.MarketDescription ||
-        "Prop";
-
-      const baseValue =
-        typeof prop.Value === "number"
-          ? prop.Value
-          : typeof prop.Total === "number"
-          ? prop.Total
-          : null;
-
-      const overOutcome =
-        (prop.BettingOutcomes || []).find(
-          (o) =>
-            o.BettingOutcomeType === "Over" ||
-            o.BettingOutcomeType === "OVER" ||
-            o.OutcomeType === "Over"
-        ) || null;
-
-      const displayValue =
-        overOutcome && typeof overOutcome.Value === "number"
-          ? overOutcome.Value
-          : baseValue;
-
-      if (displayValue == null) return;
-
-      const label = `${playerName} o${displayValue} ${statType}`.replace(
-        /\s+/g,
-        " "
+      /* =========================
+         AUTH (Supabase)
+         ========================= */
+      window.supabase = supabase.createClient(
+        "https://kmgrpyvcxonfjswxusbt.supabase.co",
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImttZ3JweXZjeG9uZmpzd3h1c2J0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2NjE4NTIsImV4cCI6MjA4MTIzNzg1Mn0.teDypPoT-TMPkIDGemYVRfCNdmK0uAbOCDaiHfNmgac",
+        { auth: { persistSession: true, autoRefreshToken: true } }
       );
 
-      propLines.push({
-        label,
-        category: "props",
-        sharp: 55, // placeholder sentiment
-        sweep: 45,
-        book,
-      });
-    });
+      async function syncAuthState() {
+        const { data } = await window.supabase.auth.getSession();
+        const session = data?.session || null;
+        isLoggedIn = !!session;
+        if (session) {
+          const userRes = await window.supabase.auth.getUser();
+          const u = userRes?.data?.user || null;
+          currentUser = u ? { id: u.id, email: u.email } : { id: "session", email: "signed-in" };
+          authOverlay.classList.add("hidden");
+        }
+        buildUserDropdown();
+      }
 
-    if (!propLines.length) continue;
+      function exitAuthAndEnterApp(source) {
+        console.log("enter app:", source);
+        authOverlay.classList.add("hidden");
+        renderScreen();
+      }
 
-    const MAX_PROPS_PER_GAME = 10;
-    const selectedPropLines = propLines.slice(0, MAX_PROPS_PER_GAME);
+      async function handleSignIn() {
+        const email = (document.getElementById("email")?.value || "").trim();
+        const password = document.getElementById("password")?.value || "";
+        if (!email || !password) return alert("Enter email + password");
 
-    matchup.lines = matchup.lines.concat(selectedPropLines);
-    console.log(
-      `Attached ${selectedPropLines.length} props to matchup:`,
-      matchup.name
-    );
-  }
-}
+        const res = await window.supabase.auth.signInWithPassword({ email, password });
+        console.log("SIGNIN:", res);
 
-// AUTO-LOAD NFL WHEN PAGE IS READY
-document.addEventListener("DOMContentLoaded", loadLiveNflOdds);
+        if (res.error) return alert(res.error.message);
 
-<script>
-  // AUTO-LOAD NFL WHEN PAGE IS READY
-  document.addEventListener("DOMContentLoaded", loadLiveNflOdds);
+        await syncAuthState();
+        exitAuthAndEnterApp("signIn");
+      }
 
-  /* ============================
-     AUTH: ENTER APP (SKIP / CONTINUE)
-     ============================ */
+      async function handleSignUp() {
+        const email = (document.getElementById("email")?.value || "").trim();
+        const password = document.getElementById("password")?.value || "";
+        if (!email || !password) return alert("Enter email + password");
 
-  function exitAuthAndEnterApp(source) {
-    console.log("exitAuthAndEnterApp called from:", source);
+        const res = await window.supabase.auth.signUp({ email, password });
+        console.log("SIGNUP:", res);
 
-    // Hide the auth overlay cleanly (no ancestor-walking hacks)
-    const overlay = document.getElementById("auth-overlay");
-    if (overlay) overlay.style.display = "none";
+        if (res.error) return alert(res.error.message);
 
-    // Show main app shell
-    const appShell = document.querySelector(".app-shell");
-    if (appShell) {
-      appShell.style.display = "flex";
-      appShell.style.opacity = "1";
-      appShell.style.visibility = "visible";
-    }
+        alert("Account created. If confirmation is enabled, confirm email then sign in.");
+      }
 
-    // Set mode + render
-    if (typeof mode !== "undefined") mode = "sports";
-    if (typeof renderScreen === "function") renderScreen();
-  }
-
-  async function handleSignIn() {
-    const email = (document.getElementById("email")?.value || "").trim();
-    const password = document.getElementById("password")?.value || "";
-
-    if (!email || !password) return alert("Enter email and password");
-    if (!window.supabase) return alert("Supabase not loaded yet. Refresh.");
-
-    console.log("Attempting sign in for:", email);
-
-    const res = await window.supabase.auth.signInWithPassword({ email, password });
-    console.log("SIGNIN RESPONSE:", res);
-
-    if (res.error) {
-      alert(res.error.message);
-      return;
-    }
-
-    // Confirm session exists
-    const sessionRes = await window.supabase.auth.getSession();
-    console.log("POST SIGNIN getSession:", sessionRes);
-
-    if (!sessionRes.data?.session) {
-      alert("Signed in, but no session was created. (Auth persistence issue)");
-      return;
-    }
-
-    exitAuthAndEnterApp("signIn");
-  }
-
-  async function handleSignUp() {
-    const email = (document.getElementById("email")?.value || "").trim();
-    const password = document.getElementById("password")?.value || "";
-
-    if (!email || !password) return alert("Enter email and password");
-    if (!window.supabase) return alert("Supabase not loaded yet. Refresh.");
-
-    console.log("Attempting sign up for:", email);
-
-    const res = await window.supabase.auth.signUp({ email, password });
-    console.log("SIGNUP RESPONSE:", res);
-
-    if (res.error) {
-      alert(res.error.message);
-      return;
-    }
-
-    alert("Account created. If email confirmation is enabled, confirm then Sign In.");
-  }
-
-  function wireAuthButtons() {
-    console.log("wireAuthButtons running…");
-
-    // SKIP = guest mode
-    const skipBtn = document.getElementById("auth-skip");
-    if (skipBtn) {
-      skipBtn.addEventListener("click", (e) => {
+      authSkipBtn.addEventListener("click", (e) => {
         e.preventDefault();
         e.stopPropagation();
-        exitAuthAndEnterApp("auth-skip");
+        // Guest mode: SideBias stays blue unless logged-in
+        exitAuthAndEnterApp("skip");
       });
-    }
 
-    // CONTINUE = requires auth
-    const continueBtn = document.getElementById("auth-continue");
-    if (continueBtn) {
-      continueBtn.addEventListener("click", async (e) => {
+      authContinueBtn.addEventListener("click", async (e) => {
         e.preventDefault();
         e.stopPropagation();
+        // Continue only requires: either logged-in OR allow guest; we allow both
+        await syncAuthState();
+        exitAuthAndEnterApp("continue");
+      });
 
-        const sessionRes = await window.supabase.auth.getSession();
-        console.log("CONTINUE getSession:", sessionRes);
+      signInBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        handleSignIn();
+      });
 
-        if (!sessionRes.data?.session) {
-          alert("Please sign in first.");
-          return;
+      signUpBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        handleSignUp();
+      });
+
+      /* =========================
+         NFL LIVE ODDS + PROPS (kept)
+         ========================= */
+      const NFL_API_KEY = "05e71f5146e8488d9ff3c537b89f4ffc"; // your key
+
+      async function fetchJsonSafe(url) {
+        try {
+          const r = await fetch(url);
+          if (!r.ok) {
+            console.warn("Fetch not OK:", r.status, url);
+            return null;
+          }
+          return await r.json();
+        } catch (e) {
+          console.warn("Fetch failed:", url, e);
+          return null;
+        }
+      }
+
+      async function loadLiveNflOdds() {
+        if (!NFL_API_KEY) return;
+
+        const seasonUrl = `https://api.sportsdata.io/v3/nfl/scores/json/CurrentSeason?key=${NFL_API_KEY}`;
+        const weekUrl = `https://api.sportsdata.io/v3/nfl/scores/json/CurrentWeek?key=${NFL_API_KEY}`;
+
+        const seasonRaw = await fetchJsonSafe(seasonUrl);
+        const weekRaw = await fetchJsonSafe(weekUrl);
+
+        const season = Number(seasonRaw);
+        const week = Number(weekRaw);
+        if (!season || !week) return;
+
+        const oddsUrl = `https://api.sportsdata.io/v3/nfl/odds/json/GameOddsByWeek/${season}/${week}?key=${NFL_API_KEY}`;
+        const oddsData = await fetchJsonSafe(oddsUrl);
+        if (!Array.isArray(oddsData) || oddsData.length === 0) return;
+
+        applyLiveNflOdds(oddsData);
+        await augmentNflMatchupsWithProps(oddsData);
+
+        // refresh if NFL currently visible
+        if (currentSport().id === "nfl") renderScreen();
+      }
+
+      function applyLiveNflOdds(oddsData) {
+        const nflSport = SPORTS.find((s) => s.id === "nfl");
+        if (!nflSport) return;
+
+        const mapped = [];
+
+        oddsData.forEach((game) => {
+          const homeName = game.HomeTeamName || game.HomeTeam || game.HomeTeamKey || "HOME";
+          const awayName = game.AwayTeamName || game.AwayTeam || game.AwayTeamKey || "AWAY";
+          const matchupName = `${awayName} @ ${homeName}`;
+
+          const pre = game.PregameOdds || [];
+          if (!pre.length) return;
+
+          const lines = [];
+          pre.forEach((odd) => {
+            const book =
+              odd.SportsbookName ||
+              odd.Sportsbook ||
+              odd.SportsBook ||
+              `Sportsbook ${odd.SportsbookId || ""}`.trim();
+
+            if (typeof odd.Spread === "number" && odd.FavoredTeam) {
+              const spreadLabel = `${odd.FavoredTeam} ${odd.Spread > 0 ? "+" : ""}${odd.Spread}`;
+              lines.push({ label: spreadLabel, category: "spread", book });
+            }
+
+            if (typeof odd.OverUnder === "number") {
+              lines.push({ label: `Total ${odd.OverUnder}`, category: "total", book });
+            }
+
+            if (typeof odd.HomeTeamMoneyLine === "number") {
+              const val = odd.HomeTeamMoneyLine;
+              lines.push({ label: `${homeName} ${val > 0 ? "+" : ""}${val} ML`, category: "moneyline", book });
+            }
+            if (typeof odd.AwayTeamMoneyLine === "number") {
+              const val = odd.AwayTeamMoneyLine;
+              lines.push({ label: `${awayName} ${val > 0 ? "+" : ""}${val} ML`, category: "moneyline", book });
+            }
+          });
+
+          if (!lines.length) return;
+
+          mapped.push({
+            name: matchupName,
+            lines: lines.slice(0, 20),
+            _scoreId: game.ScoreId || game.ScoreID || null,
+          });
+        });
+
+        if (mapped.length) {
+          nflSport.matchups = mapped;
+          buildSportsMenu(); // update dropdown with real games
+        }
+      }
+
+      async function augmentNflMatchupsWithProps(oddsData) {
+        const nflSport = SPORTS.find((s) => s.id === "nfl");
+        if (!nflSport) return;
+
+        const gamesWithScore = oddsData.filter((g) => g.ScoreId || g.ScoreID);
+        if (!gamesWithScore.length) return;
+
+        const limited = gamesWithScore.slice(0, 4);
+
+        function findMatchupByScoreId(scoreId) {
+          return nflSport.matchups.find((m) => m._scoreId === scoreId || m._scoreId === Number(scoreId));
         }
 
-        exitAuthAndEnterApp("auth-continue");
-      });
-    }
+        for (const game of limited) {
+          const scoreId = game.ScoreId || game.ScoreID;
+          if (!scoreId) continue;
 
-    // SIGN IN / SIGN UP
-    const signInBtn = document.getElementById("signInBtn");
-    const signUpBtn = document.getElementById("signUpBtn");
+          const matchup = findMatchupByScoreId(scoreId);
+          if (!matchup) continue;
 
-    if (signInBtn) {
-      signInBtn.addEventListener("click", async (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        console.log("SIGN IN button clicked");
-        await handleSignIn();
-      });
-    } else {
-      console.log("Missing #signInBtn in DOM");
-    }
+          const propsUrl = `https://api.sportsdata.io/v3/nfl/odds/json/BettingPlayerPropsByScoreID/${scoreId}?key=${NFL_API_KEY}`;
+          const propsData = await fetchJsonSafe(propsUrl);
+          if (!Array.isArray(propsData) || !propsData.length) continue;
 
-    if (signUpBtn) {
-      signUpBtn.addEventListener("click", async (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        console.log("SIGN UP button clicked");
-        await handleSignUp();
-      });
-    } else {
-      console.log("Missing #signUpBtn in DOM");
-    }
-  }
+          const propLines = [];
+          propsData.forEach((prop) => {
+            const book = prop.SportsbookName || prop.Sportsbook || prop.SportsBook || "Sportsbook";
+            const playerName = prop.PlayerName || prop.Name || prop.ParticipantName || "Player";
+            const statType =
+              prop.BettingMarketTypeDescription || prop.BettingMarketType || prop.MarketDescription || "Prop";
 
-  window.addEventListener("load", wireAuthButtons);
-</script>
-<style>
-  #auth-overlay.is-hidden {
-    display: none !important;
-    visibility: hidden !important;
-    pointer-events: none !important;
-  }
-</style>
-      
-<!-- =========================
-     AUTH OVERLAY (HTML)
-     ========================= -->
-<div id="auth-overlay" style="position:fixed;inset:0;background:#0e0e0e;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;">
-  <button id="auth-skip" type="button">Skip</button>
-  <button id="auth-continue" type="button">Continue</button>
+            const baseValue =
+              typeof prop.Value === "number" ? prop.Value : typeof prop.Total === "number" ? prop.Total : null;
 
-  <input id="email" type="email" placeholder="Email" />
-  <input id="password" type="password" placeholder="Password" />
+            const overOutcome =
+              (prop( prop.BettingOutcomes || []).find((o) => o.BettingOutcomeType === "Over" || o.OutcomeType === "Over")) ||
+              null;
 
-  <button id="signInBtn" type="button">Sign In</button>
-  <button id="signUpBtn" type="button">Create Account</button>
-</div>
+            const displayValue =
+              overOutcome && typeof overOutcome.Value === "number" ? overOutcome.Value : baseValue;
 
-<!-- =========================
-     SUPABASE (NON-MODULE, RELIABLE)
-     ========================= -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-  // 1) Create client globally (no module timing issues)
-  window.supabase = supabase.createClient(
-    "https://kmgrpyvcxonfjswxusbt.supabase.co",
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImttZ3JweXZjeG9uZmpzd3h1c2J0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2NjE4NTIsImV4cCI6MjA4MTIzNzg1Mn0.teDypPoT-TMPkIDGemYVRfCNdmK0uAbOCDaiHfNmgac",
-    {
-      auth: { persistSession: true, autoRefreshToken: true }
-    }
-  );
+            if (displayValue == null) return;
 
-  console.log("SUPABASE READY:", !!window.supabase);
+            const label = `${playerName} o${displayValue} ${statType}`.replace(/\s+/g, " ");
+            propLines.push({ label, category: "props", book });
+          });
 
-// 2) Enter app helper
-function exitAuthAndEnterApp(source) {
-  console.log("exitAuthAndEnterApp:", source);
+          if (!propLines.length) continue;
 
-  const overlay = document.getElementById("auth-overlay");
-  if (overlay) overlay.classList.add("is-hidden"); // hard hide
+          matchup.lines = matchup.lines.concat(propLines.slice(0, 10));
+        }
+      }
 
-  const appShell = document.querySelector(".app-shell");
-  if (appShell) {
-    appShell.style.display = "flex";
-    appShell.style.opacity = "1";
-    appShell.style.visibility = "visible";
-  }
+      /* =========================
+         INIT
+         ========================= */
+      (async function init() {
+        buildSportsMenu();
+        updateUserMenuLabel();
+        buildUserDropdown();
+        renderScreen();
 
-  if (typeof mode !== "undefined") mode = "sports";
-  if (typeof renderScreen === "function") renderScreen();
-}
+        // Check if already signed in (persisted session)
+        try {
+          await syncAuthState();
+        } catch (_) {}
 
-async function handleSignIn() {
-  const email = (document.getElementById("email")?.value || "").trim();
-  const password = document.getElementById("password")?.value || "";
-  if (!email || !password) return alert("Enter email and password");
-
-  const res = await window.supabase.auth.signInWithPassword({ email, password });
-  console.log("SIGNIN RESPONSE:", res);
-
-  if (res.error) return alert(res.error.message);
-
-  const sess = await window.supabase.auth.getSession();
-  console.log("POST SIGNIN SESSION:", sess.data.session);
-
-  if (!sess.data.session) return alert("Signed in but no session created.");
-
-  exitAuthAndEnterApp("signIn");
-}
-
-async function handleSignUp() {
-  const email = (document.getElementById("email")?.value || "").trim();
-  const password = document.getElementById("password")?.value || "";
-  if (!email || !password) return alert("Enter email and password");
-
-  const res = await window.supabase.auth.signUp({ email, password });
-  console.log("SIGNUP RESPONSE:", res);
-
-  if (res.error) return alert(res.error.message);
-
-  alert("Account created. Confirm email if required, then sign in.");
-}
-
-// 3) Wire buttons after DOM exists
-window.addEventListener("load", () => {
-  console.log("WIRING AUTH BUTTONS…");
-
-  // Skip: guest
-  document.getElementById("auth-skip")?.addEventListener("click", (e) => {
-    e.preventDefault();
-    exitAuthAndEnterApp("skip");
-  });
-
-  // Continue: requires session
-  document.getElementById("auth-continue")?.addEventListener("click", async (e) => {
-    e.preventDefault();
-    const sess = await window.supabase.auth.getSession();
-    console.log("CONTINUE SESSION:", sess.data.session);
-    if (!sess.data.session) return alert("Please sign in first.");
-    exitAuthAndEnterApp("continue");
-  });
-
-  document.getElementById("signInBtn")?.addEventListener("click", (e) => {
-    e.preventDefault();
-    console.log("SIGN IN CLICK");
-    handleSignIn();
-  });
-
-  document.getElementById("signUpBtn")?.addEventListener("click", (e) => {
-    e.preventDefault();
-    console.log("SIGN UP CLICK");
-    handleSignUp();
-  });
-});
-
-</script>
-
-</body>
+        // Load NFL live data
+        document.addEventListener("DOMContentLoaded", loadLiveNflOdds);
+      })();
+    </script>
+  </body>
 </html>
-
-
