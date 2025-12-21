@@ -1518,6 +1518,22 @@
             youRow.textContent = "Your lock: Confident ✅ • Saved";
             card.appendChild(youRow);
 
+            /* =============================================
+               ✅ CHANGE #2: per-line PLACE BET button (inside each lock card)
+               ============================================= */
+            const betBtn = document.createElement("button");
+            betBtn.className = "sportsbook-cta-btn";
+            betBtn.textContent = `PLACE BET IN ${(item.book || book || "SPORTSBOOK").toUpperCase()}`;
+            betBtn.addEventListener("click", (e) => {
+              e.stopPropagation();
+              openModal({
+                title: "Coming soon",
+                body: `Affiliate deep-links for ${item.book || book} will go here.`,
+                actions: [{ label: "OK", variant: "primary", onClick: () => {} }],
+              });
+            });
+            card.appendChild(betBtn);
+
             // dblclick details
             card.addEventListener("dblclick", (e) => {
               e.stopPropagation();
@@ -1536,19 +1552,10 @@
             matchupsListEl.appendChild(card);
           });
 
-          // Affiliate button per sportsbook
-          const bookBtn = document.createElement("button");
-          bookBtn.className = "sportsbook-cta-btn";
-          bookBtn.textContent = `PLACE BET IN ${book.toUpperCase()}`;
-          bookBtn.addEventListener("click", (e) => {
-            e.stopPropagation();
-            openModal({
-              title: "Coming soon",
-              body: "For now, please access your book to wager.",
-              actions: [{ label: "OK", variant: "primary", onClick: () => {} }],
-            });
-          });
-          matchupsListEl.appendChild(bookBtn);
+          /* =============================================
+             ✅ CHANGE #2 (continued): remove the per-book footer button
+             If you want to keep it, you can re-add your old block here.
+             ============================================= */
         });
       }
 
@@ -1794,10 +1801,24 @@
         card.addEventListener("pointerleave", () => clearTimeout(holdTimer));
       }
 
+      /* =============================================
+         ✅ CHANGE #1: Replace attachSwipeAndHoldHandlers
+         - Robust swipe detection inside scroll containers
+         - Prevents accidental vertical scroll from breaking swipe
+         - Cancels hold once swipe intent is detected
+         ============================================= */
       function attachSwipeAndHoldHandlers(card, meta, ln, context) {
-        let startX = null;
+        let pointerId = null;
+        let startX = 0;
+        let startY = 0;
+        let lastX = 0;
+        let lastY = 0;
         let isDown = false;
+        let isHorizontalGesture = false;
         let holdTimer = null;
+
+        const SWIPE_THRESHOLD = 48;
+        const INTENT_THRESHOLD = 10;
 
         // Double click: line details (always)
         card.addEventListener("dblclick", (e) => {
@@ -1811,20 +1832,35 @@
           });
         });
 
-        // Hold: flip/change only this line
         card.addEventListener("pointerdown", (e) => {
-          isDown = true;
-          startX = e.clientX;
+          if (card.classList.contains("disabled")) return;
 
+          isDown = true;
+          isHorizontalGesture = false;
+          pointerId = e.pointerId;
+
+          startX = e.clientX;
+          startY = e.clientY;
+          lastX = startX;
+          lastY = startY;
+
+          try { card.setPointerCapture(pointerId); } catch {}
+
+          // Hold: only if logged in (edit this one line)
           if (currentUser) {
             holdTimer = setTimeout(async () => {
-              const key = makeLineKey({ sportId: meta.sportId, matchupName: meta.matchupName, label: meta.label, book: meta.book });
+              const key = makeLineKey({
+                sportId: meta.sportId,
+                matchupName: meta.matchupName,
+                label: meta.label,
+                book: meta.book
+              });
+
               const item = biasStore[key];
               if (!item) return;
 
               const actions = [];
 
-              // In locks: remove from locks
               if (item.status === "lock") {
                 actions.push({
                   label: "Remove from Locks",
@@ -1836,7 +1872,6 @@
                   },
                 });
               } else {
-                // Flip bias (only this line)
                 actions.push({
                   label: "Change bias (flip)",
                   variant: "primary",
@@ -1860,47 +1895,55 @@
           }
         });
 
-        card.addEventListener("pointerup", async (e) => {
-          clearTimeout(holdTimer);
+        card.addEventListener("pointermove", (e) => {
           if (!isDown) return;
-          isDown = false;
+          if (pointerId !== e.pointerId) return;
 
-          const dx = e.clientX - startX;
-          const threshold = 40;
-          if (Math.abs(dx) < threshold) return;
+          lastX = e.clientX;
+          lastY = e.clientY;
 
-          e.stopPropagation();
+          const dx = lastX - startX;
+          const dy = lastY - startY;
 
+          if (!isHorizontalGesture) {
+            if (Math.abs(dx) > INTENT_THRESHOLD && Math.abs(dx) > Math.abs(dy)) {
+              isHorizontalGesture = true;
+              clearTimeout(holdTimer);
+            }
+          }
+
+          if (isHorizontalGesture) {
+            e.preventDefault();
+            const clamp = Math.max(-60, Math.min(60, dx));
+            card.style.transform = `translateX(${clamp}px)`;
+            card.style.opacity = String(1 - Math.min(0.35, Math.abs(clamp) / 220));
+          }
+        }, { passive: false });
+
+        async function finalizeSwipe(direction) {
           if (!requireLoginGuard()) return;
 
-          const direction = dx > 0 ? "right" : "left";
-
-          // Right swipe = Confident
-          // Left swipe = Doubt
           const vote = direction === "right" ? "confident" : "doubt";
+          const key = makeLineKey({
+            sportId: meta.sportId,
+            matchupName: meta.matchupName,
+            label: meta.label,
+            book: meta.book
+          });
 
-          // Build key and save
-          const key = makeLineKey({ sportId: meta.sportId, matchupName: meta.matchupName, label: meta.label, book: meta.book });
-
-          // Do not allow double-swipe per line
           if (biasStore[key] && biasStore[key].vote) {
             showToast("Already saved");
             return;
           }
 
-          // Update swipe counter (unlocks community after 5)
           userSwipeCount += 1;
           await persistUserSwipeCount();
 
-          // Decide where it goes depending on context
-          // - From games: all swipes go into MyBias (inbox)
-          // - From MyBias: swipe moves out into locks/archive
           let status = "inbox";
           if (context === "mybias") {
             status = vote === "confident" ? "lock" : "archived";
           }
 
-          // Community values (if unlocked show; else store placeholder)
           const communityConf = typeof ln.confident === "number" ? ln.confident : 50;
           const communityDoubt = typeof ln.doubt === "number" ? ln.doubt : 50;
 
@@ -1920,25 +1963,55 @@
             communityDoubt: communityDoubt,
           });
 
-          // UI behavior
           if (context === "mybias") {
-            // remove from MyBias list immediately
             showToast(vote === "confident" ? "Saved to MyLocks" : "Saved to MyArchive");
             renderScreen();
             return;
           }
 
-          // On game pages: drop to bottom, grey out, and do NOT flip card back
           markCardDisabledAndDrop(card);
           showToast(vote === "confident" ? "Confident ✅ saved" : "Doubt It 🤔 saved");
 
-          // After 5 swipes: rerender to reveal community biases in green
           if (isCommunityUnlocked()) renderScreen();
+        }
+
+        function resetCardVisual() {
+          card.style.transform = "";
+          card.style.opacity = "";
+        }
+
+        card.addEventListener("pointerup", async (e) => {
+          clearTimeout(holdTimer);
+          if (!isDown) return;
+          isDown = false;
+
+          if (pointerId !== e.pointerId) {
+            resetCardVisual();
+            return;
+          }
+
+          const dx = lastX - startX;
+          const dy = lastY - startY;
+
+          if (!isHorizontalGesture || Math.abs(dx) < SWIPE_THRESHOLD || Math.abs(dx) < Math.abs(dy)) {
+            resetCardVisual();
+            return;
+          }
+
+          e.stopPropagation();
+          resetCardVisual();
+
+          await finalizeSwipe(dx > 0 ? "right" : "left");
         });
 
         card.addEventListener("pointercancel", () => {
           clearTimeout(holdTimer);
           isDown = false;
+          resetCardVisual();
+        });
+
+        card.addEventListener("pointerleave", () => {
+          if (!isDown) resetCardVisual();
         });
       }
 
