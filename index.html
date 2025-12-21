@@ -480,7 +480,8 @@
         outline: none;
       }
 
-      .auth-actions { display:flex; gap: 10px; margin-top: 8px; flex-wrap: wrap; }
+      .auth-actions { display:flex; gap: 10px; margin-top: 8px; }
+      .auth-actions.second-row { margin-top: 10px; }
       .auth-primary {
         flex: 1;
         padding: 10px 12px;
@@ -630,7 +631,7 @@
       <div class="auth-card">
         <div class="auth-title">Sign in to swipe</div>
         <div class="auth-sub">
-          Swiping is locked until you sign in. If Supabase email confirmations are enabled, “Create” may require verification before you can sign in.
+          Swiping is locked until you sign in. If email confirmation is ON in Supabase, you may need to confirm before signing in.
         </div>
 
         <div class="auth-field">
@@ -642,11 +643,12 @@
           <input id="auth-password" type="password" placeholder="••••••••" />
         </div>
 
-        <!-- ONLY 3 BUTTONS: Sign In / Create / Reset Password -->
         <div class="auth-actions">
           <button id="auth-signin" class="auth-primary" type="button">Sign In</button>
           <button id="auth-signup" class="auth-secondary" type="button">Create</button>
-          <button id="auth-reset" class="auth-secondary" type="button">Reset Password</button>
+        </div>
+        <div class="auth-actions second-row">
+          <button id="auth-reset" class="auth-secondary" type="button" style="flex:1;">Reset Password</button>
         </div>
       </div>
     </div>
@@ -732,11 +734,12 @@
       let previousModeBeforeDetails = null;
       let detailsMeta = null;
 
+      // Auth + data
       let supabaseClient = null;
       let authedUser = null;
 
-      // Local cache of user items (Supabase -> device)
-      const userItems = {}; // { [key]: row }
+      // Local cache of user items (comes from Supabase after login)
+      const userItems = {}; // { [key]: { ...row } }
 
       function getUserSwipeCount() {
         return Object.values(userItems).length;
@@ -817,17 +820,10 @@
         modalOverlay.classList.add("open");
       }
       function closeModal() { modalOverlay.classList.remove("open"); }
-      modalOverlay.addEventListener("click", (e) => {
-        if (e.target === modalOverlay) closeModal();
-      });
+      modalOverlay.addEventListener("click", (e) => { if (e.target === modalOverlay) closeModal(); });
 
-      function openAuthOverlay(reasonText) {
-        authOverlayEl.classList.add("open");
-        if (reasonText) showToast(reasonText);
-      }
-      function closeAuthOverlay() {
-        authOverlayEl.classList.remove("open");
-      }
+      function openAuthOverlay() { authOverlayEl.classList.add("open"); }
+      function closeAuthOverlay() { authOverlayEl.classList.remove("open"); }
 
       function getNextIndex(length, current) { return (current + 1) % length; }
       function getPrevIndex(length, current) { return current === 0 ? length - 1 : current - 1; }
@@ -844,10 +840,14 @@
 
       function isAuthed() { return !!authedUser; }
 
-      // Must be logged in to swipe — in-app UI only
       function requireAuthOrOpen() {
         if (!isAuthed()) {
-          openAuthOverlay("Sign in required to swipe");
+          openAuthOverlay();
+          openModal({
+            title: "Sign in required",
+            body: "You must be signed in to swipe lines.",
+            actions: [{ label: "OK", kind: "primary", onClick: () => {} }],
+          });
           return false;
         }
         return true;
@@ -883,18 +883,6 @@
         supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
           auth: { persistSession: true, autoRefreshToken: true },
         });
-
-        // ✅ CRITICAL FIX: always register auth state listener immediately
-        supabaseClient.auth.onAuthStateChange(async (event, session) => {
-          authedUser = session?.user || null;
-          if (authedUser) {
-            closeAuthOverlay();             // ✅ ensures overlay disappears on successful session
-            await loadUserSwipes();
-          }
-          updateUserMenuLabel();
-          buildUserDropdown();
-          renderScreen();
-        });
       }
 
       async function refreshAuth() {
@@ -903,10 +891,14 @@
 
         authedUser = data?.session?.user || null;
 
+        // Always show auth overlay on fresh entry if no session (your requirement)
+        if (authedUser) closeAuthOverlay();
+        else openAuthOverlay();
+
         if (authedUser) {
-          closeAuthOverlay();               // ✅ ensures overlay is removed if session exists
           await loadUserSwipes();
         }
+
         updateUserMenuLabel();
         buildUserDropdown();
       }
@@ -914,7 +906,9 @@
       async function loadUserSwipes() {
         if (!authedUser) return;
 
-        // Graceful fallback if table isn't set up yet
+        // Clear cache first (prevents weirdness after deleting users / switching accounts)
+        for (const k of Object.keys(userItems)) delete userItems[k];
+
         const { data, error } = await supabaseClient
           .from(SWIPES_TABLE)
           .select("*")
@@ -922,13 +916,13 @@
 
         if (error) {
           console.warn("loadUserSwipes error:", error);
-          showToast("Swipes table missing? (Supabase)");
+          // graceful fallback
           return;
         }
 
-        // reset cache then refill to stay in sync
-        for (const k of Object.keys(userItems)) delete userItems[k];
-        for (const row of data || []) userItems[row.swipe_key] = row;
+        for (const row of data || []) {
+          userItems[row.swipe_key] = row;
+        }
       }
 
       async function saveSwipeRow(row) {
@@ -938,10 +932,7 @@
           .select()
           .single();
 
-        if (error) {
-          console.warn("saveSwipeRow error:", error);
-          return { data: null, error };
-        }
+        if (error) return { data: null, error };
         userItems[data.swipe_key] = data;
         return { data, error: null };
       }
@@ -986,12 +977,12 @@
        ************************************************************/
       function getDisplayBias(meta, fallbackSharp, fallbackSweep) {
         const count = getUserSwipeCount();
-        if (!authedUser || count < 5) {
+        if (count < 5) {
           return { confident: 50, doubt: 50, color: "blue" };
         }
         const conf = typeof fallbackSharp === "number" ? fallbackSharp : 55;
         const doubt = typeof fallbackSweep === "number" ? fallbackSweep : (100 - conf);
-        return { confident: conf, doubt, color: "green" };
+        return { confident: conf, doubt: doubt, color: "green" };
       }
 
       function buildBiasUI(meta, fallbackSharp, fallbackSweep) {
@@ -1006,16 +997,16 @@
         const fill = document.createElement("div");
         fill.className = "sentiment-bar-fill";
         fill.style.width = bias.confident + "%";
-        fill.style.background = bias.color === "blue"
-          ? "linear-gradient(90deg, rgba(37,99,235,0.95), rgba(37,99,235,0.65))"
-          : "linear-gradient(90deg, rgba(22,163,74,0.95), rgba(22,163,74,0.65))";
+        fill.style.background =
+          bias.color === "blue"
+            ? "linear-gradient(90deg, rgba(37,99,235,0.95), rgba(37,99,235,0.65))"
+            : "linear-gradient(90deg, rgba(22,163,74,0.95), rgba(22,163,74,0.65))";
 
         bg.appendChild(fill);
 
         const labels = document.createElement("div");
         labels.className = "sentiment-labels";
 
-        // LEFT = Doubt it, RIGHT = Confident
         const left = document.createElement("span");
         left.textContent = `Doubt it ${bias.doubt}%`;
         const right = document.createElement("span");
@@ -1035,6 +1026,9 @@
        ************************************************************/
       function attachLineInteractions(card, meta, context, fallbackSharp, fallbackSweep) {
         const key = makeSwipeKey(meta);
+        const already = !!userItems[key];
+
+        if (already) card.classList.add("is-disabled");
 
         // Double click: open details
         card.addEventListener("dblclick", (e) => {
@@ -1043,37 +1037,109 @@
           openLineDetails(meta, fallbackSharp, fallbackSweep);
         });
 
-        // Long press: change bias OR remove from locks
+        // Long press: flip or remove from locks
         let pressTimer = null;
         let downX = 0;
         let downY = 0;
         let pointerDown = false;
-        let pointerId = null;
 
         function clearPress() {
           if (pressTimer) clearTimeout(pressTimer);
           pressTimer = null;
         }
 
+        // Special behavior for MyBias: swipes update status (not blocked)
+        if (context === "mybias") {
+          card.addEventListener("pointerdown", (e) => {
+            e.stopPropagation();
+            pointerDown = true;
+            downX = e.clientX;
+            downY = e.clientY;
+
+            clearPress();
+            pressTimer = setTimeout(() => {
+              clearPress();
+              pointerDown = false;
+
+              if (!requireAuthOrOpen()) return;
+
+              const item = userItems[key];
+              if (!item) { showToast("Missing item"); return; }
+
+              openModal({
+                title: "Change your bias?",
+                body: "Flip your saved bias for this line (only this line).",
+                actions: [
+                  { label: "Cancel", onClick: () => {} },
+                  { label: "Flip", kind: "primary", onClick: async () => {
+                      const newVote = item.vote === "confident" ? "doubt" : "confident";
+                      const { data, error } = await supabaseClient
+                        .from(SWIPES_TABLE)
+                        .update({ vote: newVote, updated_at: new Date().toISOString() })
+                        .eq("user_id", authedUser.id)
+                        .eq("swipe_key", key)
+                        .select()
+                        .single();
+                      if (error) { showToast("Flip failed"); return; }
+                      userItems[key] = data;
+                      showToast("Bias flipped");
+                      renderScreen();
+                    }
+                  },
+                ],
+              });
+            }, 650);
+          });
+
+          card.addEventListener("pointermove", (e) => {
+            if (!pointerDown) return;
+            const dx = Math.abs(e.clientX - downX);
+            const dy = Math.abs(e.clientY - downY);
+            if (dx > 10 || dy > 10) clearPress();
+          });
+
+          card.addEventListener("pointerup", async (e) => {
+            e.stopPropagation();
+            clearPress();
+            if (!pointerDown) return;
+            pointerDown = false;
+
+            if (!requireAuthOrOpen()) return;
+
+            const dx = e.clientX - downX;
+            const threshold = 42;
+            if (Math.abs(dx) < threshold) return;
+
+            const newStatus = dx > 0 ? "lock" : "archived";
+            await updateStatus(key, newStatus);
+
+            card.classList.add(dx > 0 ? "swipe-right" : "swipe-left");
+            setTimeout(() => {
+              showToast(newStatus === "lock" ? "Moved to MyLocks" : "Moved to MyArchives");
+              renderScreen();
+            }, 190);
+          });
+
+          card.addEventListener("pointercancel", () => { clearPress(); pointerDown = false; });
+          card.addEventListener("click", (e) => e.stopPropagation());
+          return;
+        }
+
         card.addEventListener("pointerdown", (e) => {
           e.stopPropagation();
           pointerDown = true;
-          pointerId = e.pointerId;
           downX = e.clientX;
           downY = e.clientY;
-
-          try { card.setPointerCapture(pointerId); } catch (_) {}
 
           clearPress();
           pressTimer = setTimeout(() => {
             clearPress();
             pointerDown = false;
 
-            if (!requireAuthOrOpen()) return;
+            if (!isAuthed()) { openAuthOverlay(); return; }
 
             const item = userItems[key];
 
-            // If in locks: long press removes from locks entirely
             if (context === "mylocks") {
               openModal({
                 title: "Remove from MyLocks?",
@@ -1091,7 +1157,6 @@
               return;
             }
 
-            // Otherwise: flip vote for ONLY this line
             if (!item) {
               showToast("Swipe it once first");
               return;
@@ -1112,11 +1177,7 @@
                       .select()
                       .single();
 
-                    if (error) {
-                      showToast("Flip failed");
-                      console.warn(error);
-                      return;
-                    }
+                    if (error) { showToast("Flip failed"); return; }
                     userItems[key] = data;
                     showToast("Bias flipped");
                     renderScreen();
@@ -1140,33 +1201,20 @@
           if (!pointerDown) return;
           pointerDown = false;
 
+          if (already) {
+            showToast("Already saved (hold to flip bias)");
+            return;
+          }
+
+          if (context === "mylocks" || context === "myarchives") return;
           if (!requireAuthOrOpen()) return;
 
           const dx = e.clientX - downX;
           const threshold = 42;
           if (Math.abs(dx) < threshold) return;
 
-          // ✅ MyBias: update status only (no “already saved” block)
-          if (context === "mybias") {
-            const newStatus = dx > 0 ? "lock" : "archived";
-            await updateStatus(key, newStatus);
-            card.classList.add(dx > 0 ? "swipe-right" : "swipe-left");
-            setTimeout(() => {
-              showToast(newStatus === "lock" ? "Moved to MyLocks" : "Moved to MyArchives");
-              renderScreen();
-            }, 190);
-            return;
-          }
-
-          // For other contexts: block re-swipe
-          const already = !!userItems[key];
-          if (already) {
-            showToast("Already saved (hold to flip bias)");
-            return;
-          }
-
-          const vote = dx > 0 ? "confident" : "doubt"; // RIGHT = confident, LEFT = doubt
-          const status = "inbox"; // new swipes always land in MyBias (inbox)
+          const vote = dx > 0 ? "confident" : "doubt";
+          const status = "inbox";
 
           const sport = SPORTS[meta.sportIndex];
           const matchup = sport.matchups[meta.matchupIndex];
@@ -1188,8 +1236,8 @@
 
           const saved = await saveSwipeRow(row);
           if (saved.error) {
-            showToast("Save failed (check Supabase swipes table/unique constraint)");
             console.warn(saved.error);
+            showToast("Save failed (check swipes table/constraint)");
             return;
           }
 
@@ -1205,7 +1253,6 @@
           pointerDown = false;
         });
 
-        // Prevent clicks from flipping main card
         card.addEventListener("click", (e) => e.stopPropagation());
       }
 
@@ -1269,7 +1316,6 @@
             topLine.sharp, topLine.sweep
           ));
 
-          // ✅ Double-click matchup opens All Lines for that matchup
           card.addEventListener("dblclick", (e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -1436,7 +1482,6 @@
             card.appendChild(buildBiasUI(meta, ln.sharp, ln.sweep));
 
             attachLineInteractions(card, meta, "allLines", ln.sharp, ln.sweep);
-
             matchupsListEl.appendChild(card);
           });
         });
@@ -1520,6 +1565,14 @@
       function getLocks() { return Object.values(userItems).filter((x) => x.status === "lock"); }
       function getArchives() { return Object.values(userItems).filter((x) => x.status === "archived"); }
 
+      function renderMyBiasFront() {
+        logoEl.textContent = "🧠";
+        nameEl.textContent = "MyBias";
+        codeEl.textContent = authedUser ? "Your saved swipes" : "Sign in required";
+        indexIndicatorFront.textContent = "";
+        indexIndicatorBack.textContent = "";
+      }
+
       function inferMetaFromRow(row) {
         const sIndex = SPORTS.findIndex((s) => s.id === row.sport_id);
         const mIndex = sIndex >= 0 ? SPORTS[sIndex].matchups.findIndex((m) => m.name === row.matchup_name) : 0;
@@ -1530,14 +1583,6 @@
           category: row.category || "other",
           book: row.book || "Best Available",
         };
-      }
-
-      function renderMyBiasFront() {
-        logoEl.textContent = "🧠";
-        nameEl.textContent = "MyBias";
-        codeEl.textContent = authedUser ? "Your saved swipes" : "Sign in required";
-        indexIndicatorFront.textContent = "";
-        indexIndicatorBack.textContent = "";
       }
 
       function renderMyBiasBack() {
@@ -1595,12 +1640,10 @@
           top.appendChild(right);
 
           card.appendChild(top);
+          card.appendChild(buildBiasUI(inferMetaFromRow(item), 55, 45));
 
-          const meta = inferMetaFromRow(item);
-          card.appendChild(buildBiasUI(meta, 55, 45));
-
-          // ✅ In MyBias swiping updates status (lock/archive)
-          attachLineInteractions(card, meta, "mybias", 55, 45);
+          const inferredMeta = inferMetaFromRow(item);
+          attachLineInteractions(card, inferredMeta, "mybias", 55, 45);
 
           matchupsListEl.appendChild(card);
         });
@@ -1684,7 +1727,6 @@
               top.appendChild(right);
 
               card.appendChild(top);
-
               const meta = inferMetaFromRow(item);
               card.appendChild(buildBiasUI(meta, 55, 45));
               attachLineInteractions(card, meta, "mylocks", 55, 45);
@@ -1701,7 +1743,7 @@
             openModal({
               title: "Coming Soon",
               body: "For now please access your book to wager.",
-              actions: [{ label: "OK", onClick: () => {} }],
+              actions: [{ label: "OK", kind: "primary", onClick: () => {} }],
             });
           });
           matchupsListEl.appendChild(btn);
@@ -1773,7 +1815,6 @@
             top.appendChild(right);
 
             card.appendChild(top);
-
             const meta = inferMetaFromRow(item);
             card.appendChild(buildBiasUI(meta, 55, 45));
             attachLineInteractions(card, meta, "myarchives", 55, 45);
@@ -1840,8 +1881,7 @@
         if (mode === "mylocks") {
           titleEl.textContent = "MyLocks";
           subtitleEl.textContent = "Grouped by sportsbook";
-          directionsEl.innerHTML =
-            'Hold a lock to remove it. Place Bet buttons show a demo pop-up.';
+          directionsEl.innerHTML = 'Hold a lock to remove it. Place Bet buttons show a demo pop-up.';
           renderLocksFront();
           renderLocksBack();
           flipped = true;
@@ -1850,8 +1890,7 @@
         if (mode === "myarchives") {
           titleEl.textContent = "MyArchives";
           subtitleEl.textContent = "Archived lines";
-          directionsEl.innerHTML =
-            'Double-click a line for details. Hold to flip your bias (only that line).';
+          directionsEl.innerHTML = 'Double-click a line for details. Hold to flip your bias (only that line).';
           renderArchivesFront();
           renderArchivesBack();
           flipped = true;
@@ -1867,31 +1906,14 @@
           renderScreen();
           return;
         }
-        if (mode === "allLines") {
-          mode = "matchups";
-          flipped = true;
-          renderScreen();
-          return;
-        }
-        if (mode === "matchups") {
-          mode = "sports";
-          flipped = false;
-          renderScreen();
-          return;
-        }
+        if (mode === "allLines") { mode = "matchups"; flipped = true; renderScreen(); return; }
+        if (mode === "matchups") { mode = "sports"; flipped = false; renderScreen(); return; }
         if (mode === "mybias" || mode === "mylocks" || mode === "myarchives") {
-          mode = "sports";
-          flipped = false;
-          renderScreen();
-          return;
+          mode = "sports"; flipped = false; renderScreen(); return;
         }
       }
 
-      backToSportsBtn.addEventListener("click", (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        handleGlobalBack();
-      });
+      backToSportsBtn.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); handleGlobalBack(); });
 
       /************************************************************
        * MAIN CARD CLICK (single vs double)
@@ -1904,36 +1926,16 @@
         const x = e.clientX - rect.left;
         const zone = x / rect.width;
 
-        if (mode === "mybias" || mode === "mylocks" || mode === "myarchives" || mode === "lineDetails") {
-          return;
-        }
+        if (mode === "mybias" || mode === "mylocks" || mode === "myarchives" || mode === "lineDetails") return;
 
         if (zone < 0.2) {
-          if (mode === "sports") {
-            currentSportIndex = getPrevIndex(SPORTS.length, currentSportIndex);
-            flipped = false;
-            renderScreen();
-            return;
-          }
-          if (mode === "matchups" || mode === "allLines") {
-            currentMatchupIndex = getPrevIndex(currentSport().matchups.length, currentMatchupIndex);
-            renderScreen();
-            return;
-          }
+          if (mode === "sports") { currentSportIndex = getPrevIndex(SPORTS.length, currentSportIndex); flipped = false; renderScreen(); return; }
+          if (mode === "matchups" || mode === "allLines") { currentMatchupIndex = getPrevIndex(currentSport().matchups.length, currentMatchupIndex); renderScreen(); return; }
         }
 
         if (zone > 0.8) {
-          if (mode === "sports") {
-            currentSportIndex = getNextIndex(SPORTS.length, currentSportIndex);
-            flipped = false;
-            renderScreen();
-            return;
-          }
-          if (mode === "matchups" || mode === "allLines") {
-            currentMatchupIndex = getNextIndex(currentSport().matchups.length, currentMatchupIndex);
-            renderScreen();
-            return;
-          }
+          if (mode === "sports") { currentSportIndex = getNextIndex(SPORTS.length, currentSportIndex); flipped = false; renderScreen(); return; }
+          if (mode === "matchups" || mode === "allLines") { currentMatchupIndex = getNextIndex(currentSport().matchups.length, currentMatchupIndex); renderScreen(); return; }
         }
 
         if (zone >= 0.2 && zone <= 0.8) {
@@ -1949,31 +1951,10 @@
         const x = e.clientX - rect.left;
         const zone = x / rect.width;
 
-        if (mode === "sports" && zone >= 0.2 && zone <= 0.8) {
-          mode = "matchups";
-          currentMatchupIndex = 0;
-          flipped = false;
-          renderScreen();
-          return;
-        }
-
-        if (mode === "matchups" && zone >= 0.2 && zone <= 0.8) {
-          mode = "allLines";
-          flipped = true;
-          renderScreen();
-          return;
-        }
-
-        if (mode === "allLines" && zone >= 0.2 && zone <= 0.8) {
-          flipped = !flipped;
-          renderCardFlipState();
-          return;
-        }
-
-        if (mode === "lineDetails") {
-          handleGlobalBack();
-          return;
-        }
+        if (mode === "sports" && zone >= 0.2 && zone <= 0.8) { mode = "matchups"; currentMatchupIndex = 0; flipped = false; renderScreen(); return; }
+        if (mode === "matchups" && zone >= 0.2 && zone <= 0.8) { mode = "allLines"; flipped = true; renderScreen(); return; }
+        if (mode === "allLines" && zone >= 0.2 && zone <= 0.8) { flipped = !flipped; renderCardFlipState(); return; }
+        if (mode === "lineDetails") { handleGlobalBack(); return; }
 
         handleSingleClick(e);
       }
@@ -2045,34 +2026,19 @@
         const myBiasItem = document.createElement("div");
         myBiasItem.className = "user-dropdown-item";
         myBiasItem.textContent = "MyBias";
-        myBiasItem.addEventListener("click", () => {
-          mode = "mybias";
-          flipped = true;
-          userDropdown.classList.remove("open");
-          renderScreen();
-        });
+        myBiasItem.addEventListener("click", () => { mode = "mybias"; flipped = true; userDropdown.classList.remove("open"); renderScreen(); });
         userDropdown.appendChild(myBiasItem);
 
         const locksItem = document.createElement("div");
         locksItem.className = "user-dropdown-item";
         locksItem.textContent = "MyLocks";
-        locksItem.addEventListener("click", () => {
-          mode = "mylocks";
-          flipped = true;
-          userDropdown.classList.remove("open");
-          renderScreen();
-        });
+        locksItem.addEventListener("click", () => { mode = "mylocks"; flipped = true; userDropdown.classList.remove("open"); renderScreen(); });
         userDropdown.appendChild(locksItem);
 
         const archItem = document.createElement("div");
         archItem.className = "user-dropdown-item";
         archItem.textContent = "MyArchives";
-        archItem.addEventListener("click", () => {
-          mode = "myarchives";
-          flipped = true;
-          userDropdown.classList.remove("open");
-          renderScreen();
-        });
+        archItem.addEventListener("click", () => { mode = "myarchives"; flipped = true; userDropdown.classList.remove("open"); renderScreen(); });
         userDropdown.appendChild(archItem);
 
         const sep = document.createElement("div");
@@ -2086,14 +2052,10 @@
           userDropdown.classList.remove("open");
           if (authedUser) {
             await supabaseClient.auth.signOut();
-            authedUser = null;
             showToast("Signed out");
-            openAuthOverlay("Signed out — sign in to swipe");
-            updateUserMenuLabel();
-            buildUserDropdown();
-            renderScreen();
+            openAuthOverlay();
           } else {
-            openAuthOverlay("Sign in to continue");
+            openAuthOverlay();
           }
         });
         userDropdown.appendChild(authItem);
@@ -2112,7 +2074,7 @@
       });
 
       /************************************************************
-       * AUTH HANDLERS (3 buttons)
+       * AUTH HANDLERS (FIXED: overlay ALWAYS closes after success)
        ************************************************************/
       authSignInBtn.addEventListener("click", async () => {
         const email = (authEmailEl.value || "").trim();
@@ -2120,16 +2082,11 @@
         if (!email || !password) return showToast("Enter email + password");
 
         const res = await supabaseClient.auth.signInWithPassword({ email, password });
-        if (res.error) {
-          showToast(res.error.message || "Sign in failed");
-          return;
-        }
+        if (res.error) { showToast(res.error.message || "Sign in failed"); return; }
 
-        // ✅ Force-close overlay immediately on successful sign-in
-        closeAuthOverlay();
-
-        // Keep state consistent
+        // Force refresh + close overlay
         await refreshAuth();
+        if (authedUser) closeAuthOverlay();
         showToast("Signed in");
         renderScreen();
       });
@@ -2140,50 +2097,31 @@
         if (!email || !password) return showToast("Enter email + password");
 
         const res = await supabaseClient.auth.signUp({ email, password });
+        if (res.error) { showToast(res.error.message || "Sign up failed"); return; }
 
-        if (res.error) {
-          showToast(res.error.message || "Sign up failed");
-          return;
-        }
-
-        // If confirmations are ON, Supabase returns no session -> overlay should stay
-        const session = res.data?.session || null;
-        if (!session) {
-          showToast("Account created. Check email to confirm, then sign in.");
-          openAuthOverlay();
-          return;
-        }
-
-        // If confirmations are OFF, you get a session -> close overlay
-        closeAuthOverlay();
+        // If confirmations are OFF, signUp returns a session and we can close overlay
         await refreshAuth();
-        showToast("Account created & signed in");
-        renderScreen();
+        if (authedUser) {
+          closeAuthOverlay();
+          showToast("Account created + signed in");
+          renderScreen();
+        } else {
+          showToast("Account created. Check email if confirmation is ON.");
+          openAuthOverlay();
+        }
       });
 
       authResetBtn.addEventListener("click", async () => {
         const email = (authEmailEl.value || "").trim();
         if (!email) return showToast("Enter your email first");
 
-        const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-          // You can set this to your deployed URL later
-          redirectTo: window.location.href.split("#")[0],
-        });
-
-        if (error) {
-          showToast(error.message || "Reset failed");
-          return;
-        }
-
-        openModal({
-          title: "Password reset sent",
-          body: "Check your email for a reset link. After resetting, come back and sign in.",
-          actions: [{ label: "OK", kind: "primary", onClick: () => {} }],
-        });
+        const { error } = await supabaseClient.auth.resetPasswordForEmail(email);
+        if (error) { showToast(error.message || "Reset failed"); return; }
+        showToast("Reset email sent (if email exists)");
       });
 
       /************************************************************
-       * INIT
+       * INIT (FIXED: auth listener registered after client init)
        ************************************************************/
       (async function init() {
         initSupabase();
@@ -2191,11 +2129,25 @@
         buildUserDropdown();
         updateUserMenuLabel();
 
-        await refreshAuth();
+        // Auth state listener MUST be registered after initSupabase()
+        supabaseClient.auth.onAuthStateChange(async (_event, session) => {
+          authedUser = session?.user || null;
 
-        // If not authed, keep UI usable but block swipes
-        if (!authedUser) openAuthOverlay(); // show overlay by default when not signed in
-        else closeAuthOverlay();
+          if (authedUser) {
+            closeAuthOverlay();
+            await loadUserSwipes();
+          } else {
+            openAuthOverlay();
+            for (const k of Object.keys(userItems)) delete userItems[k];
+          }
+
+          updateUserMenuLabel();
+          buildUserDropdown();
+          renderScreen();
+        });
+
+        // Initial session restore + ensure overlay shows for new users
+        await refreshAuth();
 
         renderScreen();
       })();
