@@ -852,7 +852,7 @@
         </div>
       </main>
 
-      <footer>BeforeTheBet • Demo MVP</footer>
+      <footer>BeforeTheBet</footer>
     </div>
 
     <!-- AUTH OVERLAY (single, no duplicates) -->
@@ -2069,13 +2069,9 @@
 
         matchupsListEl.innerHTML = "";
 
-        // Force full width in the details view
-        matchupsListEl.style.width = "100%";
-
-        // Keep the existing carrot menu row, but ensure it also spans full width
+        // Keep the existing carrot menu row
         const row = document.createElement("div");
         row.className = "details-menu-row";
-        row.style.width = "100%";
 
         const wrap = document.createElement("div");
         wrap.className = "details-menu-wrapper";
@@ -2119,10 +2115,9 @@
         row.appendChild(wrap);
         matchupsListEl.appendChild(row);
 
-        // Details content cards forced full width
+        // Details content cards
         const c1 = document.createElement("div");
         c1.className = "matchup-card";
-        c1.style.width = "100%";
         const c1t = document.createElement("div");
         c1t.className = "matchup-label";
         c1t.textContent = meta.label;
@@ -2134,7 +2129,6 @@
 
         const c2 = document.createElement("div");
         c2.className = "matchup-card";
-        c2.style.width = "100%";
         const c2t = document.createElement("div");
         c2t.className = "matchup-label";
         c2t.textContent = "Performance Snapshot";
@@ -2150,7 +2144,6 @@
 
         const c3 = document.createElement("div");
         c3.className = "matchup-card";
-        c3.style.width = "100%";
         const c3t = document.createElement("div");
         c3t.className = "matchup-label";
         c3t.textContent = "Recent Games";
