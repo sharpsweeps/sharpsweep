@@ -198,6 +198,18 @@
       html[data-theme="dark"] #back-to-sports { background: rgba(15, 23, 42, 0.85); }
       #back-to-sports:hover { border-color: rgba(148,163,184,0.4); color: var(--text); }
 
+      /* Swipe counter */
+      .swipe-counter {
+        font-size: 11px;
+        color: var(--muted);
+        padding: 6px 12px;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        background: rgba(15, 23, 42, 0.04);
+        font-weight: 600;
+      }
+      html[data-theme="dark"] .swipe-counter { background: rgba(15, 23, 42, 0.6); }
+
       /* User dropdown */
       .user-menu-wrapper { position: relative; }
 
@@ -259,6 +271,73 @@
         background: var(--chip);
         color: var(--muted);
         font-weight: 700;
+      }
+
+      /* Line Details Page */
+      .line-details-page {
+        display: none;
+        width: 100%;
+        max-width: 700px;
+        margin: 0 auto;
+      }
+      .line-details-page.active {
+        display: block;
+      }
+
+      .line-details-header {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 24px;
+      }
+
+      .line-details-back-btn {
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        background: rgba(15, 23, 42, 0.04);
+        color: var(--muted);
+        font-size: 11px;
+        padding: 8px 14px;
+        cursor: pointer;
+      }
+      html[data-theme="dark"] .line-details-back-btn { background: rgba(15, 23, 42, 0.85); }
+      .line-details-back-btn:hover { border-color: rgba(148,163,184,0.4); color: var(--text); }
+
+      .line-details-header h2 {
+        margin: 0;
+        font-size: 24px;
+        font-weight: 700;
+      }
+
+      .line-details-content {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .line-details-card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 2px 8px var(--shadow);
+      }
+
+      .line-details-label {
+        font-weight: 700;
+        font-size: 14px;
+        margin-bottom: 8px;
+        color: var(--text);
+      }
+
+      .line-details-text {
+        font-size: 13px;
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      .line-details-text + .line-details-text {
+        margin-top: 6px;
       }
 
       main {
@@ -797,12 +876,17 @@
           <button id="back-to-sports" type="button">← Back</button>
         </div>
 
-        <div class="user-menu-wrapper" id="user-menu-wrapper">
-          <button class="menu-placeholder" id="user-menu-button" type="button">
-            <span id="user-menu-label">My Hub</span>
-            <span>▾</span>
-          </button>
-          <div class="user-dropdown" id="user-dropdown"></div>
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <div id="swipe-counter" class="swipe-counter">
+            <span id="swipes-remaining">--</span>
+          </div>
+          <div class="user-menu-wrapper" id="user-menu-wrapper">
+            <button class="menu-placeholder" id="user-menu-button" type="button">
+              <span id="user-menu-label">My Hub</span>
+              <span>▾</span>
+            </button>
+            <div class="user-dropdown" id="user-dropdown"></div>
+          </div>
         </div>
       </header>
 
@@ -848,6 +932,15 @@
                 </div>
               </div>
             </div>
+          </div>
+
+          <!-- LINE DETAILS PAGE -->
+          <div class="line-details-page" id="line-details-page">
+            <div class="line-details-header">
+              <button id="line-details-back" class="line-details-back-btn" type="button">← Back</button>
+              <h2 id="line-details-title">Line Details</h2>
+            </div>
+            <div class="line-details-content" id="line-details-content"></div>
           </div>
         </div>
       </main>
@@ -962,6 +1055,7 @@
       // Auth
       let supa = null;
       let currentUser = null; // { id, email }
+      let currentUserProfile = null; // { tier, swipes_used, swipes_reset_at }
       let isAuthReady = false;
 
       // Bias storage (in-memory mirror)
@@ -1164,8 +1258,27 @@
         currentTier = (saved && TIERS[saved]) ? saved : "FREE";
       }
 
-      function saveTier() {
+      async function saveTier() {
         localStorage.setItem(tierStorageKey(), currentTier);
+
+        // Also save to database if user is logged in
+        if (currentUser && currentUserProfile && supa) {
+          try {
+            const { data, error } = await supa
+              .from('user_profiles')
+              .update({ tier: currentTier })
+              .eq('id', currentUser.id)
+              .select()
+              .single();
+
+            if (!error && data) {
+              currentUserProfile = data;
+              updateSwipeCounter();
+            }
+          } catch (err) {
+            console.error('Error saving tier to database:', err);
+          }
+        }
       }
 
       function getESTParts(date = new Date()) {
@@ -2175,8 +2288,265 @@
         detailsMenuOpen = false;
 
         mode = "lineDetails";
-        flipped = true;
-        renderScreen();
+
+        // Show Line Details Page instead of flipping card
+        showLineDetailsPage();
+      }
+
+      function showLineDetailsPage() {
+        const stats = currentLineDetailStats;
+        const meta = currentLineDetailMeta;
+
+        // Hide card container and title block
+        const cardContainer = document.querySelector('.card-container');
+        const titleBlock = document.querySelector('.title-block');
+        const lineDetailsPage = document.getElementById('line-details-page');
+
+        if (cardContainer) cardContainer.style.display = 'none';
+        if (titleBlock) titleBlock.style.display = 'none';
+        lineDetailsPage.classList.add('active');
+
+        // Update back button and title
+        const lineDetailsTitle = document.getElementById('line-details-title');
+        lineDetailsTitle.textContent = meta.label;
+
+        // Build line details content
+        const contentEl = document.getElementById('line-details-content');
+        contentEl.innerHTML = '';
+
+        // Build Advanced Features menu
+        const menuRow = document.createElement('div');
+        menuRow.className = 'details-menu-row';
+        menuRow.style.marginBottom = '16px';
+
+        const wrap = document.createElement('div');
+        wrap.className = 'details-menu-wrapper';
+
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'details-menu-button';
+        btn.textContent = 'Advanced Features ▾';
+
+        const menu = document.createElement('div');
+        menu.className = 'details-menu' + (detailsMenuOpen ? ' open' : '');
+
+        const items = buildLineDetailsFeatureItems();
+        items.forEach((it, idx) => {
+          const mi = document.createElement('div');
+          mi.className = 'details-menu-item';
+          mi.innerHTML = `<span>${it.label}</span><span class="pill">${it.pill}</span>`;
+          mi.addEventListener('click', (e) => {
+            e.stopPropagation();
+            detailsMenuOpen = false;
+            menu.classList.remove('open');
+            it.onClick && it.onClick();
+          });
+          menu.appendChild(mi);
+
+          if (idx === 2) {
+            const sep = document.createElement('div');
+            sep.className = 'details-menu-sep';
+            menu.appendChild(sep);
+          }
+        });
+
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          detailsMenuOpen = !detailsMenuOpen;
+          menu.classList.toggle('open', detailsMenuOpen);
+        });
+
+        wrap.appendChild(btn);
+        wrap.appendChild(menu);
+        menuRow.appendChild(wrap);
+        contentEl.appendChild(menuRow);
+
+        // Card 1: Line Info
+        const c1 = document.createElement('div');
+        c1.className = 'line-details-card';
+        c1.innerHTML = `
+          <div class="line-details-label">${meta.label}</div>
+          <div class="line-details-text">${stats.sportName} • ${stats.matchupName} • ${meta.book || 'Best Available'}</div>
+        `;
+        contentEl.appendChild(c1);
+
+        // Card 2: Performance Snapshot
+        const c2 = document.createElement('div');
+        c2.className = 'line-details-card';
+        c2.innerHTML = `
+          <div class="line-details-label">Performance Snapshot</div>
+          <div class="line-details-text">Season: ${stats.season} • Games sampled: ${stats.gamesSampled}</div>
+          <div class="line-details-text">Hit rate: ${stats.hitRate} • Avg: ${stats.avgDelta}</div>
+        `;
+        contentEl.appendChild(c2);
+
+        // Card 3: Recent Games
+        const c3 = document.createElement('div');
+        c3.className = 'line-details-card';
+        c3.innerHTML = `
+          <div class="line-details-label">Recent Games</div>
+          <div class="line-details-text">Last 5: ${stats.last5.join(' • ')}</div>
+          <div class="line-details-text">${stats.note}</div>
+        `;
+        contentEl.appendChild(c3);
+
+        // Show back button in header
+        backToSportsBtn.style.display = 'inline-flex';
+      }
+
+      function hideLineDetailsPage() {
+        const cardContainer = document.querySelector('.card-container');
+        const titleBlock = document.querySelector('.title-block');
+        const lineDetailsPage = document.getElementById('line-details-page');
+
+        lineDetailsPage.classList.remove('active');
+        if (cardContainer) cardContainer.style.display = 'flex';
+        if (titleBlock) titleBlock.style.display = 'block';
+      }
+
+      /*******************************
+       * USER PROFILE & SWIPE TRACKING
+       *******************************/
+      const SWIPE_LIMITS = {
+        FREE: 20,
+        PLUS: 100,
+        PRO: 500,
+        ELITE: -1 // unlimited
+      };
+
+      async function loadUserProfile() {
+        if (!currentUser || !supa) return;
+
+        try {
+          // Check if profile exists
+          const { data, error } = await supa
+            .from('user_profiles')
+            .select('*')
+            .eq('id', currentUser.id)
+            .maybeSingle();
+
+          if (error && error.code !== 'PGRST116') {
+            console.error('Error loading profile:', error);
+            return;
+          }
+
+          if (!data) {
+            // Create profile if it doesn't exist, use current tier from localStorage
+            const { data: newProfile, error: insertError } = await supa
+              .from('user_profiles')
+              .insert({
+                id: currentUser.id,
+                tier: currentTier || 'FREE',
+                swipes_used: 0,
+                swipes_reset_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+              })
+              .select()
+              .single();
+
+            if (insertError) {
+              console.error('Error creating profile:', insertError);
+              return;
+            }
+
+            currentUserProfile = newProfile;
+            currentTier = newProfile.tier;
+          } else {
+            // Check if swipes need to be reset
+            const resetDate = new Date(data.swipes_reset_at);
+            if (resetDate < new Date()) {
+              // Reset swipes
+              const { data: updatedProfile, error: updateError } = await supa
+                .from('user_profiles')
+                .update({
+                  swipes_used: 0,
+                  swipes_reset_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+                })
+                .eq('id', currentUser.id)
+                .select()
+                .single();
+
+              if (updateError) {
+                console.error('Error resetting swipes:', updateError);
+                return;
+              }
+
+              currentUserProfile = updatedProfile;
+              currentTier = updatedProfile.tier;
+            } else {
+              currentUserProfile = data;
+              currentTier = data.tier;
+            }
+          }
+
+          updateSwipeCounter();
+        } catch (err) {
+          console.error('Error in loadUserProfile:', err);
+        }
+      }
+
+      function updateSwipeCounter() {
+        const swipeCounterEl = document.getElementById('swipes-remaining');
+        if (!swipeCounterEl) return;
+
+        if (!currentUser || !currentUserProfile) {
+          swipeCounterEl.textContent = '--';
+          return;
+        }
+
+        const tier = currentUserProfile.tier || 'FREE';
+        const limit = SWIPE_LIMITS[tier];
+        const used = currentUserProfile.swipes_used || 0;
+
+        if (limit === -1) {
+          swipeCounterEl.textContent = '∞ swipes';
+        } else {
+          const remaining = Math.max(0, limit - used);
+          swipeCounterEl.textContent = `${remaining} swipes`;
+        }
+      }
+
+      async function incrementSwipeCount() {
+        if (!currentUser || !currentUserProfile || !supa) return false;
+
+        const tier = currentUserProfile.tier || 'FREE';
+        const limit = SWIPE_LIMITS[tier];
+
+        // Check if unlimited
+        if (limit === -1) return true;
+
+        const used = currentUserProfile.swipes_used || 0;
+
+        // Check if limit reached
+        if (used >= limit) {
+          openModal({
+            title: 'Swipe limit reached',
+            body: `You've used all ${limit} swipes for this period. Upgrade your plan to get more swipes!`,
+            actions: [{ label: 'OK', variant: 'primary', onClick: () => {} }]
+          });
+          return false;
+        }
+
+        // Increment swipe count
+        try {
+          const { data, error } = await supa
+            .from('user_profiles')
+            .update({ swipes_used: used + 1 })
+            .eq('id', currentUser.id)
+            .select()
+            .single();
+
+          if (error) {
+            console.error('Error incrementing swipes:', error);
+            return false;
+          }
+
+          currentUserProfile = data;
+          updateSwipeCounter();
+          return true;
+        } catch (err) {
+          console.error('Error in incrementSwipeCount:', err);
+          return false;
+        }
       }
 
       /*******************************
@@ -2372,6 +2742,10 @@
 
         async function finalizeSwipe(direction) {
           if (!requireLoginGuard()) return;
+
+          // Check monthly/period swipe limit first
+          const canSwipe = await incrementSwipeCount();
+          if (!canSwipe) return;
 
           loadDailySwipeState();
           const cap = getTierDailyCap();
@@ -2747,16 +3121,8 @@
           renderMatchupsFront();
           renderLinesBack({ allLines: true });
         } else if (mode === "lineDetails") {
-          const stats = currentLineDetailStats;
-          titleEl.textContent = "Line Details";
-          subtitleEl.textContent = stats.matchupName;
-          directionsEl.innerHTML =
-            'Double-click center to go back.';
-
-          backToSportsBtn.style.display = "inline-flex";
-
-          renderLineDetailsFront();
-          renderLineDetailsBack();
+          // Line Details now handled by showLineDetailsPage(), skip card rendering
+          return;
         } else if (mode === "mybias") {
           titleEl.textContent = "MyBias";
           subtitleEl.textContent = "Your cart";
@@ -2792,6 +3158,7 @@
 
       function handleGlobalBack() {
         if (mode === "lineDetails" && previousModeBeforeLineDetails) {
+          hideLineDetailsPage();
           mode = previousModeBeforeLineDetails;
           flipped = true;
         } else if (mode === "allLines") {
@@ -2810,6 +3177,9 @@
       }
 
       backToSportsBtn.addEventListener("click", () => handleGlobalBack());
+
+      const lineDetailsBackBtn = document.getElementById('line-details-back');
+      lineDetailsBackBtn.addEventListener("click", () => handleGlobalBack());
 
       /*******************************
        * CARD CLICK BEHAVIOR
@@ -3153,10 +3523,13 @@
                     await supa.auth.signOut();
 
                     currentUser = null;
+                    currentUserProfile = null;
                     isAuthReady = true;
 
                     biasStore = {};
                     sessionSwipeCount = 0;
+
+                    updateSwipeCounter();
 
                     loadTier();
                     loadDailySwipeState();
@@ -3260,6 +3633,8 @@
           const dbOK = await tryFetchDB();
           if (!dbOK) showToast("DB not connected yet (local fallback active)");
 
+          await loadUserProfile();
+
           buildUserDropdown();
           buildSportsMenu();
           renderScreen();
@@ -3283,6 +3658,7 @@
 
             const dbOK = await tryFetchDB();
             if (!dbOK) showToast("DB not connected yet (local fallback active)");
+            await loadUserProfile();
             buildUserDropdown();
             renderScreen();
 
@@ -3290,6 +3666,8 @@
             await runDailySnapshotIfDue();
           } else {
             currentUser = null;
+            currentUserProfile = null;
+            updateSwipeCounter();
             showAuth();
           }
         });
@@ -3299,6 +3677,7 @@
         buildUserDropdown();
         buildSportsMenu();
         renderScreen();
+        updateSwipeCounter();
 
         scheduleNext3amJobs();
       }
@@ -3349,6 +3728,8 @@
         const dbOK = await tryFetchDB();
         if (!dbOK) showToast("DB not connected yet (local fallback active)");
 
+        await loadUserProfile();
+
         buildUserDropdown();
         renderScreen();
         showToast("Signed in");
@@ -3394,6 +3775,7 @@
 
           const dbOK = await tryFetchDB();
           if (!dbOK) showToast("DB not connected yet (local fallback active)");
+          await loadUserProfile();
           buildUserDropdown();
           renderScreen();
           showToast("Account created & signed in");
