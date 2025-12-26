@@ -2039,9 +2039,22 @@
           helper.className = "matchup-line";
           helper.textContent = "Swipe: right → MyLocks • left → MyArchive. Double-click: details. Hold: change.";
 
+          const voteIndicator = document.createElement("div");
+          voteIndicator.className = "matchup-line";
+          voteIndicator.style.marginTop = "4px";
+          voteIndicator.style.fontWeight = "600";
+          if (item.vote === "confident") {
+            voteIndicator.style.color = "#22c55e";
+            voteIndicator.textContent = "✅ Confident";
+          } else {
+            voteIndicator.style.color = "#ef4444";
+            voteIndicator.textContent = "🤔 Doubt It";
+          }
+
           left.appendChild(label);
           left.appendChild(line);
           left.appendChild(helper);
+          left.appendChild(voteIndicator);
 
           const right = document.createElement("div");
           right.className = "matchup-tag";
@@ -2051,6 +2064,12 @@
           top.appendChild(right);
 
           card.appendChild(top);
+
+          if (item.vote === "confident") {
+            card.style.borderLeft = "3px solid #22c55e";
+          } else {
+            card.style.borderLeft = "3px solid #ef4444";
+          }
 
           card.appendChild(buildSideBiasUI(
             { sportIndex: item.sportIndex, matchupIndex: item.matchupIndex, label: item.lineLabel, category: item.category, book: item.book, forceUnlocked: true },
@@ -2143,9 +2162,22 @@
             helper.className = "matchup-line";
             helper.textContent = "Double-click: details. Hold: remove from locks.";
 
+            const voteIndicator = document.createElement("div");
+            voteIndicator.className = "matchup-line";
+            voteIndicator.style.marginTop = "4px";
+            voteIndicator.style.fontWeight = "600";
+            if (item.vote === "confident") {
+              voteIndicator.style.color = "#22c55e";
+              voteIndicator.textContent = "✅ Confident";
+            } else {
+              voteIndicator.style.color = "#ef4444";
+              voteIndicator.textContent = "🤔 Doubt It";
+            }
+
             left.appendChild(label);
             left.appendChild(line);
             left.appendChild(helper);
+            left.appendChild(voteIndicator);
 
             const right = document.createElement("div");
             right.className = "matchup-tag";
@@ -2155,6 +2187,12 @@
             top.appendChild(right);
 
             card.appendChild(top);
+
+            if (item.vote === "confident") {
+              card.style.borderLeft = "3px solid #22c55e";
+            } else {
+              card.style.borderLeft = "3px solid #ef4444";
+            }
 
             card.appendChild(buildSideBiasUI(
               { sportIndex: item.sportIndex, matchupIndex: item.matchupIndex, label: item.lineLabel, category: item.category, book: item.book, forceUnlocked: true },
@@ -2250,9 +2288,22 @@
           helper.className = "matchup-line";
           helper.textContent = "Double-click: details. Hold: change bias (only this line).";
 
+          const voteIndicator = document.createElement("div");
+          voteIndicator.className = "matchup-line";
+          voteIndicator.style.marginTop = "4px";
+          voteIndicator.style.fontWeight = "600";
+          if (item.vote === "confident") {
+            voteIndicator.style.color = "#22c55e";
+            voteIndicator.textContent = "✅ Confident";
+          } else {
+            voteIndicator.style.color = "#ef4444";
+            voteIndicator.textContent = "🤔 Doubt It";
+          }
+
           left.appendChild(label);
           left.appendChild(line);
           left.appendChild(helper);
+          left.appendChild(voteIndicator);
 
           const right = document.createElement("div");
           right.className = "matchup-tag";
@@ -2262,6 +2313,12 @@
           top.appendChild(right);
 
           card.appendChild(top);
+
+          if (item.vote === "confident") {
+            card.style.borderLeft = "3px solid #22c55e";
+          } else {
+            card.style.borderLeft = "3px solid #ef4444";
+          }
 
           card.appendChild(buildSideBiasUI(
             { sportIndex: item.sportIndex, matchupIndex: item.matchupIndex, label: item.lineLabel, category: item.category, book: item.book, forceUnlocked: true },
@@ -2560,8 +2617,111 @@
         `;
         contentEl.appendChild(c3);
 
+        // Card 4: Community Bias (after 5 swipes)
+        if (isCommunityUnlocked()) {
+          const key = makeLineKey({
+            sportId: meta.sportId || stats.sportId,
+            matchupName: meta.matchupName || stats.matchupName,
+            label: meta.label,
+            book: meta.book || 'Best Available'
+          });
+          const biasItem = biasStore[key];
+          const confidentPct = biasItem?.communityConfident ?? 50;
+          const doubtPct = biasItem?.communityDoubt ?? 50;
+
+          const c4 = document.createElement('div');
+          c4.className = 'line-details-card';
+          c4.style.background = 'linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(239, 68, 68, 0.1))';
+          c4.innerHTML = `
+            <div class="line-details-label">Community Bias</div>
+            <div class="line-details-text" style="font-weight: 700; color: #22c55e;">✅ Confident: ${confidentPct}%</div>
+            <div class="line-details-text" style="font-weight: 700; color: #ef4444;">🤔 Doubt It: ${doubtPct}%</div>
+          `;
+          contentEl.appendChild(c4);
+
+          fetchAndDisplaySnapshot(contentEl, meta);
+        } else {
+          const c4 = document.createElement('div');
+          c4.className = 'line-details-card';
+          c4.style.background = 'rgba(37, 99, 235, 0.1)';
+          c4.innerHTML = `
+            <div class="line-details-label">Community Bias</div>
+            <div class="line-details-text">🔒 Swipe 5 times to unlock community bias data</div>
+            <div class="line-details-text">Progress: ${sessionSwipeCount || 0}/5</div>
+          `;
+          contentEl.appendChild(c4);
+        }
+
         // Show back button in header
         backToSportsBtn.style.display = 'inline-flex';
+      }
+
+      async function fetchAndDisplaySnapshot(contentEl, meta) {
+        if (!supa || !currentUser) return;
+
+        try {
+          const key = makeLineKey({
+            sportId: meta.sportId,
+            matchupName: meta.matchupName,
+            label: meta.label,
+            book: meta.book || 'Best Available'
+          });
+          const biasItem = biasStore[key];
+          if (!biasItem) return;
+
+          const lineId = await getLineIdFromMeta(meta);
+          if (!lineId) return;
+
+          const today = new Date();
+          const yesterday = new Date(today);
+          yesterday.setDate(yesterday.getDate() - 1);
+          const snapshotDate = yesterday.toISOString().split('T')[0];
+
+          const { data: snapshot } = await supa
+            .from('line_snapshots')
+            .select('*')
+            .eq('line_id', lineId)
+            .eq('snapshot_date', snapshotDate)
+            .maybeSingle();
+
+          if (snapshot) {
+            const c5 = document.createElement('div');
+            c5.className = 'line-details-card';
+            c5.style.background = 'rgba(99, 102, 241, 0.1)';
+            c5.innerHTML = `
+              <div class="line-details-label">Yesterday's 3AM Snapshot</div>
+              <div class="line-details-text">${snapshot.home_team} vs ${snapshot.away_team}</div>
+              <div class="line-details-text">Spread: ${snapshot.spread || 'N/A'} (${snapshot.spread_odds || 'N/A'})</div>
+              <div class="line-details-text">Total: ${snapshot.total || 'N/A'} (${snapshot.total_odds || 'N/A'})</div>
+              <div class="line-details-text" style="margin-top: 8px; font-weight: 600;">Community at that time:</div>
+              <div class="line-details-text" style="color: #22c55e;">Confident: ${snapshot.confident_count} swipes</div>
+              <div class="line-details-text" style="color: #ef4444;">Doubt: ${snapshot.doubt_count} swipes</div>
+            `;
+            contentEl.appendChild(c5);
+          }
+        } catch (err) {
+          console.error('Error fetching snapshot:', err);
+        }
+      }
+
+      async function getLineIdFromMeta(meta) {
+        try {
+          const lineData = {
+            game_id: `${meta.sportId}_${meta.matchupName}`,
+            sportsbook: meta.book || 'Best Available'
+          };
+
+          const { data } = await supa
+            .from('lines')
+            .select('id')
+            .eq('game_id', lineData.game_id)
+            .eq('sportsbook', lineData.sportsbook)
+            .maybeSingle();
+
+          return data?.id;
+        } catch (err) {
+          return null;
+        }
       }
 
       function hideLineDetailsPage() {
@@ -3025,9 +3185,11 @@
             if (!biasStore[key]) return;
             if (direction === "right") {
               await setBiasStatus(key, "lock");
+              await trackSwipeInDB(key, "confident", "mylocks");
               showToast("Moved to MyLocks");
             } else {
               await setBiasStatus(key, "archived");
+              await trackSwipeInDB(key, biasStore[key].vote, "myarchives");
               showToast("Moved to MyArchive");
             }
             renderScreen();
@@ -3043,44 +3205,64 @@
             return;
           }
 
-          dailySwipeDayId = todayId;
-          dailySwipeCount += 1;
-          await persistDailySwipeCount();
+          const swipeLabel = vote === "confident" ? "Confident" : "Doubt It";
+          const swipeEmoji = vote === "confident" ? "✅" : "🤔";
 
-          sessionSwipeCount += 1;
-          backendSwipeCount += 1;
-          await persistBackendSwipeCount();
+          openModal({
+            title: `${swipeLabel} ${swipeEmoji}`,
+            body: `${meta.label}\n${meta.matchupName}`,
+            actions: [
+              {
+                label: "Confirm",
+                variant: "primary",
+                onClick: async () => {
+                  dailySwipeDayId = todayId;
+                  dailySwipeCount += 1;
+                  await persistDailySwipeCount();
 
-          const communityConf = typeof ln.confident === "number" ? ln.confident : 50;
-          const communityDoubt = typeof ln.doubt === "number" ? ln.doubt : 50;
+                  sessionSwipeCount += 1;
+                  backendSwipeCount += 1;
+                  await persistBackendSwipeCount();
 
-          // preserve existing status if line already exists (MyBias/MyLocks/MyArchive should remain)
-          const existingStatus = biasStore[key]?.status;
-          const status = existingStatus ? existingStatus : "inbox";
+                  const communityConf = typeof ln.confident === "number" ? ln.confident : 50;
+                  const communityDoubt = typeof ln.doubt === "number" ? ln.doubt : 50;
 
-          await upsertBias({
-            key,
-            sportId: meta.sportId,
-            sportName: meta.sportName,
-            sportIndex: meta.sportIndex,
-            matchupIndex: meta.matchupIndex,
-            matchupName: meta.matchupName,
-            lineLabel: meta.label,
-            category: meta.category,
-            book: meta.book,
-            vote,
-            status,
-            communityConfident: communityConf,
-            communityDoubt: communityDoubt,
-            lastSwipedDayId: todayId,
+                  const existingStatus = biasStore[key]?.status;
+                  const status = existingStatus ? existingStatus : "inbox";
+
+                  await upsertBias({
+                    key,
+                    sportId: meta.sportId,
+                    sportName: meta.sportName,
+                    sportIndex: meta.sportIndex,
+                    matchupIndex: meta.matchupIndex,
+                    matchupName: meta.matchupName,
+                    lineLabel: meta.label,
+                    category: meta.category,
+                    book: meta.book,
+                    vote,
+                    status,
+                    communityConfident: communityConf,
+                    communityDoubt: communityDoubt,
+                    lastSwipedDayId: todayId,
+                  });
+
+                  await trackSwipeInDB(key, vote, "mybias");
+
+                  markCardDisabledAndDrop(card);
+                  showToast(existingStatus ? "Updated today ✅" : "Added to MyBias ✅");
+
+                  incrementFreshSwipes();
+
+                  if (isCommunityUnlocked()) renderScreen();
+                }
+              },
+              {
+                label: "Cancel",
+                onClick: () => {}
+              }
+            ]
           });
-
-          markCardDisabledAndDrop(card);
-          showToast(existingStatus ? "Updated today ✅" : "Added to MyBias ✅");
-
-          incrementFreshSwipes();
-
-          if (isCommunityUnlocked()) renderScreen();
         }
 
         function resetCardVisual() {
@@ -3336,6 +3518,61 @@
 
         if (error) {
           // ignore if db not ready
+        }
+      }
+
+      async function trackSwipeInDB(key, direction, status) {
+        if (!supa || !currentUser) return;
+
+        try {
+          const biasItem = biasStore[key];
+          if (!biasItem) return;
+
+          const lineData = {
+            game_id: `${biasItem.sportId}_${biasItem.matchupName}`,
+            home_team: biasItem.matchupName.split(' @ ')[1] || biasItem.matchupName,
+            away_team: biasItem.matchupName.split(' @ ')[0] || biasItem.matchupName,
+            sport: biasItem.sportId || 'NFL',
+            sportsbook: biasItem.book || 'Best Available',
+            game_time: new Date(Date.now() + 86400000).toISOString(),
+            is_active: true
+          };
+
+          const { data: existingLine } = await supa
+            .from('lines')
+            .select('id')
+            .eq('game_id', lineData.game_id)
+            .eq('sportsbook', lineData.sportsbook)
+            .maybeSingle();
+
+          let lineId;
+          if (existingLine) {
+            lineId = existingLine.id;
+          } else {
+            const { data: newLine } = await supa
+              .from('lines')
+              .insert([lineData])
+              .select('id')
+              .single();
+            lineId = newLine?.id;
+          }
+
+          if (!lineId) return;
+
+          const swipeData = {
+            user_id: currentUser.id,
+            line_id: lineId,
+            direction: direction,
+            status: status,
+            swiped_from: mode || 'allLines'
+          };
+
+          await supa
+            .from('swipes')
+            .upsert([swipeData], { onConflict: 'user_id,line_id' });
+
+        } catch (err) {
+          console.error('Error tracking swipe in DB:', err);
         }
       }
 
