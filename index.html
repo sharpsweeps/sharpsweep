@@ -3040,8 +3040,8 @@
         let isHorizontalGesture = false;
         let holdTimer = null;
 
-        const SWIPE_THRESHOLD = 40;
-        const INTENT_THRESHOLD = 8;
+        const SWIPE_THRESHOLD = 15;
+        const INTENT_THRESHOLD = 5;
 
         card.style.position = 'relative';
         card.style.touchAction = 'pan-y';
@@ -3146,7 +3146,7 @@
                 body: meta.label,
                 actions,
               });
-            }, 650);
+            }, 500);
           }
         });
 
@@ -3169,7 +3169,7 @@
 
           if (isHorizontalGesture) {
             e.preventDefault();
-            const clamp = Math.max(-250, Math.min(250, dx));
+            const clamp = Math.max(-300, Math.min(300, dx));
             const absClamp = Math.abs(clamp);
             const opacity = 1 - Math.min(0.2, absClamp / 400);
 
@@ -3185,10 +3185,10 @@
               card.style.borderWidth = '3px';
 
               if (clamp > 0) {
-                confidentOverlay.style.opacity = String(Math.min(1, absClamp / 80));
+                confidentOverlay.style.opacity = String(Math.min(1, absClamp / 50));
                 doubtOverlay.style.opacity = '0';
               } else {
-                doubtOverlay.style.opacity = String(Math.min(1, absClamp / 80));
+                doubtOverlay.style.opacity = String(Math.min(1, absClamp / 50));
                 confidentOverlay.style.opacity = '0';
               }
             } else {
@@ -3338,7 +3338,7 @@
           isDown = false;
 
           if (pointerId !== e.pointerId) {
-            card.style.transition = "all 0.3s ease-out";
+            card.style.transition = "all 0.2s ease-out";
             resetCardVisual();
             return;
           }
@@ -3348,11 +3348,11 @@
 
           console.log('Pointer up:', { dx, dy, threshold: SWIPE_THRESHOLD });
 
-          const isValidSwipe = Math.abs(dx) >= SWIPE_THRESHOLD && Math.abs(dx) > Math.abs(dy) * 1.5;
+          const isValidSwipe = Math.abs(dx) >= SWIPE_THRESHOLD && Math.abs(dx) > Math.abs(dy) * 0.7;
 
           if (!isValidSwipe) {
             console.log('Invalid swipe - resetting card');
-            card.style.transition = "all 0.3s ease-out";
+            card.style.transition = "all 0.2s ease-out";
             resetCardVisual();
             return;
           }
@@ -3372,23 +3372,27 @@
 
           console.log('Swipe validated - animating card');
           const flyDistance = direction === "right" ? 400 : -400;
-          card.style.transition = "all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)";
+          card.style.transition = "all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)";
           card.style.transform = `translateX(${flyDistance}px) rotate(${flyDistance * 0.1}deg)`;
           card.style.opacity = "0";
 
           setTimeout(async () => {
             await finalizeSwipe(direction);
-          }, 350);
+          }, 220);
         });
 
         card.addEventListener("pointercancel", () => {
           clearTimeout(holdTimer);
           isDown = false;
+          card.style.transition = "all 0.2s ease-out";
           resetCardVisual();
         });
 
         card.addEventListener("pointerleave", () => {
-          if (!isDown) resetCardVisual();
+          if (!isDown) {
+            card.style.transition = "all 0.2s ease-out";
+            resetCardVisual();
+          }
         });
       }
 
