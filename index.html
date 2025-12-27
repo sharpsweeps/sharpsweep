@@ -2128,17 +2128,12 @@
             const withMeta = list.map((ln) => {
               const key = makeLineKey({ sportId: sport.id, matchupName: matchup.name, label: ln.label, book: (ln.book || "Best Available") });
               const it = biasStore[key];
-              return { ln, swiped: !!(it && it.lastSwipedDayId === todayId) };
+              return { ln, hasStatus: !!(it && it.status) };
             });
 
-            const unswiped = withMeta.filter(x => !x.swiped).map(x => x.ln);
-            const swiped = withMeta.filter(x => x.swiped).map(x => x.ln);
+            const available = withMeta.filter(x => !x.hasStatus).map(x => x.ln);
 
-            unswiped.forEach((ln) => {
-              const card = buildLineCard({ ln, sport, matchup, context: allLines ? "allLines" : "matchupsTop" });
-              matchupsListEl.appendChild(card);
-            });
-            swiped.forEach((ln) => {
+            available.forEach((ln) => {
               const card = buildLineCard({ ln, sport, matchup, context: allLines ? "allLines" : "matchupsTop" });
               matchupsListEl.appendChild(card);
             });
@@ -2148,18 +2143,12 @@
           const withMeta = top.map((ln) => {
             const key = makeLineKey({ sportId: sport.id, matchupName: matchup.name, label: ln.label, book: (ln.book || "Best Available") });
             const it = biasStore[key];
-            return { ln, swiped: !!(it && it.lastSwipedDayId === todayId) };
+            return { ln, hasStatus: !!(it && it.status) };
           });
 
-          const unswiped = withMeta.filter(x => !x.swiped).map(x => x.ln);
-          const swiped = withMeta.filter(x => x.swiped).map(x => x.ln);
+          const available = withMeta.filter(x => !x.hasStatus).map(x => x.ln);
 
-          unswiped.forEach((ln) => {
-            const card = buildLineCard({ ln, sport, matchup, context: "matchupsTop" });
-            matchupsListEl.appendChild(card);
-          });
-
-          swiped.forEach((ln) => {
+          available.forEach((ln) => {
             const card = buildLineCard({ ln, sport, matchup, context: "matchupsTop" });
             matchupsListEl.appendChild(card);
           });
@@ -3497,8 +3486,8 @@
             return true;
           }
 
-          if (biasStore[key] && biasStore[key].lastSwipedDayId === todayId) {
-            showToast("Already swiped today");
+          if (biasStore[key] && biasStore[key].status) {
+            showToast("Already in MyBias");
             return false;
           }
 
@@ -3575,13 +3564,12 @@
 
             await trackSwipeInDB(key, vote, "mybias");
 
-            markCardDisabledAndDrop(card);
             const swipeEmoji = vote === "confident" ? "✅" : "🤔";
             showToast(`${vote === "confident" ? "Confident" : "Doubt It"} ${swipeEmoji}`);
 
             incrementFreshSwipes();
 
-            if (isCommunityUnlocked()) renderScreen();
+            renderScreen();
           } catch (err) {
             console.error('Error in finalizeSwipe:', err);
             showToast('Error saving swipe');
@@ -3638,13 +3626,13 @@
           }
 
           console.log('Swipe validated - animating card');
-          card.style.transition = "all 0.3s ease-out";
-          card.style.transform = "scale(0.95)";
-          card.style.opacity = "0.5";
+          card.style.transition = "all 0.25s ease-out";
+          card.style.transform = "scale(0.92)";
+          card.style.opacity = "0.3";
 
           setTimeout(async () => {
             await finalizeSwipe(direction);
-          }, 150);
+          }, 250);
         });
 
         card.addEventListener("pointercancel", () => {
