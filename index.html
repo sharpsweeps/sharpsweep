@@ -307,6 +307,123 @@
         margin-bottom: 16px;
       }
 
+      /* MyBias, MyLocks, MyArchive Pages */
+      .mybias-page, .mylocks-page, .myarchive-page {
+        display: none;
+        width: 100%;
+        max-width: 700px;
+        margin: 0 auto;
+      }
+      .mybias-page.active, .mylocks-page.active, .myarchive-page.active {
+        display: block;
+      }
+
+      .page-subtitle {
+        font-size: 12px;
+        color: var(--muted);
+        margin-bottom: 16px;
+        line-height: 1.5;
+      }
+
+      .feed-list {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .feed-card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 2px 8px var(--shadow);
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+
+      .feed-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 16px var(--shadow);
+      }
+
+      .feed-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 16px;
+      }
+
+      .feed-card-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 6px;
+      }
+
+      .feed-card-meta {
+        font-size: 13px;
+        color: var(--muted);
+        margin-bottom: 4px;
+      }
+
+      .feed-card-tag {
+        background: rgba(37, 99, 235, 0.1);
+        color: #2563eb;
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+      }
+
+      .feed-card-vote {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 12px;
+        padding: 12px;
+        border-radius: 12px;
+        font-size: 14px;
+        font-weight: 600;
+      }
+
+      .feed-card-vote.confident {
+        background: rgba(34, 197, 94, 0.1);
+        color: #22c55e;
+        border-left: 4px solid #22c55e;
+      }
+
+      .feed-card-vote.doubt {
+        background: rgba(59, 130, 246, 0.1);
+        color: #3b82f6;
+        border-left: 4px solid #3b82f6;
+      }
+
+      .feed-card-actions {
+        font-size: 11px;
+        color: var(--muted);
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid var(--border);
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 48px 24px;
+        color: var(--muted);
+      }
+
+      .empty-state-title {
+        font-size: 18px;
+        font-weight: 700;
+        margin-bottom: 8px;
+        color: var(--text);
+      }
+
+      .empty-state-text {
+        font-size: 14px;
+        line-height: 1.6;
+      }
+
       .line-details-header {
         display: flex;
         align-items: center;
@@ -1139,6 +1256,36 @@
             <div class="all-lines-subtitle" id="all-lines-subtitle"></div>
             <div class="matchups-list" id="all-lines-list"></div>
             <div class="back-footer-note" id="all-lines-footer-note"></div>
+          </div>
+
+          <!-- MYBIAS PAGE -->
+          <div class="mybias-page" id="mybias-page">
+            <div class="line-details-header">
+              <button id="mybias-back" class="line-details-back-btn" type="button">← Back</button>
+              <h2 id="mybias-title">MyBias</h2>
+            </div>
+            <div class="page-subtitle" id="mybias-subtitle"></div>
+            <div class="feed-list" id="mybias-list"></div>
+          </div>
+
+          <!-- MYLOCKS PAGE -->
+          <div class="mylocks-page" id="mylocks-page">
+            <div class="line-details-header">
+              <button id="mylocks-back" class="line-details-back-btn" type="button">← Back</button>
+              <h2 id="mylocks-title">MyLocks</h2>
+            </div>
+            <div class="page-subtitle" id="mylocks-subtitle"></div>
+            <div class="feed-list" id="mylocks-list"></div>
+          </div>
+
+          <!-- MYARCHIVE PAGE -->
+          <div class="myarchive-page" id="myarchive-page">
+            <div class="line-details-header">
+              <button id="myarchive-back" class="line-details-back-btn" type="button">← Back</button>
+              <h2 id="myarchive-title">MyArchive</h2>
+            </div>
+            <div class="page-subtitle" id="myarchive-subtitle"></div>
+            <div class="feed-list" id="myarchive-list"></div>
           </div>
         </div>
       </main>
@@ -2861,7 +3008,6 @@
         const stats = currentLineDetailStats;
         const meta = currentLineDetailMeta;
 
-        // Hide card container and title block
         const cardContainer = document.querySelector('.card-container');
         const titleBlock = document.querySelector('.title-block');
         const lineDetailsPage = document.getElementById('line-details-page');
@@ -2870,60 +3016,11 @@
         if (titleBlock) titleBlock.style.display = 'none';
         lineDetailsPage.classList.add('active');
 
-        // Update back button and title
         const lineDetailsTitle = document.getElementById('line-details-title');
         lineDetailsTitle.textContent = meta.label;
 
-        // Build line details content
         const contentEl = document.getElementById('line-details-content');
         contentEl.innerHTML = '';
-
-        // Build Advanced Features menu
-        const menuRow = document.createElement('div');
-        menuRow.className = 'details-menu-row';
-        menuRow.style.marginBottom = '16px';
-
-        const wrap = document.createElement('div');
-        wrap.className = 'details-menu-wrapper';
-
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'details-menu-button';
-        btn.textContent = 'Advanced Features ▾';
-
-        const menu = document.createElement('div');
-        menu.className = 'details-menu' + (detailsMenuOpen ? ' open' : '');
-
-        const items = buildLineDetailsFeatureItems();
-        items.forEach((it, idx) => {
-          const mi = document.createElement('div');
-          mi.className = 'details-menu-item';
-          mi.innerHTML = `<span>${it.label}</span><span class="pill">${it.pill}</span>`;
-          mi.addEventListener('click', (e) => {
-            e.stopPropagation();
-            detailsMenuOpen = false;
-            menu.classList.remove('open');
-            it.onClick && it.onClick();
-          });
-          menu.appendChild(mi);
-
-          if (idx === 2) {
-            const sep = document.createElement('div');
-            sep.className = 'details-menu-sep';
-            menu.appendChild(sep);
-          }
-        });
-
-        btn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          detailsMenuOpen = !detailsMenuOpen;
-          menu.classList.toggle('open', detailsMenuOpen);
-        });
-
-        wrap.appendChild(btn);
-        wrap.appendChild(menu);
-        menuRow.appendChild(wrap);
-        contentEl.appendChild(menuRow);
 
         // Card 1: Line Info
         const c1 = document.createElement('div');
@@ -2989,7 +3086,85 @@
           contentEl.appendChild(c4);
         }
 
-        // Show back button in header
+        const featureItems = buildLineDetailsFeatureItems();
+        featureItems.forEach((feature) => {
+          const card = document.createElement('div');
+          card.className = 'line-details-card';
+
+          const isAvailable = feature.pill === "On" ||
+                              (feature.pill === "Plus" && ["PLUS", "PRO", "ELITE"].includes(currentTier)) ||
+                              (feature.pill === "Pro" && ["PRO", "ELITE"].includes(currentTier)) ||
+                              (feature.pill === "Elite" && currentTier === "ELITE");
+
+          const isLocked = !currentUser || !isAvailable;
+
+          if (isLocked) {
+            card.style.opacity = currentUser ? "0.5" : "0.3";
+            card.style.cursor = "not-allowed";
+            card.style.pointerEvents = currentUser ? "auto" : "none";
+          } else {
+            card.style.cursor = "pointer";
+          }
+
+          const labelDiv = document.createElement('div');
+          labelDiv.className = 'line-details-label';
+          labelDiv.style.display = 'flex';
+          labelDiv.style.justifyContent = 'space-between';
+          labelDiv.style.alignItems = 'center';
+
+          const labelText = document.createElement('span');
+          labelText.textContent = feature.label;
+
+          const pillSpan = document.createElement('span');
+          pillSpan.className = 'pill';
+          pillSpan.textContent = feature.pill;
+          pillSpan.style.fontSize = '10px';
+          pillSpan.style.padding = '4px 8px';
+          pillSpan.style.borderRadius = '6px';
+          pillSpan.style.fontWeight = '700';
+          pillSpan.style.textTransform = 'uppercase';
+
+          if (feature.pill === "On") {
+            pillSpan.style.background = 'rgba(34, 197, 94, 0.2)';
+            pillSpan.style.color = '#22c55e';
+          } else if (feature.pill === "Plus") {
+            pillSpan.style.background = 'rgba(37, 99, 235, 0.2)';
+            pillSpan.style.color = '#2563eb';
+          } else if (feature.pill === "Pro") {
+            pillSpan.style.background = 'rgba(168, 85, 247, 0.2)';
+            pillSpan.style.color = '#a855f7';
+          } else if (feature.pill === "Elite") {
+            pillSpan.style.background = 'rgba(234, 179, 8, 0.2)';
+            pillSpan.style.color = '#eab308';
+          }
+
+          labelDiv.appendChild(labelText);
+          labelDiv.appendChild(pillSpan);
+          card.appendChild(labelDiv);
+
+          const description = document.createElement('div');
+          description.className = 'line-details-text';
+
+          if (!currentUser) {
+            description.textContent = "🔒 Sign in to access features";
+          } else if (!isAvailable) {
+            description.textContent = `🔒 Upgrade to ${feature.pill} tier to unlock this feature`;
+          } else {
+            description.textContent = `Click to view ${feature.label.toLowerCase()}`;
+          }
+
+          card.appendChild(description);
+
+          if (!isLocked) {
+            card.addEventListener('click', (e) => {
+              e.stopPropagation();
+              feature.onClick && feature.onClick();
+            });
+          }
+
+          contentEl.appendChild(card);
+        });
+
         backToSportsBtn.style.display = 'inline-flex';
       }
 
@@ -3155,6 +3330,235 @@
         allLinesPage.classList.remove('active');
         if (cardContainer) cardContainer.style.display = 'flex';
         if (titleBlock) titleBlock.style.display = 'block';
+      }
+
+      function showMyBiasPage() {
+        const cardContainer = document.querySelector('.card-container');
+        const titleBlock = document.querySelector('.title-block');
+        const mybiasPage = document.getElementById('mybias-page');
+
+        if (cardContainer) cardContainer.style.display = 'none';
+        if (titleBlock) titleBlock.style.display = 'none';
+        mybiasPage.classList.add('active');
+
+        const mybiasTitle = document.getElementById('mybias-title');
+        const mybiasSubtitle = document.getElementById('mybias-subtitle');
+        const mybiasList = document.getElementById('mybias-list');
+
+        const biasCount = Object.values(biasStore).filter(x => x.status === "inbox").length;
+        mybiasTitle.textContent = `MyBias (${biasCount})`;
+        mybiasSubtitle.textContent = "Your cart: Swipe right → MyLocks (checkout), swipe left → MyArchive (save for later). Double-click for details.";
+
+        mybiasList.innerHTML = "";
+
+        const items = Object.values(biasStore)
+          .filter((x) => x.status === "inbox")
+          .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+
+        if (!items.length) {
+          const empty = document.createElement("div");
+          empty.className = "empty-state";
+          empty.innerHTML = `
+            <div class="empty-state-title">Your cart is empty</div>
+            <div class="empty-state-text">Swipe lines in games first — then checkout (MyLocks) or save for later (MyArchive).</div>
+          `;
+          mybiasList.appendChild(empty);
+          return;
+        }
+
+        items.forEach((item) => {
+          const card = buildFeedCard(item, "mybias");
+          mybiasList.appendChild(card);
+        });
+      }
+
+      function hideMyBiasPage() {
+        const cardContainer = document.querySelector('.card-container');
+        const titleBlock = document.querySelector('.title-block');
+        const mybiasPage = document.getElementById('mybias-page');
+
+        mybiasPage.classList.remove('active');
+        if (cardContainer) cardContainer.style.display = 'flex';
+        if (titleBlock) titleBlock.style.display = 'block';
+      }
+
+      function showMyLocksPage() {
+        const cardContainer = document.querySelector('.card-container');
+        const titleBlock = document.querySelector('.title-block');
+        const mylocksPage = document.getElementById('mylocks-page');
+
+        if (cardContainer) cardContainer.style.display = 'none';
+        if (titleBlock) titleBlock.style.display = 'none';
+        mylocksPage.classList.add('active');
+
+        const mylocksTitle = document.getElementById('mylocks-title');
+        const mylocksSubtitle = document.getElementById('mylocks-subtitle');
+        const mylocksList = document.getElementById('mylocks-list');
+
+        const locksCount = Object.values(biasStore).filter(x => x.status === "lock").length;
+        mylocksTitle.textContent = `MyLocks (${locksCount})`;
+        mylocksSubtitle.textContent = "Checkout page: swipe left → back to MyBias (cart). Double-click for details. Hold to change bias.";
+
+        mylocksList.innerHTML = "";
+
+        const items = Object.values(biasStore)
+          .filter((x) => x.status === "lock")
+          .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+
+        if (!items.length) {
+          const empty = document.createElement("div");
+          empty.className = "empty-state";
+          empty.innerHTML = `
+            <div class="empty-state-title">No locks yet</div>
+            <div class="empty-state-text">Swipe lines right from MyBias to add them here.</div>
+          `;
+          mylocksList.appendChild(empty);
+          return;
+        }
+
+        items.forEach((item) => {
+          const card = buildFeedCard(item, "locks");
+          mylocksList.appendChild(card);
+        });
+      }
+
+      function hideMyLocksPage() {
+        const cardContainer = document.querySelector('.card-container');
+        const titleBlock = document.querySelector('.title-block');
+        const mylocksPage = document.getElementById('mylocks-page');
+
+        mylocksPage.classList.remove('active');
+        if (cardContainer) cardContainer.style.display = 'flex';
+        if (titleBlock) titleBlock.style.display = 'block';
+      }
+
+      function showMyArchivePage() {
+        const cardContainer = document.querySelector('.card-container');
+        const titleBlock = document.querySelector('.title-block');
+        const myarchivePage = document.getElementById('myarchive-page');
+
+        if (cardContainer) cardContainer.style.display = 'none';
+        if (titleBlock) titleBlock.style.display = 'none';
+        myarchivePage.classList.add('active');
+
+        const myarchiveTitle = document.getElementById('myarchive-title');
+        const myarchiveSubtitle = document.getElementById('myarchive-subtitle');
+        const myarchiveList = document.getElementById('myarchive-list');
+
+        const archiveCount = Object.values(biasStore).filter(x => x.status === "archived").length;
+        myarchiveTitle.textContent = `MyArchive (${archiveCount})`;
+        myarchiveSubtitle.textContent = "Save for later: swipe right → back to MyBias (cart). Double-click for details. Hold to change bias.";
+
+        myarchiveList.innerHTML = "";
+
+        const items = Object.values(biasStore)
+          .filter((x) => x.status === "archived")
+          .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+
+        if (!items.length) {
+          const empty = document.createElement("div");
+          empty.className = "empty-state";
+          empty.innerHTML = `
+            <div class="empty-state-title">Archive is empty</div>
+            <div class="empty-state-text">Swipe lines left from MyBias to save them here for later.</div>
+          `;
+          myarchiveList.appendChild(empty);
+          return;
+        }
+
+        items.forEach((item) => {
+          const card = buildFeedCard(item, "archive");
+          myarchiveList.appendChild(card);
+        });
+      }
+
+      function hideMyArchivePage() {
+        const cardContainer = document.querySelector('.card-container');
+        const titleBlock = document.querySelector('.title-block');
+        const myarchivePage = document.getElementById('myarchive-page');
+
+        myarchivePage.classList.remove('active');
+        if (cardContainer) cardContainer.style.display = 'flex';
+        if (titleBlock) titleBlock.style.display = 'block';
+      }
+
+      function buildFeedCard(item, context) {
+        const card = document.createElement("div");
+        card.className = "feed-card";
+
+        const header = document.createElement("div");
+        header.className = "feed-card-header";
+
+        const leftSection = document.createElement("div");
+
+        const title = document.createElement("div");
+        title.className = "feed-card-title";
+        title.textContent = item.lineLabel;
+
+        const meta = document.createElement("div");
+        meta.className = "feed-card-meta";
+        meta.textContent = `${item.matchupName} • ${item.sportName}`;
+
+        leftSection.appendChild(title);
+        leftSection.appendChild(meta);
+
+        const tag = document.createElement("div");
+        tag.className = "feed-card-tag";
+        tag.textContent = item.book || "Best Available";
+
+        header.appendChild(leftSection);
+        header.appendChild(tag);
+        card.appendChild(header);
+
+        const voteBox = document.createElement("div");
+        voteBox.className = `feed-card-vote ${item.vote === "confident" ? "confident" : "doubt"}`;
+        voteBox.textContent = item.vote === "confident" ? "✅ Confident" : "🤔 Doubt It";
+        card.appendChild(voteBox);
+
+        card.appendChild(buildSideBiasUI(
+          { sportIndex: item.sportIndex, matchupIndex: item.matchupIndex, label: item.lineLabel, category: item.category, book: item.book, forceUnlocked: true },
+          item.communityConfident ?? 50,
+          item.communityDoubt ?? 50
+        ));
+
+        const actions = document.createElement("div");
+        actions.className = "feed-card-actions";
+        if (context === "mybias") {
+          actions.textContent = "Swipe: right → MyLocks • left → MyArchive. Double-click: details. Hold: change.";
+        } else if (context === "locks") {
+          actions.textContent = "Swipe: left → back to MyBias. Double-click: details. Hold: change.";
+        } else if (context === "archive") {
+          actions.textContent = "Swipe: right → back to MyBias. Double-click: details. Hold: change.";
+        }
+        card.appendChild(actions);
+
+        card.addEventListener("dblclick", (e) => {
+          e.stopPropagation();
+          openLineDetails({
+            sportIndex: item.sportIndex,
+            matchupIndex: item.matchupIndex,
+            label: item.lineLabel,
+            category: item.category,
+            book: item.book,
+          });
+        });
+
+        if (context === "mybias") {
+          attachSwipeAndHoldHandlers(card, {
+            sportIndex: item.sportIndex,
+            matchupIndex: item.matchupIndex,
+            sportId: item.sportId,
+            sportName: item.sportName,
+            matchupName: item.matchupName,
+            label: item.lineLabel,
+            category: item.category,
+            book: item.book
+          }, { confident: item.communityConfident ?? 50, doubt: item.communityDoubt ?? 50 }, "mybias");
+        } else if (context === "locks" || context === "archive") {
+          attachHoldOnly(card, item, { allowFlip: true });
+        }
+
+        return card;
       }
 
       /*******************************
@@ -4127,6 +4531,9 @@
 
         if (mode !== "allLines") hideAllLinesPage();
         if (mode !== "lineDetails") hideLineDetailsPage();
+        if (mode !== "mybias") hideMyBiasPage();
+        if (mode !== "locks") hideMyLocksPage();
+        if (mode !== "archive") hideMyArchivePage();
 
         if (mode === "sports") {
           titleEl.textContent = "Select Your Sport";
@@ -4181,29 +4588,26 @@
           hideAllLinesPage();
           return;
         } else if (mode === "mybias") {
-          const biasCount = Object.values(biasStore).filter(x => x.status === "inbox").length;
-          titleEl.textContent = `MyBias (${biasCount})`;
-          subtitleEl.textContent = "Your cart";
-          backToSportsBtn.style.display = "inline-flex";
-
-          renderMyBiasFront();
-          renderMyBiasBack();
+          hideLineDetailsPage();
+          hideAllLinesPage();
+          hideMyLocksPage();
+          hideMyArchivePage();
+          showMyBiasPage();
+          return;
         } else if (mode === "locks") {
-          const locksCount = Object.values(biasStore).filter(x => x.status === "lock").length;
-          titleEl.textContent = `MyLocks (${locksCount})`;
-          subtitleEl.textContent = "Checkout page";
-          backToSportsBtn.style.display = "inline-flex";
-
-          renderLocksFront();
-          renderLocksBack();
+          hideLineDetailsPage();
+          hideAllLinesPage();
+          hideMyBiasPage();
+          hideMyArchivePage();
+          showMyLocksPage();
+          return;
         } else if (mode === "archive") {
-          const archiveCount = Object.values(biasStore).filter(x => x.status === "archived").length;
-          titleEl.textContent = `MyArchive (${archiveCount})`;
-          subtitleEl.textContent = "Save for later";
-          backToSportsBtn.style.display = "inline-flex";
-
-          renderArchiveFront();
-          renderArchiveBack();
+          hideLineDetailsPage();
+          hideAllLinesPage();
+          hideMyBiasPage();
+          hideMyLocksPage();
+          showMyArchivePage();
+          return;
         }
 
         renderCardFlipState();
@@ -4219,10 +4623,19 @@
           hideAllLinesPage();
           mode = "topLines";
           flipped = false;
-        } else if (mode === "topLines") {
+        } else if (mode === "mybias") {
+          hideMyBiasPage();
           mode = "sports";
           flipped = false;
-        } else if (mode === "mybias" || mode === "locks" || mode === "archive") {
+        } else if (mode === "locks") {
+          hideMyLocksPage();
+          mode = "sports";
+          flipped = false;
+        } else if (mode === "archive") {
+          hideMyArchivePage();
+          mode = "sports";
+          flipped = false;
+        } else if (mode === "topLines") {
           mode = "sports";
           flipped = false;
         } else {
@@ -4238,6 +4651,15 @@
 
       const allLinesBackBtn = document.getElementById('all-lines-back');
       allLinesBackBtn.addEventListener("click", () => handleGlobalBack());
+
+      const mybiasBackBtn = document.getElementById('mybias-back');
+      mybiasBackBtn.addEventListener("click", () => handleGlobalBack());
+
+      const mylocksBackBtn = document.getElementById('mylocks-back');
+      mylocksBackBtn.addEventListener("click", () => handleGlobalBack());
+
+      const myarchiveBackBtn = document.getElementById('myarchive-back');
+      myarchiveBackBtn.addEventListener("click", () => handleGlobalBack());
 
       /*******************************
        * CARD CLICK BEHAVIOR
@@ -4270,19 +4692,7 @@
           return;
         }
 
-        if (mode === "allLines") {
-          return;
-        }
-
-        if (mode === "mybias") {
-          return;
-        }
-
-        if (mode === "locks" || mode === "archive") {
-          if (zone >= 0.2 && zone <= 0.8) {
-            flipped = !flipped;
-            renderCardFlipState();
-          }
+        if (mode === "mybias" || mode === "locks" || mode === "archive" || mode === "allLines") {
           return;
         }
 
@@ -4302,16 +4712,7 @@
         const x = e.clientX - rect.left;
         const zone = x / rect.width;
 
-        if (mode === "lineDetails") {
-          handleGlobalBack();
-          return;
-        }
-
-        if (mode === "mybias" || mode === "locks" || mode === "archive") {
-          if (zone >= 0.2 && zone <= 0.8) {
-            flipped = !flipped;
-            renderCardFlipState();
-          }
+        if (mode === "lineDetails" || mode === "mybias" || mode === "locks" || mode === "archive" || mode === "allLines") {
           return;
         }
 
@@ -4327,7 +4728,10 @@
       }
 
       cardClickArea.addEventListener("click", (e) => {
-        if (flipped && (mode === "mybias" || mode === "locks" || mode === "archive" || mode === "topLines")) {
+        if (mode === "mybias" || mode === "locks" || mode === "archive" || mode === "allLines" || mode === "lineDetails") {
+          return;
+        }
+        if (flipped && mode === "topLines") {
           return;
         }
 
