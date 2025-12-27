@@ -482,6 +482,7 @@
         flex: 1;
         overflow-y: auto;
         padding-right: 4px;
+        max-height: 420px;
       }
 
       .matchup-card {
@@ -3338,9 +3339,11 @@
         let isDown = false;
         let isHorizontalGesture = false;
         let holdTimer = null;
+        let lastClickTime = 0;
 
-        const SWIPE_THRESHOLD = 20;
-        const INTENT_THRESHOLD = 5;
+        const SWIPE_THRESHOLD = 15;
+        const INTENT_THRESHOLD = 3;
+        const DOUBLE_CLICK_DELAY = 300;
 
         card.style.position = 'relative';
         card.style.touchAction = 'pan-y';
@@ -3375,18 +3378,6 @@
         doubtOverlay.style.pointerEvents = 'none';
         doubtOverlay.textContent = 'DOUBT IT 🤔';
         card.appendChild(doubtOverlay);
-
-        card.addEventListener("dblclick", (e) => {
-          e.stopPropagation();
-          e.preventDefault();
-          openLineDetails({
-            sportIndex: meta.sportIndex,
-            matchupIndex: meta.matchupIndex,
-            label: meta.label,
-            category: meta.category,
-            book: meta.book,
-          });
-        });
 
         card.addEventListener("pointerdown", (e) => {
           if (card.classList.contains("disabled")) return;
@@ -3461,7 +3452,7 @@
           const dy = lastY - startY;
 
           if (!isHorizontalGesture) {
-            if (Math.abs(dx) > INTENT_THRESHOLD && Math.abs(dx) > Math.abs(dy) * 1.5) {
+            if (Math.abs(dx) > INTENT_THRESHOLD && Math.abs(dx) > Math.abs(dy) * 0.8) {
               isHorizontalGesture = true;
               clearTimeout(holdTimer);
             }
@@ -3643,7 +3634,34 @@
 
           console.log('Pointer up:', { dx, dy, threshold: SWIPE_THRESHOLD });
 
-          const isValidSwipe = Math.abs(dx) >= SWIPE_THRESHOLD && Math.abs(dx) > Math.abs(dy) * 0.4;
+          const isValidSwipe = Math.abs(dx) >= SWIPE_THRESHOLD && Math.abs(dx) > Math.abs(dy) * 0.3;
+          const currentTime = Date.now();
+          const timeSinceLastClick = currentTime - lastClickTime;
+
+          if (!isValidSwipe && !isHorizontalGesture) {
+            console.log('Not a swipe - checking for double click');
+
+            if (timeSinceLastClick < DOUBLE_CLICK_DELAY) {
+              console.log('Double-click detected - opening line details');
+              e.stopPropagation();
+              e.preventDefault();
+              lastClickTime = 0;
+              openLineDetails({
+                sportIndex: meta.sportIndex,
+                matchupIndex: meta.matchupIndex,
+                label: meta.label,
+                category: meta.category,
+                book: meta.book,
+              });
+              return;
+            } else {
+              lastClickTime = currentTime;
+            }
+
+            card.style.transition = "all 0.25s ease-out";
+            resetCardVisual();
+            return;
+          }
 
           if (!isValidSwipe) {
             console.log('Invalid swipe - resetting card');
@@ -3665,14 +3683,15 @@
             return;
           }
 
-          console.log('Swipe validated - animating card');
-          card.style.transition = "all 0.25s ease-out";
-          card.style.transform = "scale(0.92)";
-          card.style.opacity = "0.3";
+          console.log('Swipe validated - throwing card');
+          card.style.transition = "all 0.3s cubic-bezier(0.4, 0.0, 1, 1)";
+          const throwDistance = direction === "right" ? 600 : -600;
+          card.style.transform = `translateX(${throwDistance}px) translateY(50px) rotate(${throwDistance * 0.08}deg)`;
+          card.style.opacity = "0";
 
           setTimeout(async () => {
             await finalizeSwipe(direction);
-          }, 250);
+          }, 300);
         });
 
         card.addEventListener("pointercancel", () => {
@@ -4221,8 +4240,8 @@
         let pointerId = null;
         let intentLocked = false;
 
-        const SWIPE_THRESHOLD = 20;
-        const INTENT_THRESHOLD = 5;
+        const SWIPE_THRESHOLD = 15;
+        const INTENT_THRESHOLD = 3;
 
         cardClickArea.addEventListener("pointerdown", (e) => {
           if (flipped) return;
