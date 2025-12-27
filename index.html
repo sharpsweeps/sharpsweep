@@ -284,6 +284,29 @@
         display: block;
       }
 
+      /* All Lines Page */
+      .all-lines-page {
+        display: none;
+        width: 100%;
+        max-width: 700px;
+        margin: 0 auto;
+      }
+      .all-lines-page.active {
+        display: block;
+      }
+
+      .all-lines-subtitle {
+        font-size: 12px;
+        color: var(--muted);
+        margin-bottom: 16px;
+        line-height: 1.5;
+      }
+
+      .all-lines-page .matchups-list {
+        margin-top: 0;
+        margin-bottom: 16px;
+      }
+
       .line-details-header {
         display: flex;
         align-items: center;
@@ -1105,6 +1128,17 @@
               <h2 id="line-details-title">Line Details</h2>
             </div>
             <div class="line-details-content" id="line-details-content"></div>
+          </div>
+
+          <!-- ALL LINES PAGE -->
+          <div class="all-lines-page" id="all-lines-page">
+            <div class="line-details-header">
+              <button id="all-lines-back" class="line-details-back-btn" type="button">← Back</button>
+              <h2 id="all-lines-title">All Lines</h2>
+            </div>
+            <div class="all-lines-subtitle" id="all-lines-subtitle"></div>
+            <div class="matchups-list" id="all-lines-list"></div>
+            <div class="back-footer-note" id="all-lines-footer-note"></div>
           </div>
         </div>
       </main>
@@ -3037,6 +3071,92 @@
         if (titleBlock) titleBlock.style.display = 'block';
       }
 
+      function showAllLinesPage() {
+        const sport = currentSport();
+        const matchup = currentMatchup();
+
+        const cardContainer = document.querySelector('.card-container');
+        const titleBlock = document.querySelector('.title-block');
+        const allLinesPage = document.getElementById('all-lines-page');
+
+        if (cardContainer) cardContainer.style.display = 'none';
+        if (titleBlock) titleBlock.style.display = 'none';
+        allLinesPage.classList.add('active');
+
+        const allLinesTitle = document.getElementById('all-lines-title');
+        const allLinesSubtitle = document.getElementById('all-lines-subtitle');
+        const allLinesList = document.getElementById('all-lines-list');
+        const allLinesFooterNote = document.getElementById('all-lines-footer-note');
+
+        allLinesTitle.textContent = `${sport.name} – All Lines`;
+        allLinesSubtitle.textContent = "Swipe a line: Doubt It (left) or Confident (right). Double-click a line for details.";
+        allLinesFooterNote.textContent = currentUser
+          ? (isCommunityUnlocked()
+              ? "Community SideBias unlocked (green)."
+              : `SideBias hidden until you swipe ${SWIPES_TO_UNLOCK_COMMUNITY} times (blue 50/50).`)
+          : "Login required to swipe.";
+
+        allLinesList.innerHTML = "";
+
+        const baseLines = matchup.lines || [];
+        let lines = baseLines.slice();
+
+        const todayId = getSwipeDayIdEST();
+
+        let altCounter = 1;
+        while (lines.length < 14 && baseLines.length > 0) {
+          const template = baseLines[(lines.length - baseLines.length) % baseLines.length];
+          const cat = ["spread","total","points","moneyline"].includes(template.category) ? "alt" : (template.category || "alt");
+          lines.push({ ...template, label: `${template.label} (Alt ${altCounter})`, category: cat });
+          altCounter++;
+        }
+
+        const grouped = {};
+        lines.forEach((ln) => {
+          const cat = ln.category || "other";
+          if (!grouped[cat]) grouped[cat] = [];
+          grouped[cat].push(ln);
+        });
+
+        CATEGORY_ORDER.forEach((catKey) => {
+          const list = grouped[catKey];
+          if (!list || !list.length) return;
+
+          const header = document.createElement("div");
+          header.className = "category-header";
+          header.textContent = CATEGORY_LABELS[catKey] || "Other";
+          allLinesList.appendChild(header);
+
+          const withMeta = list.map((ln) => {
+            const key = makeLineKey({ sportId: sport.id, matchupName: matchup.name, label: ln.label, book: (ln.book || "Best Available") });
+            const it = biasStore[key];
+            return { ln, swiped: !!(it && it.lastSwipedDayId === todayId) };
+          });
+
+          const unswiped = withMeta.filter(x => !x.swiped).map(x => x.ln);
+          const swiped = withMeta.filter(x => x.swiped).map(x => x.ln);
+
+          unswiped.forEach((ln) => {
+            const card = buildLineCard({ ln, sport, matchup, context: "allLines" });
+            allLinesList.appendChild(card);
+          });
+          swiped.forEach((ln) => {
+            const card = buildLineCard({ ln, sport, matchup, context: "allLines" });
+            allLinesList.appendChild(card);
+          });
+        });
+      }
+
+      function hideAllLinesPage() {
+        const cardContainer = document.querySelector('.card-container');
+        const titleBlock = document.querySelector('.title-block');
+        const allLinesPage = document.getElementById('all-lines-page');
+
+        allLinesPage.classList.remove('active');
+        if (cardContainer) cardContainer.style.display = 'flex';
+        if (titleBlock) titleBlock.style.display = 'block';
+      }
+
       /*******************************
        * FRESH SWIPES REQUIREMENT
        *******************************/
@@ -4005,6 +4125,9 @@
       function renderScreen() {
         navButtonsEl.innerHTML = "";
 
+        if (mode !== "allLines") hideAllLinesPage();
+        if (mode !== "lineDetails") hideLineDetailsPage();
+
         if (mode === "sports") {
           titleEl.textContent = "Select Your Sport";
           subtitleEl.textContent = "";
@@ -4032,7 +4155,7 @@
           allLinesBtn.textContent = "View All Lines";
           allLinesBtn.addEventListener("click", () => {
             mode = "allLines";
-            flipped = true;
+            flipped = false;
             renderScreen();
           });
 
@@ -4051,26 +4174,11 @@
           renderMatchupsFront();
           renderLinesBack({ allLines: false });
         } else if (mode === "allLines") {
-          const sport = currentSport();
-          const matchup = currentMatchup();
-          titleEl.textContent = `${sport.name} – All Lines`;
-          subtitleEl.textContent = matchup.name;
-          backToSportsBtn.style.display = "inline-flex";
-
-          const backBtn = document.createElement("button");
-          backBtn.className = "nav-btn";
-          backBtn.textContent = "← Back to Top Lines";
-          backBtn.addEventListener("click", () => {
-            mode = "topLines";
-            flipped = true;
-            renderScreen();
-          });
-
-          navButtonsEl.appendChild(backBtn);
-
-          renderMatchupsFront();
-          renderLinesBack({ allLines: true });
+          hideLineDetailsPage();
+          showAllLinesPage();
+          return;
         } else if (mode === "lineDetails") {
+          hideAllLinesPage();
           return;
         } else if (mode === "mybias") {
           const biasCount = Object.values(biasStore).filter(x => x.status === "inbox").length;
@@ -4108,8 +4216,9 @@
           mode = previousModeBeforeLineDetails;
           flipped = true;
         } else if (mode === "allLines") {
+          hideAllLinesPage();
           mode = "topLines";
-          flipped = true;
+          flipped = false;
         } else if (mode === "topLines") {
           mode = "sports";
           flipped = false;
@@ -4126,6 +4235,9 @@
 
       const lineDetailsBackBtn = document.getElementById('line-details-back');
       lineDetailsBackBtn.addEventListener("click", () => handleGlobalBack());
+
+      const allLinesBackBtn = document.getElementById('all-lines-back');
+      allLinesBackBtn.addEventListener("click", () => handleGlobalBack());
 
       /*******************************
        * CARD CLICK BEHAVIOR
@@ -4151,7 +4263,7 @@
           }
           if (zone >= 0.2 && zone <= 0.8 && !flipped) {
             mode = "allLines";
-            flipped = true;
+            flipped = false;
             renderScreen();
             return;
           }
@@ -4215,7 +4327,7 @@
       }
 
       cardClickArea.addEventListener("click", (e) => {
-        if (flipped && (mode === "mybias" || mode === "locks" || mode === "archive" || mode === "allLines" || mode === "topLines")) {
+        if (flipped && (mode === "mybias" || mode === "locks" || mode === "archive" || mode === "topLines")) {
           return;
         }
 
@@ -4291,7 +4403,7 @@
           if (mode === "matchups" || mode === "allLines") {
             if (dx < 0) currentMatchupIndex = getNextIndex(currentSport().matchups.length, currentMatchupIndex);
             else currentMatchupIndex = getPrevIndex(currentSport().matchups.length, currentMatchupIndex);
-            flipped = (mode === "allLines") ? true : false;
+            flipped = false;
             renderScreen();
             return;
           }
@@ -4336,7 +4448,7 @@
               currentSportIndex = sIndex;
               currentMatchupIndex = mIndex;
               mode = "allLines";
-              flipped = true;
+              flipped = false;
 
               sportsMenuEl.classList.remove("open");
               renderScreen();
