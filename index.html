@@ -3059,13 +3059,6 @@
         freshSwipesCount = 0;
         freshSwipesRequired = false;
 
-        if (currentUser) {
-          if (checkFreshSwipesRequired()) {
-            freshSwipesRequired = true;
-            showFreshSwipesOverlay();
-          }
-        }
-
         updateSwipeCounter();
       }
 
@@ -3153,26 +3146,15 @@
         const swipeCounterEl = document.getElementById('swipes-remaining');
         if (!swipeCounterEl) return;
 
-        if (!currentUser || !currentUserProfile) {
+        if (!currentUser) {
           swipeCounterEl.textContent = '--';
           return;
         }
 
-        if (freshSwipesRequired) {
-          swipeCounterEl.textContent = `${freshSwipesCount}/5 Fresh`;
-          return;
-        }
-
-        const tier = currentUserProfile.tier || 'FREE';
-        const limit = SWIPE_LIMITS[tier];
-        const used = currentUserProfile.swipes_used || 0;
-
-        if (limit === -1) {
-          swipeCounterEl.textContent = '∞ swipes';
-        } else {
-          const remaining = Math.max(0, limit - used);
-          swipeCounterEl.textContent = `${remaining} swipes`;
-        }
+        loadDailySwipeState();
+        const cap = getTierDailyCap();
+        const remaining = Math.max(0, cap - dailySwipeCount);
+        swipeCounterEl.textContent = `${remaining} today`;
       }
 
       async function incrementSwipeCount() {
@@ -3203,10 +3185,16 @@
             .update({ swipes_used: used + 1 })
             .eq('id', currentUser.id)
             .select()
-            .single();
+            .maybeSingle();
 
           if (error) {
             console.error('Error incrementing swipes:', error);
+            return false;
+          }
+
+          if (!data) {
+            console.error('No profile data returned after increment');
+            await loadUserProfile();
             return false;
           }
 
@@ -3508,12 +3496,6 @@
 
         async function finalizeSwipe(direction) {
           try {
-            const canSwipe = await incrementSwipeCount();
-            if (!canSwipe) {
-              console.log('Swipe blocked: incrementSwipeCount returned false');
-              renderScreen();
-              return;
-            }
 
             const todayId = getSwipeDayIdEST();
             const key = makeLineKey({
