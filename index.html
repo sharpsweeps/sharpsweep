@@ -497,8 +497,8 @@
       html[data-theme="dark"] .matchup-card { background: rgba(15, 23, 42, 0.98); }
 
       .matchup-card.disabled {
-        opacity: 0.45;
-        filter: grayscale(0.15);
+        opacity: 0.35;
+        filter: grayscale(0.3);
         pointer-events: none;
       }
 
@@ -2305,7 +2305,7 @@
             voteIndicator.style.color = "#22c55e";
             voteIndicator.textContent = "✅ Confident";
           } else {
-            voteIndicator.style.color = "#ef4444";
+            voteIndicator.style.color = "#3b82f6";
             voteIndicator.textContent = "🤔 Doubt It";
           }
 
@@ -2326,7 +2326,7 @@
           if (item.vote === "confident") {
             card.style.borderLeft = "3px solid #22c55e";
           } else {
-            card.style.borderLeft = "3px solid #ef4444";
+            card.style.borderLeft = "3px solid #3b82f6";
           }
 
           card.appendChild(buildSideBiasUI(
@@ -2449,7 +2449,7 @@
             if (item.vote === "confident") {
               card.style.borderLeft = "3px solid #22c55e";
             } else {
-              card.style.borderLeft = "3px solid #ef4444";
+              card.style.borderLeft = "3px solid #3b82f6";
             }
 
             card.appendChild(buildSideBiasUI(
@@ -2554,7 +2554,7 @@
             voteIndicator.style.color = "#22c55e";
             voteIndicator.textContent = "✅ Confident";
           } else {
-            voteIndicator.style.color = "#ef4444";
+            voteIndicator.style.color = "#3b82f6";
             voteIndicator.textContent = "🤔 Doubt It";
           }
 
@@ -2575,7 +2575,7 @@
           if (item.vote === "confident") {
             card.style.borderLeft = "3px solid #22c55e";
           } else {
-            card.style.borderLeft = "3px solid #ef4444";
+            card.style.borderLeft = "3px solid #3b82f6";
           }
 
           card.appendChild(buildSideBiasUI(
@@ -2889,11 +2889,11 @@
 
           const c4 = document.createElement('div');
           c4.className = 'line-details-card';
-          c4.style.background = 'linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(239, 68, 68, 0.1))';
+          c4.style.background = 'linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(59, 130, 246, 0.1))';
           c4.innerHTML = `
             <div class="line-details-label">Community Bias</div>
             <div class="line-details-text" style="font-weight: 700; color: #22c55e;">✅ Confident: ${confidentPct}%</div>
-            <div class="line-details-text" style="font-weight: 700; color: #ef4444;">🤔 Doubt It: ${doubtPct}%</div>
+            <div class="line-details-text" style="font-weight: 700; color: #3b82f6;">🤔 Doubt It: ${doubtPct}%</div>
           `;
           contentEl.appendChild(c4);
 
@@ -2953,7 +2953,7 @@
               <div class="line-details-text">Total: ${snapshot.total || 'N/A'} (${snapshot.total_odds || 'N/A'})</div>
               <div class="line-details-text" style="margin-top: 8px; font-weight: 600;">Community at that time:</div>
               <div class="line-details-text" style="color: #22c55e;">Confident: ${snapshot.confident_count} swipes</div>
-              <div class="line-details-text" style="color: #ef4444;">Doubt: ${snapshot.doubt_count} swipes</div>
+              <div class="line-details-text" style="color: #3b82f6;">Doubt: ${snapshot.doubt_count} swipes</div>
             `;
             contentEl.appendChild(c5);
           }
@@ -3236,10 +3236,17 @@
 
       function markCardDisabledAndDrop(cardEl) {
         cardEl.classList.add("disabled");
-        cardEl.style.transform = "";
-        cardEl.style.transition = "all 0.3s ease";
+        cardEl.style.transform = "scale(0.95)";
+        cardEl.style.transition = "all 0.5s ease";
         const parent = cardEl.parentElement;
-        if (parent) parent.appendChild(cardEl);
+        if (parent) {
+          setTimeout(() => {
+            parent.appendChild(cardEl);
+            setTimeout(() => {
+              cardEl.style.transform = "scale(1)";
+            }, 50);
+          }, 200);
+        }
       }
 
       function attachHoldOnly(card, item, opts = {}) {
@@ -3300,8 +3307,8 @@
         let isHorizontalGesture = false;
         let holdTimer = null;
 
-        const SWIPE_THRESHOLD = 25;
-        const INTENT_THRESHOLD = 6;
+        const SWIPE_THRESHOLD = 50;
+        const INTENT_THRESHOLD = 10;
 
         card.style.position = 'relative';
         card.style.touchAction = 'pan-y';
@@ -3329,7 +3336,7 @@
         doubtOverlay.style.transform = 'translateY(-50%) rotate(15deg)';
         doubtOverlay.style.fontSize = '28px';
         doubtOverlay.style.fontWeight = '900';
-        doubtOverlay.style.color = '#ef4444';
+        doubtOverlay.style.color = '#3b82f6';
         doubtOverlay.style.textShadow = '0 2px 4px rgba(0,0,0,0.2)';
         doubtOverlay.style.opacity = '0';
         doubtOverlay.style.transition = 'opacity 0.2s';
@@ -3429,26 +3436,26 @@
 
           if (isHorizontalGesture) {
             e.preventDefault();
-            const clamp = Math.max(-300, Math.min(300, dx));
+            const clamp = Math.max(-250, Math.min(250, dx));
             const absClamp = Math.abs(clamp);
-            const opacity = 1 - Math.min(0.2, absClamp / 400);
+            const opacity = 1 - Math.min(0.15, absClamp / 500);
 
-            card.style.transform = `translateX(${clamp}px) rotate(${clamp * 0.1}deg)`;
+            card.style.transform = `translateX(${clamp}px) rotate(${clamp * 0.05}deg)`;
             card.style.opacity = String(opacity);
             card.style.transition = 'none';
 
             if (absClamp >= SWIPE_THRESHOLD) {
               card.style.backgroundColor = clamp > 0
-                ? 'rgba(34, 197, 94, 0.3)'
-                : 'rgba(239, 68, 68, 0.3)';
-              card.style.borderColor = clamp > 0 ? '#22c55e' : '#ef4444';
-              card.style.borderWidth = '3px';
+                ? 'rgba(34, 197, 94, 0.25)'
+                : 'rgba(59, 130, 246, 0.25)';
+              card.style.borderColor = clamp > 0 ? '#22c55e' : '#3b82f6';
+              card.style.borderWidth = '2px';
 
               if (clamp > 0) {
-                confidentOverlay.style.opacity = String(Math.min(1, absClamp / 60));
+                confidentOverlay.style.opacity = String(Math.min(0.9, absClamp / 80));
                 doubtOverlay.style.opacity = '0';
               } else {
-                doubtOverlay.style.opacity = String(Math.min(1, absClamp / 60));
+                doubtOverlay.style.opacity = String(Math.min(0.9, absClamp / 80));
                 confidentOverlay.style.opacity = '0';
               }
             } else {
@@ -3608,7 +3615,7 @@
 
           console.log('Pointer up:', { dx, dy, threshold: SWIPE_THRESHOLD });
 
-          const isValidSwipe = Math.abs(dx) >= SWIPE_THRESHOLD && Math.abs(dx) > Math.abs(dy) * 1.2;
+          const isValidSwipe = Math.abs(dx) >= SWIPE_THRESHOLD && Math.abs(dx) > Math.abs(dy) * 0.8;
 
           if (!isValidSwipe) {
             console.log('Invalid swipe - resetting card');
@@ -3631,14 +3638,13 @@
           }
 
           console.log('Swipe validated - animating card');
-          const flyDistance = direction === "right" ? 500 : -500;
-          card.style.transition = "all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)";
-          card.style.transform = `translateX(${flyDistance}px) rotate(${flyDistance * 0.15}deg)`;
-          card.style.opacity = "0";
+          card.style.transition = "all 0.3s ease-out";
+          card.style.transform = "scale(0.95)";
+          card.style.opacity = "0.5";
 
           setTimeout(async () => {
             await finalizeSwipe(direction);
-          }, 280);
+          }, 150);
         });
 
         card.addEventListener("pointercancel", () => {
